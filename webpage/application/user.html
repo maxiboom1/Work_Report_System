@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Employee Work Report System</title>
+  <link rel="stylesheet" href="/assets/user.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div id="brand-title" class="brand-title" title="About Employee Work Report System">Work Reports</div>
+      <div id="crumb" class="crumb">Loading…</div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-logout" class="btn">Logout</button>
+    </div>
+  </header>
+
+  <main id="main" class="main" role="main">
+    <section class="content" role="region" aria-label="Employee work reporting">
+
+      <div class="tabbar" role="tablist" aria-label="Employee tabs">
+        <button id="tab-register" class="tabbtn active" type="button" role="tab" aria-selected="true">Register day</button>
+        <button id="tab-reports" class="tabbtn" type="button" role="tab" aria-selected="false">View reports</button>
+      </div>
+
+      <!-- TAB: Register day -->
+      <section id="panel-register" class="panel" role="tabpanel">
+        <div class="card">
+          <div class="card-title">New work entry</div>
+
+          <div class="form-grid">
+            <div class="field">
+              <div class="field-label">Work date</div>
+              <input id="work-date" class="select select-md" type="date" />
+            </div>
+            <div class="field">
+              <div class="field-label">Project</div>
+              <select id="project" class="select select-md"></select>
+            </div>
+            <div class="field">
+              <div class="field-label">Start</div>
+              <input id="start-time" class="select select-md" type="time" />
+            </div>
+            <div class="field">
+              <div class="field-label">End</div>
+              <input id="end-time" class="select select-md" type="time" />
+            </div>
+          </div>
+
+          <div class="field mt-10">
+            <div class="field-label">Notes</div>
+            <input id="notes" class="select select-md" type="text" placeholder="Optional notes..." />
+          </div>
+
+          <div class="row-actions">
+            <button id="btn-add" class="btn btn-open" type="button">Add entry</button>
+            <div id="status" class="crumb">Ready.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: View reports -->
+      <section id="panel-reports" class="panel" role="tabpanel" hidden>
+        <div class="card">
+          <div class="card-title">My entries</div>
+
+          <div class="form-grid mt-10">
+            <div class="field">
+              <div class="field-label">Month</div>
+              <input id="rep-month" class="select select-md" type="month" />
+            </div>
+          </div>
+
+          <div id="rep-entries" class="entries mt-12"></div>
+
+          <div id="empty" class="empty" hidden>
+            <div class="empty-title">No entries</div>
+            <div class="empty-sub">No work entries for selected month.</div>
+          </div>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <script src="/assets/user.js"></script>
+</body>
+</html>

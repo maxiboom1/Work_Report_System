@@ -1,0 +1,7 @@
+node_modules/
+uploads/
+*.zip
+logs/
+dist/
+build/
+config.json

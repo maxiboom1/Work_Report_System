@@ -1,0 +1,32 @@
+{
+  "name": "employee_work_report_system",
+  "version": "1.0.3",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "bin": "build/app.cjs",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "build:exe": "node scripts/build-cjs.mjs && pkg . --targets node18-win-x64 --output dist/employee-work-report.exe"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mssql": "^10.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.2",
+    "nodemon": "^3.1.10",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "assets": [
+      "webpage/**/*"
+    ]
+  }
+}
