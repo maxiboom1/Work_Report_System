@@ -69,6 +69,14 @@ function isSameLocalDay(a, b) {
          a.getDate() === b.getDate();
 }
 
+function localTodayISO() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function parseISODateToLocalNoon(dateIso) {
   const [y,m,d] = dateIso.split("-").map(Number);
   return new Date(y, m-1, d, 12, 0, 0, 0);
@@ -91,6 +99,7 @@ class AppService {
     const password = String(payload?.password || "");
     const passport_id = String(payload?.passport_id || "").trim();
     const card_id = String(payload?.card_id || "").trim();
+    const car_id = String(payload?.car_id || "").trim();
     // Admin is a system user and is not managed from the Employees tab.
     // All accounts created from the admin UI are employees.
     const role = "employee";
@@ -114,6 +123,7 @@ class AppService {
       last_name,
       passport_id: passport_id || null,
       card_id: card_id || null,
+      car_id: car_id || null,
       daily_rate,
       login,
       password_hash,
@@ -145,6 +155,8 @@ class AppService {
     if (payload?.login !== undefined) patch.login = String(payload.login || "").trim();
     if (payload?.passport_id !== undefined) patch.passport_id = String(payload.passport_id || "").trim();
     if (payload?.card_id !== undefined) patch.card_id = String(payload.card_id || "").trim();
+    if (payload?.car_id !== undefined) patch.car_id = String(payload.car_id || "").trim();
+    if (payload?.car_id !== undefined) patch.car_id = String(payload.car_id || "").trim();
     // role is not editable for employees in this system
     if (payload?.daily_rate !== undefined) patch.daily_rate = Number(payload.daily_rate);
     if (payload?.password !== undefined && String(payload.password).length > 0) {
@@ -252,7 +264,18 @@ class AppService {
     const range = monthRange(month);
     if (!range) return { ok: false, status: 400, message: "Invalid month (expected YYYY-MM)" };
     const rows = await sqlService.listWorkEntriesForEmployee(user.uid, range.from, range.to);
-    return { ok: true, entries: rows };
+
+    const now = new Date();
+    const todayIso = localTodayISO();
+    const entries = (rows || []).map((r) => {
+      // UI rule: show Edit only for today's work entries.
+      const can_edit = String(r?.work_date || "") === todayIso;
+      // Never expose admin_notes to employees.
+      const { admin_notes, ...safe } = r;
+      return { ...safe, can_edit };
+    });
+
+    return { ok: true, entries };
   }
 
   async createMyEntry(user, payload) {
@@ -304,27 +327,22 @@ class AppService {
     if (!existing) return { ok: false, status: 404, message: "Entry not found" };
     if (existing.employee_id !== user.uid) return { ok: false, status: 403, message: "Forbidden" };
 
-    // Employees can edit only on the same local calendar day as creation.
-    const createdAt = existing.created_at ? new Date(existing.created_at) : null;
-    if (!createdAt) return { ok: false, status: 500, message: "Entry missing created_at" };
-    const now = new Date();
-    if (!isSameLocalDay(createdAt, now)) {
+    // Employees can edit only today's work entries (local day). Past dates are locked.
+    const todayIso = localTodayISO();
+    if (String(existing.work_date || "") !== todayIso) {
       return { ok: false, status: 403, message: "Editing window expired" };
     }
 
     const patch = {};
-    if (payload?.work_date !== undefined) patch.work_date = parseISODate(payload.work_date);
+    // NOTE: Employees cannot edit work_date (date is locked once created).
     if (payload?.start_time !== undefined) patch.start_time = parseTime(payload.start_time);
     if (payload?.end_time !== undefined) patch.end_time = parseTime(payload.end_time);
     if (payload?.project_id !== undefined) patch.project_id = toInt(payload.project_id);
     if (payload?.notes !== undefined) patch.notes = String(payload.notes || "");
 
     // Validate times if both present or if one present + existing
-    const finalWorkDate = patch.work_date ?? existing.work_date;
+    const finalWorkDate = String(existing.work_date);
     if (!finalWorkDate) return { ok: false, status: 400, message: "Invalid work_date" };
-    if (isFutureDateISO(String(finalWorkDate))) {
-      return { ok: false, status: 400, message: "work_date cannot be in the future" };
-    }
 
     const st = patch.start_time ?? existing.start_time;
     const et = patch.end_time ?? existing.end_time;

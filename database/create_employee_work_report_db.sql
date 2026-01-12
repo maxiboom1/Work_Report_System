@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.0.4
+   Version: v1.0.5
 
    Tables:
      - employees
@@ -42,6 +42,7 @@ CREATE TABLE dbo.[employees] (
   [last_name]     NVARCHAR(100) NOT NULL,
   [passport_id]  NVARCHAR(50) NULL,
   [card_id]      NVARCHAR(50) NULL,
+  [car_id]       NVARCHAR(50) NULL,
   [daily_rate]   DECIMAL(12,2) NOT NULL CONSTRAINT DF_employees_daily_rate DEFAULT (0),
   [login]         NVARCHAR(100) NOT NULL,
   [password_hash] NVARCHAR(255) NOT NULL,

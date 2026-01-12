@@ -96,6 +96,7 @@ function fillEmployeeEdit(e) {
   $id("emp-edit-last").value = e?.last_name || "";
   $id("emp-edit-passport").value = e?.passport_id || "";
   $id("emp-edit-card").value = e?.card_id || "";
+  $id("emp-edit-car").value = e?.car_id || "";
   $id("emp-edit-rate").value = (e?.daily_rate ?? "");
   $id("emp-edit-login").value = e?.login || "";
   $id("emp-edit-pass").value = "";
@@ -122,6 +123,9 @@ async function createEmployee() {
   const payload = {
     first_name: $id("emp-add-first").value,
     last_name: $id("emp-add-last").value,
+    passport_id: $id("emp-add-passport").value,
+    card_id: $id("emp-add-card").value,
+    car_id: $id("emp-add-car").value,
     daily_rate: Number($id("emp-add-rate").value),
     login: $id("emp-add-login").value,
     password: $id("emp-add-pass").value,
@@ -137,10 +141,12 @@ async function saveEmployee() {
   const payload = {
     first_name: $id("emp-edit-first").value,
     last_name: $id("emp-edit-last").value,
+    passport_id: $id("emp-edit-passport").value,
+    card_id: $id("emp-edit-card").value,
+    car_id: $id("emp-edit-car").value,
     daily_rate: Number($id("emp-edit-rate").value),
     login: $id("emp-edit-login").value,
     password: $id("emp-edit-pass").value,
-    is_active: $id("emp-edit-active").value === "1",
   };
   const r = await api(`/admin/employees/${selectedEmployee.id}`, { method: "PUT", body: JSON.stringify(payload) });
   $id("emp-edit-note").textContent = r.message || "Saved";
