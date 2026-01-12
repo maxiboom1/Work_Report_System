@@ -497,3 +497,10 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
   border-bottom: none;
 }
 .table tbody tr.summary-row:hover{ background: rgba(79,140,255,0.12); }
+
+
+/* --- Reports table inline controls --- */
+.btn.btn-mini{ padding: 6px 10px; font-size: 12px; line-height: 1; }
+.input.input-compact{ padding: 6px 10px; font-size: 12px; width: 100%; }
+.actions-td{ white-space: nowrap; }
+.actions-td .btn{ margin-right: 6px; }

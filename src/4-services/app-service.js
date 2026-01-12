@@ -3,6 +3,7 @@
 
 import bcrypt from "bcryptjs";
 import sqlService from "./sql-service.js";
+import logger from "../3-utilities/logger.js";
 
 function toInt(v) {
   const n = Number(v);
@@ -51,6 +52,28 @@ function monthRange(month) {
   return { from, to };
 }
 
+
+
+function isFutureDateISO(dateIso) {
+  // dateIso: YYYY-MM-DD
+  const [y,m,d] = dateIso.split("-").map(Number);
+  const dt = new Date(y, m-1, d, 12, 0, 0, 0); // noon local
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0, 0);
+  return dt.getTime() > today.getTime();
+}
+
+function isSameLocalDay(a, b) {
+  return a.getFullYear() === b.getFullYear() &&
+         a.getMonth() === b.getMonth() &&
+         a.getDate() === b.getDate();
+}
+
+function parseISODateToLocalNoon(dateIso) {
+  const [y,m,d] = dateIso.split("-").map(Number);
+  return new Date(y, m-1, d, 12, 0, 0, 0);
+}
+
 class AppService {
   /* =========================
      EMPLOYEES (ADMIN)
@@ -66,17 +89,19 @@ class AppService {
     const last_name = String(payload?.last_name || "").trim();
     const login = String(payload?.login || "").trim();
     const password = String(payload?.password || "");
+    const passport_id = String(payload?.passport_id || "").trim();
+    const card_id = String(payload?.card_id || "").trim();
     // Admin is a system user and is not managed from the Employees tab.
     // All accounts created from the admin UI are employees.
     const role = "employee";
-    const is_active = payload?.is_active === 0 ? 0 : 1;
+    const is_active = 1;
 
     const daily_rate = Number(payload?.daily_rate);
     if (!first_name || !last_name || !login || !password) {
       return { ok: false, status: 400, message: "Missing required fields" };
     }
-    if (!Number.isFinite(daily_rate) || daily_rate < 0) {
-      return { ok: false, status: 400, message: "Invalid daily_rate" };
+    if (!Number.isFinite(daily_rate) || daily_rate <= 0) {
+      return { ok: false, status: 400, message: "Invalid daily_rate (must be > 0)" };
     }
     // role is always employee here
 
@@ -87,6 +112,8 @@ class AppService {
     const id = await sqlService.createEmployee({
       first_name,
       last_name,
+      passport_id: passport_id || null,
+      card_id: card_id || null,
       daily_rate,
       login,
       password_hash,
@@ -94,7 +121,11 @@ class AppService {
       is_active,
     });
 
-    if (!id) return { ok: false, status: 500, message: "Failed to create employee" };
+    if (!id) {
+      logger(`[ADMIN] Failed to create employee (login=${login})`, "red");
+      return { ok: false, status: 500, message: "Failed to create employee" };
+    }
+    logger(`[ADMIN] Employee created id=${id} login=${login}`);
     return { ok: true, id, message: "Employee created" };
   }
 
@@ -112,15 +143,16 @@ class AppService {
     if (payload?.first_name !== undefined) patch.first_name = String(payload.first_name || "").trim();
     if (payload?.last_name !== undefined) patch.last_name = String(payload.last_name || "").trim();
     if (payload?.login !== undefined) patch.login = String(payload.login || "").trim();
+    if (payload?.passport_id !== undefined) patch.passport_id = String(payload.passport_id || "").trim();
+    if (payload?.card_id !== undefined) patch.card_id = String(payload.card_id || "").trim();
     // role is not editable for employees in this system
-    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
     if (payload?.daily_rate !== undefined) patch.daily_rate = Number(payload.daily_rate);
     if (payload?.password !== undefined && String(payload.password).length > 0) {
       patch.password_hash = await bcrypt.hash(String(payload.password), 10);
     }
 
-    if (patch.daily_rate !== undefined && (!Number.isFinite(patch.daily_rate) || patch.daily_rate < 0)) {
-      return { ok: false, status: 400, message: "Invalid daily_rate" };
+    if (patch.daily_rate !== undefined && (!Number.isFinite(patch.daily_rate) || patch.daily_rate <= 0)) {
+      return { ok: false, status: 400, message: "Invalid daily_rate (must be > 0)" };
     }
     // role is not editable
     if (patch.login) {
@@ -131,7 +163,11 @@ class AppService {
     }
 
     const affected = await sqlService.updateEmployee(employeeId, patch);
-    if (!affected) return { ok: false, status: 404, message: "Employee not found" };
+    if (!affected) {
+      logger(`[ADMIN] Failed to update employee id=${employeeId}`, "red");
+      return { ok: false, status: 404, message: "Employee not found" };
+    }
+    logger(`[ADMIN] Employee updated id=${employeeId}`);
     return { ok: true, message: "Employee updated" };
   }
 
@@ -144,7 +180,11 @@ class AppService {
       return { ok: false, status: 403, message: "Cannot delete admin account" };
     }
     const affected = await sqlService.deleteEmployee(employeeId);
-    if (!affected) return { ok: false, status: 404, message: "Employee not found" };
+    if (!affected) {
+      logger(`[ADMIN] Failed to update employee id=${employeeId}`, "red");
+      return { ok: false, status: 404, message: "Employee not found" };
+    }
+    logger(`[ADMIN] Employee deleted id=${employeeId}`);
     return { ok: true, message: "Employee deleted" };
   }
 
@@ -170,7 +210,11 @@ class AppService {
     const n = String(name || "").trim();
     if (!n) return { ok: false, status: 400, message: "Missing project name" };
     const id = await sqlService.createProject(n);
-    if (!id) return { ok: false, status: 500, message: "Failed to create project" };
+    if (!id) {
+      logger(`[ADMIN] Failed to create project (name=${n})`, "red");
+      return { ok: false, status: 500, message: "Failed to create project" };
+    }
+    logger(`[ADMIN] Project created id=${id} name=${n}`);
     return { ok: true, id, message: "Project created" };
   }
 
@@ -179,9 +223,12 @@ class AppService {
     if (!projectId) return { ok: false, status: 400, message: "Invalid project id" };
     const p = {};
     if (patch?.name !== undefined) p.name = String(patch.name || "").trim();
-    if (patch?.is_active !== undefined) p.is_active = patch.is_active ? 1 : 0;
     const affected = await sqlService.updateProject(projectId, p);
-    if (!affected) return { ok: false, status: 404, message: "Project not found" };
+    if (!affected) {
+      logger(`[ADMIN] Failed to update project id=${projectId}`, "red");
+      return { ok: false, status: 404, message: "Project not found" };
+    }
+    logger(`[ADMIN] Project updated id=${projectId}`);
     return { ok: true, message: "Project updated" };
   }
 
@@ -189,7 +236,11 @@ class AppService {
     const projectId = toInt(id);
     if (!projectId) return { ok: false, status: 400, message: "Invalid project id" };
     const affected = await sqlService.deleteProject(projectId);
-    if (!affected) return { ok: false, status: 404, message: "Project not found" };
+    if (!affected) {
+      logger(`[ADMIN] Failed to delete project id=${projectId}`, "red");
+      return { ok: false, status: 404, message: "Project not found" };
+    }
+    logger(`[ADMIN] Project deleted id=${projectId}`);
     return { ok: true, message: "Project deleted" };
   }
 
@@ -214,6 +265,9 @@ class AppService {
     if (!work_date || !start_time || !end_time || !project_id) {
       return { ok: false, status: 400, message: "Missing/invalid fields" };
     }
+    if (isFutureDateISO(work_date)) {
+      return { ok: false, status: 400, message: "work_date cannot be in the future" };
+    }
 
     const mins = minutesBetween(start_time, end_time);
     if (mins <= 0) return { ok: false, status: 400, message: "end_time must be after start_time" };
@@ -222,6 +276,9 @@ class AppService {
     const project = await sqlService.getProjectById(project_id);
     if (!project) return { ok: false, status: 400, message: "Invalid project" };
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
+
+    const overlapId = await sqlService.findOverlappingWorkEntries(user.uid, work_date, start_time, end_time, null);
+    if (overlapId) return { ok: false, status: 409, message: "Overlapping entry exists for this date/time" };
 
     const id = await sqlService.createWorkEntry({
       employee_id: user.uid,
@@ -232,7 +289,11 @@ class AppService {
       notes,
     });
 
-    if (!id) return { ok: false, status: 500, message: "Failed to create work entry" };
+    if (!id) {
+      logger(`[USER] Failed to create entry user=${user.uid} date=${work_date}`, "red");
+      return { ok: false, status: 500, message: "Failed to create work entry" };
+    }
+    logger(`[USER] Entry created id=${id} user=${user.uid} date=${work_date} project=${project_id}`);
     return { ok: true, id, message: "Work entry created" };
   }
 
@@ -243,6 +304,14 @@ class AppService {
     if (!existing) return { ok: false, status: 404, message: "Entry not found" };
     if (existing.employee_id !== user.uid) return { ok: false, status: 403, message: "Forbidden" };
 
+    // Employees can edit only on the same local calendar day as creation.
+    const createdAt = existing.created_at ? new Date(existing.created_at) : null;
+    if (!createdAt) return { ok: false, status: 500, message: "Entry missing created_at" };
+    const now = new Date();
+    if (!isSameLocalDay(createdAt, now)) {
+      return { ok: false, status: 403, message: "Editing window expired" };
+    }
+
     const patch = {};
     if (payload?.work_date !== undefined) patch.work_date = parseISODate(payload.work_date);
     if (payload?.start_time !== undefined) patch.start_time = parseTime(payload.start_time);
@@ -251,6 +320,12 @@ class AppService {
     if (payload?.notes !== undefined) patch.notes = String(payload.notes || "");
 
     // Validate times if both present or if one present + existing
+    const finalWorkDate = patch.work_date ?? existing.work_date;
+    if (!finalWorkDate) return { ok: false, status: 400, message: "Invalid work_date" };
+    if (isFutureDateISO(String(finalWorkDate))) {
+      return { ok: false, status: 400, message: "work_date cannot be in the future" };
+    }
+
     const st = patch.start_time ?? existing.start_time;
     const et = patch.end_time ?? existing.end_time;
 
@@ -260,25 +335,59 @@ class AppService {
     const project = await sqlService.getProjectById(finalProjectId);
     if (!project) return { ok: false, status: 400, message: "Invalid project" };
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
+    const overlapId = await sqlService.findOverlappingWorkEntries(user.uid, String(finalWorkDate), String(st), String(et), id);
+    if (overlapId) return { ok: false, status: 409, message: "Overlapping entry exists for this date/time" };
+
     const mins = minutesBetween(String(st), String(et));
     if (mins <= 0) return { ok: false, status: 400, message: "end_time must be after start_time" };
 
     const affected = await sqlService.updateWorkEntry(id, patch);
     if (!affected) return { ok: false, status: 404, message: "Entry not found" };
+    logger(`[USER] Entry updated id=${id} user=${user.uid}`);
     return { ok: true, message: "Work entry updated" };
   }
 
   async deleteMyEntry(user, entryId) {
     const id = toInt(entryId);
     if (!id) return { ok: false, status: 400, message: "Invalid entry id" };
-    const existing = await sqlService.getWorkEntryById(id);
-    if (!existing) return { ok: false, status: 404, message: "Entry not found" };
-    if (existing.employee_id !== user.uid) return { ok: false, status: 403, message: "Forbidden" };
-
-    const affected = await sqlService.deleteWorkEntry(id);
-    if (!affected) return { ok: false, status: 404, message: "Entry not found" };
-    return { ok: true, message: "Work entry deleted" };
+    // Employee deletion is not allowed in this version (audit & HR control).
+    logger(`[USER] Forbidden delete attempt entry=${id} user=${user.uid}`, "yellow");
+    return { ok: false, status: 403, message: "Employees cannot delete work entries" };
   }
+
+
+/* =========================
+   WORK ENTRIES (ADMIN)
+   ========================= */
+
+async adminDeleteWorkEntry(entryId) {
+  const id = toInt(entryId);
+  if (!id) return { ok: false, status: 400, message: "Invalid entry id" };
+  const existing = await sqlService.getWorkEntryById(id);
+  if (!existing) return { ok: false, status: 404, message: "Entry not found" };
+  const affected = await sqlService.deleteWorkEntry(id);
+  if (!affected) {
+    logger(`[ADMIN] Failed to delete work entry id=${id}`, "red");
+    return { ok: false, status: 404, message: "Entry not found" };
+  }
+  logger(`[ADMIN] Work entry deleted id=${id} employee=${existing.employee_id} date=${existing.work_date}`);
+  return { ok: true, message: "Work entry deleted" };
+}
+
+async adminUpdateWorkEntryAdminNotes(entryId, adminNotes) {
+  const id = toInt(entryId);
+  if (!id) return { ok: false, status: 400, message: "Invalid entry id" };
+  const existing = await sqlService.getWorkEntryById(id);
+  if (!existing) return { ok: false, status: 404, message: "Entry not found" };
+  const notes = String(adminNotes || "");
+  const affected = await sqlService.updateWorkEntryAdminNotes(id, notes);
+  if (!affected) {
+    logger(`[ADMIN] Failed to update admin_notes for entry id=${id}`, "red");
+    return { ok: false, status: 404, message: "Entry not found" };
+  }
+  logger(`[ADMIN] admin_notes updated entry id=${id}`);
+  return { ok: true, message: "Admin notes updated" };
+}
 
   /* =========================
      REPORTS (ADMIN)

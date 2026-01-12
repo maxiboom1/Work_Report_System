@@ -64,22 +64,7 @@ function makeEntryCard(e) {
   meta.appendChild(time);
   if (notes.textContent.trim()) meta.appendChild(notes);
 
-  const actions = document.createElement("div");
-  actions.className = "entry-actions";
-
-  const btnDel = document.createElement("button");
-  btnDel.className = "btn";
-  btnDel.type = "button";
-  btnDel.textContent = "Delete";
-  btnDel.addEventListener("click", async () => {
-    if (!confirm("Delete this entry?")) return;
-    await api(`/my/work-entries/${e.id}`, { method: "DELETE" });
-    await loadEntries();
-  });
-
-  actions.appendChild(btnDel);
   card.appendChild(meta);
-  card.appendChild(actions);
   return card;
 }
 
@@ -123,9 +108,14 @@ async function loadEntries() {
 }
 
 async function addEntry() {
+  const wd = $id("work-date").value;
+  if (wd && wd > todayISO()) {
+    throw new Error("Work date cannot be in the future");
+  }
+
   const payload = {
     project_id: Number($id("project").value || 0),
-    work_date: $id("work-date").value,
+    work_date: wd,
     start_time: $id("start-time").value,
     end_time: $id("end-time").value,
     notes: $id("notes").value,
@@ -149,6 +139,7 @@ async function logout() {
 async function init() {
   $id("rep-month").value = todayMonth();
   $id("work-date").value = todayISO();
+  $id("work-date").max = todayISO();
   $id("start-time").value = "09:00";
   $id("end-time").value = "17:00";
 

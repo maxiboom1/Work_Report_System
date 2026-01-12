@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.0.3
+   Version: v1.0.4
 
    Tables:
      - employees
@@ -40,6 +40,8 @@ CREATE TABLE dbo.[employees] (
   [id]            INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_employees PRIMARY KEY,
   [first_name]    NVARCHAR(100) NOT NULL,
   [last_name]     NVARCHAR(100) NOT NULL,
+  [passport_id]  NVARCHAR(50) NULL,
+  [card_id]      NVARCHAR(50) NULL,
   [daily_rate]   DECIMAL(12,2) NOT NULL CONSTRAINT DF_employees_daily_rate DEFAULT (0),
   [login]         NVARCHAR(100) NOT NULL,
   [password_hash] NVARCHAR(255) NOT NULL,
@@ -72,6 +74,7 @@ CREATE TABLE dbo.[work_entries] (
   [start_time]  TIME(0) NOT NULL,
   [end_time]    TIME(0) NOT NULL,
   [notes]       NVARCHAR(1000) NOT NULL CONSTRAINT DF_work_entries_notes DEFAULT (''),
+  [admin_notes] NVARCHAR(1000) NOT NULL CONSTRAINT DF_work_entries_admin_notes DEFAULT (''),
   [created_at]  DATETIME2 NOT NULL CONSTRAINT DF_work_entries_created_at DEFAULT (SYSUTCDATETIME()),
   [updated_at]  DATETIME2 NOT NULL CONSTRAINT DF_work_entries_updated_at DEFAULT (SYSUTCDATETIME())
 );

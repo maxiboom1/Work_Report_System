@@ -1,3 +1,22 @@
+function closeAllAccordions(scopeEl = document) {
+  scopeEl.querySelectorAll("details.acc").forEach((d) => { d.open = false; });
+}
+
+function initAccordions() {
+  // Start with all closed
+  closeAllAccordions(document);
+
+  document.querySelectorAll("details.acc").forEach((d) => {
+    d.addEventListener("toggle", () => {
+      if (!d.open) return;
+      // Close other accordions inside the same tab panel
+      const panel = d.closest(".tab-panel") || document;
+      panel.querySelectorAll("details.acc").forEach((other) => {
+        if (other !== d) other.open = false;
+      });
+    });
+  });
+}
 /* =========================================================
    Employee Work Report System — Admin UI
    ========================================================= */
@@ -75,10 +94,11 @@ function fillEmployeeEdit(e) {
   $id("emp-selected").textContent = e ? `${e.last_name}, ${e.first_name}` : "None";
   $id("emp-edit-first").value = e?.first_name || "";
   $id("emp-edit-last").value = e?.last_name || "";
+  $id("emp-edit-passport").value = e?.passport_id || "";
+  $id("emp-edit-card").value = e?.card_id || "";
   $id("emp-edit-rate").value = (e?.daily_rate ?? "");
   $id("emp-edit-login").value = e?.login || "";
   $id("emp-edit-pass").value = "";
-  $id("emp-edit-active").value = (e?.is_active ? "1" : "0");
 }
 
 function selectEmployee(id) {
@@ -299,24 +319,115 @@ async function runStats() {
 
     const r = await api(`/admin/reports/employee/${empId}?month=${encodeURIComponent(month)}`);
 
-    const rows = (r.rows || []).map((x) => [
-      String(x.work_date).slice(0, 10),
-      String(x.start_time).slice(0, 5),
-      String(x.end_time).slice(0, 5),
-      x.project_name,
-      x.notes || "",
-    ]);
+    const rows = (r.rows || []);
 
+    // Build table with editable admin notes + row delete (admin only)
+    const table = document.createElement("table");
+    table.className = "table";
+
+    const thead = document.createElement("thead");
+    const trh = document.createElement("tr");
+    ["Date", "Start", "End", "Project", "Notes", "Admin notes", "Actions"].forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    rows.forEach((x) => {
+      const tr = document.createElement("tr");
+
+      const d = String(x.work_date).slice(0, 10);
+      const st = String(x.start_time).slice(0, 5);
+      const et = String(x.end_time).slice(0, 5);
+
+      const cells = [
+        d,
+        st,
+        et,
+        x.project_name,
+        x.notes || "",
+      ];
+
+      for (const c of cells) {
+        const td = document.createElement("td");
+        td.textContent = c;
+        tr.appendChild(td);
+      }
+
+      // admin notes editable
+      const tdAdmin = document.createElement("td");
+      const inp = document.createElement("input");
+      inp.className = "input input-compact";
+      inp.type = "text";
+      inp.value = x.admin_notes || "";
+      inp.placeholder = "Admin notes…";
+      tdAdmin.appendChild(inp);
+      tr.appendChild(tdAdmin);
+
+      const tdAct = document.createElement("td");
+      tdAct.className = "actions-td";
+
+      const btnSave = document.createElement("button");
+      btnSave.className = "btn btn-mini";
+      btnSave.type = "button";
+      btnSave.textContent = "Save";
+      btnSave.addEventListener("click", async () => {
+        await api(`/admin/work-entries/${x.entry_id}/admin-notes`, {
+          method: "PUT",
+          body: JSON.stringify({ admin_notes: inp.value }),
+        });
+        $id("stats-summary").textContent = "Admin notes saved.";
+      });
+
+      inp.addEventListener("keydown", async (ev) => {
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          btnSave.click();
+        }
+      });
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "btn btn-mini btn-danger";
+      btnDel.type = "button";
+      btnDel.textContent = "Delete";
+      btnDel.addEventListener("click", async () => {
+        if (!confirm("Delete this entry?")) return;
+        await api(`/admin/work-entries/${x.entry_id}`, { method: "DELETE" });
+        await runStats();
+      });
+
+      tdAct.appendChild(btnSave);
+      tdAct.appendChild(btnDel);
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+
+    // Summary row
     const totalDays = r.totals?.days ?? 0;
     const totalHours = r.totals?.hours ?? 0;
 
-    const summaryRow = ["Summary", "", "", "", `Total days: ${totalDays}`];
+    const trSum = document.createElement("tr");
+    trSum.className = "summary-row";
+    const sumCells = ["Summary", "", "", "", "", `Total days: ${totalDays} | Total hours: ${totalHours}`, ""];
+    sumCells.forEach((c) => {
+      const td = document.createElement("td");
+      td.textContent = c;
+      trSum.appendChild(td);
+    });
+    tbody.appendChild(trSum);
 
-    const table = renderTable(["Date", "Start", "End", "Project", "Notes"], rows, summaryRow);
+    table.appendChild(tbody);
+
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
     $id("stats-summary").textContent = `Total days: ${totalDays} | Total hours: ${totalHours}`;
   } else {
+
     const prjId = $id("stats-prj").value;
     if (!prjId) throw new Error("Please select project");
 
@@ -362,6 +473,7 @@ async function logout() {
 // =========================
 
 async function init() {
+  initAccordions();
   initTabs();
 
   $id("btn-logout").addEventListener("click", logout);

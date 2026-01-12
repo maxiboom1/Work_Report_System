@@ -99,3 +99,14 @@ The SQL script creates a bootstrap admin user:
 - password: `admin`
 
 **Important:** change it immediately in production.
+
+
+## Changelog
+
+### v1.0.4
+- Admin: accordion sections (only one open at a time; all closed on load and on tab switch)
+- Admin: Statistics renamed to Reports
+- Employees: added Passport ID + Card ID fields; Daily rate must be > 0; removed Active from UI
+- Reports (admin): per-entry Admin notes (admin-only) + row delete
+- Validations: prevent future dates; prevent employee deletion of work entries; employee edit window limited to creation day (backend)
+- Logging: added audit logs for major admin and user actions

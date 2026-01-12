@@ -20,7 +20,7 @@
       <nav class="nav-tabs">
         <button class="nav-tab active" data-tab="employees">Employees</button>
         <button class="nav-tab" data-tab="projects">Projects</button>
-        <button class="nav-tab" data-tab="stats">Statistics</button>
+        <button class="nav-tab" data-tab="stats">Reports</button>
       </nav>
 
       <div class="nav-bottom">
@@ -31,9 +31,7 @@
     <!-- RIGHT CONTENT -->
     <main class="admin-main">
 
-      <!-- =========================
-           TAB: EMPLOYEES
-           ========================= -->
+      <!-- =========================TAB: EMPLOYEES========================= -->
       <section class="tab-panel is-active" data-panel="employees">
         <div class="page-header">
           <h1>Employees</h1>
@@ -56,104 +54,112 @@
             </div>
           </section>
 
-          <!-- Right actions -->
-          <section class="pane pane-scroll">
+                  <!-- Right actions -->
+        <section class="pane pane-scroll">
 
-            <details class="section acc" open>
-              <summary class="section-title">Add employee</summary>
-              <div class="section-body">
+          <details class="section acc">
+            <summary class="section-title">Add employee</summary>
+            <div class="section-body">
 
-                <div class="form-row">
-                  <label class="label" for="emp-add-first">First name</label>
-                  <input id="emp-add-first" class="input" type="text" placeholder="e.g. John" />
-                </div>
-
-                <div class="form-row">
-                  <label class="label" for="emp-add-last">Last name</label>
-                  <input id="emp-add-last" class="input" type="text" placeholder="e.g. Smith" />
-                </div>
-
-                <div class="form-row">
-                  <label class="label" for="emp-add-rate">Daily rate</label>
-                  <input id="emp-add-rate" class="input" type="number" step="0.01" placeholder="e.g. 120" />
-                </div>
-
-                <div class="form-row">
-                  <label class="label" for="emp-add-login">Login</label>
-                  <input id="emp-add-login" class="input" type="text" placeholder="e.g. john.smith" />
-                </div>
-
-                <div class="form-row">
-                  <label class="label" for="emp-add-pass">Password</label>
-                  <input id="emp-add-pass" class="input" type="password" placeholder="••••••••" />
-                </div>
-
-                <div class="actions">
-                  <button id="btn-emp-create" class="btn">Add</button>
-                  <div id="emp-add-note" class="hint"></div>
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-first">First name</label>
+                <input id="emp-add-first" class="input" type="text" placeholder="e.g. John" />
               </div>
-            </details>
 
-            <details class="section acc">
-              <summary class="section-title">Edit selected</summary>
-              <div class="section-body">
+              <div class="form-row">
+                <label class="label" for="emp-add-last">Last name</label>
+                <input id="emp-add-last" class="input" type="text" placeholder="e.g. Smith" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label">Selected</label>
-                  <div id="emp-selected" class="badge">None</div>
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-passport">Passport ID</label>
+                <input id="emp-add-passport" class="input" type="text" placeholder="Optional" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-first">First name</label>
-                  <input id="emp-edit-first" class="input" type="text" />
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-card">Card ID</label>
+                <input id="emp-add-card" class="input" type="text" placeholder="Optional" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-last">Last name</label>
-                  <input id="emp-edit-last" class="input" type="text" />
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-rate">Daily rate</label>
+                <input id="emp-add-rate" class="input" type="number" step="0.01" placeholder="e.g. 900" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-rate">Daily rate</label>
-                  <input id="emp-edit-rate" class="input" type="number" step="0.01" />
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-login">Login</label>
+                <input id="emp-add-login" class="input" type="text" placeholder="e.g. john.smith" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-login">Login</label>
-                  <input id="emp-edit-login" class="input" type="text" />
-                </div>
+              <div class="form-row">
+                <label class="label" for="emp-add-pass">Password</label>
+                <input id="emp-add-pass" class="input" type="password" placeholder="••••••••" />
+              </div>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-pass">New password (optional)</label>
-                  <input id="emp-edit-pass" class="input" type="password" placeholder="leave empty to keep" />
-                </div>
+              <div class="actions">
+                <button id="btn-emp-create" class="btn">Add</button>
+                <div id="emp-add-note" class="hint"></div>
+              </div>
+            </div>
+          </details>
 
-                <div class="form-row">
-                  <label class="label" for="emp-edit-active">Active</label>
-                  <select id="emp-edit-active" class="select">
-                    <option value="1" selected>active</option>
-                    <option value="0">disabled</option>
-                  </select>
-                </div>
+          <details class="section acc">
+            <summary class="section-title">Edit selected</summary>
+            <div class="section-body">
 
-                <div class="actions">
-                  <button id="btn-emp-save" class="btn">Save</button>
-                  <button id="btn-emp-delete" class="btn danger">Delete</button>
-                </div>
+              <div class="form-row">
+                <label class="label">Selected</label>
+                <div id="emp-selected" class="badge">None</div>
+              </div>
 
+              <div class="form-row">
+                <label class="label" for="emp-edit-first">First name</label>
+                <input id="emp-edit-first" class="input" type="text" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-last">Last name</label>
+                <input id="emp-edit-last" class="input" type="text" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-passport">Passport ID</label>
+                <input id="emp-edit-passport" class="input" type="text" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-card">Card ID</label>
+                <input id="emp-edit-card" class="input" type="text" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-rate">Daily rate</label>
+                <input id="emp-edit-rate" class="input" type="number" step="0.01" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-login">Login</label>
+                <input id="emp-edit-login" class="input" type="text" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="emp-edit-pass">New password (optional)</label>
+                <input id="emp-edit-pass" class="input" type="password" placeholder="leave empty to keep" />
+              </div>
+
+              <div class="actions">
+                <button id="btn-emp-save" class="btn">Save</button>
+                <button id="btn-emp-delete" class="btn btn-danger">Delete</button>
                 <div id="emp-edit-note" class="hint"></div>
               </div>
-            </details>
+            </div>
+          </details>
 
-          </section>
-        </div>
+        </section>
+      </div>
       </section>
 
-
-      <!-- =========================
-           TAB: PROJECTS
-           ========================= -->
+      <!-- =========================TAB: PROJECTS========================= -->
       <section class="tab-panel" data-panel="projects">
         <div class="page-header">
           <h1>Projects</h1>
@@ -174,7 +180,7 @@
           </section>
 
           <section class="pane pane-scroll">
-            <details class="section acc" open>
+            <details class="section acc">
               <summary class="section-title">Add project</summary>
               <div class="section-body">
                 <div class="form-row">
@@ -218,12 +224,10 @@
       </section>
 
 
-      <!-- =========================
-           TAB: STATISTICS
-           ========================= -->
+      <!-- =========================TAB: REPORTS========================= -->
       <section class="tab-panel" data-panel="stats">
         <div class="page-header">
-          <h1>Statistics</h1>
+          <h1>Reports</h1>
           <div class="page-hint">Employee monthly report or project monthly report (hours & cost).</div>
         </div>
 
