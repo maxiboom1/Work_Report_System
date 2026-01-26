@@ -83,46 +83,6 @@
         </div>
       </section>
 
-      <!-- EDIT MODAL (employee can edit only entries created today) -->
-      <div id="edit-modal" class="modal" hidden>
-        <div class="modal-backdrop" data-close="1"></div>
-        <div class="modal-card" role="dialog" aria-modal="true" aria-label="Edit work entry">
-          <div class="card-title">Edit work entry</div>
-
-          <input id="edit-entry-id" type="hidden" />
-
-          <div class="form-grid">
-            <div class="field">
-              <div class="field-label">Work date</div>
-              <input id="edit-work-date" class="select select-md" type="date" disabled />
-            </div>
-            <div class="field">
-              <div class="field-label">Project</div>
-              <select id="edit-project" class="select select-md"></select>
-            </div>
-            <div class="field">
-              <div class="field-label">Start</div>
-              <input id="edit-start-time" class="select select-md" type="time" />
-            </div>
-            <div class="field">
-              <div class="field-label">End</div>
-              <input id="edit-end-time" class="select select-md" type="time" />
-            </div>
-          </div>
-
-          <div class="field mt-10">
-            <div class="field-label">Notes</div>
-            <input id="edit-notes" class="select select-md" type="text" placeholder="Optional notes..." />
-          </div>
-
-          <div class="row-actions">
-            <button id="btn-edit-save" class="btn btn-open" type="button">Save</button>
-            <button id="btn-edit-cancel" class="btn" type="button" data-close="1">Cancel</button>
-            <div id="edit-status" class="crumb">&nbsp;</div>
-          </div>
-        </div>
-      </div>
-
     </section>
   </main>
 

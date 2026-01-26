@@ -10,7 +10,8 @@ class SqlService {
 
   async getEmployeeByLogin(login) {
     const q = `
-      SELECT id, first_name, last_name, passport_id, card_id, car_id, daily_rate, login, password_hash, role, is_active
+      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+             daily_rate, login, password_hash, role, is_active
       FROM dbo.[employees]
       WHERE login = @login;
     `;
@@ -20,7 +21,8 @@ class SqlService {
 
   async listEmployees() {
     const q = `
-      SELECT id, first_name, last_name, passport_id, card_id, car_id, daily_rate, login, role, is_active
+      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+             daily_rate, login, role, is_active
       FROM dbo.[employees]
       WHERE role = 'employee'
       ORDER BY last_name, first_name;
@@ -31,7 +33,8 @@ class SqlService {
 
   async getEmployeeById(id) {
     const q = `
-      SELECT id, first_name, last_name, passport_id, card_id, car_id, daily_rate, login, password_hash, role, is_active
+      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+             daily_rate, login, password_hash, role, is_active
       FROM dbo.[employees]
       WHERE id = @id;
     `;
@@ -42,17 +45,17 @@ class SqlService {
   async createEmployee(e) {
     const q = `
       INSERT INTO dbo.[employees]
-        (first_name, last_name, passport_id, card_id, car_id, daily_rate, login, password_hash, role, is_active)
+        (first_name, last_name, passport_id, car_id, card_id, daily_rate, login, password_hash, role, is_active)
       OUTPUT inserted.id
       VALUES
-        (@first_name, @last_name, @passport_id, @card_id, @car_id, @daily_rate, @login, @password_hash, @role, @is_active);
+        (@first_name, @last_name, @passport_id, @car_id, @card_id, @daily_rate, @login, @password_hash, @role, @is_active);
     `;
     const r = await db.execute(q, {
       first_name: e.first_name,
       last_name: e.last_name,
       passport_id: e.passport_id ?? null,
-      card_id: e.card_id ?? null,
       car_id: e.car_id ?? null,
+      card_id: e.card_id ?? null,
       daily_rate: e.daily_rate,
       login: e.login,
       password_hash: e.password_hash,
@@ -68,9 +71,9 @@ class SqlService {
       SET
         first_name    = COALESCE(@first_name, first_name),
         last_name     = COALESCE(@last_name, last_name),
-        passport_id  = COALESCE(@passport_id, passport_id),
-        card_id      = COALESCE(@card_id, card_id),
-        car_id       = COALESCE(@car_id, car_id),
+        passport_id   = COALESCE(@passport_id, passport_id),
+        car_id        = COALESCE(@car_id, car_id),
+        card_id       = COALESCE(@card_id, card_id),
         daily_rate   = COALESCE(@daily_rate, daily_rate),
         login         = COALESCE(@login, login),
         password_hash = COALESCE(@password_hash, password_hash),
@@ -86,8 +89,8 @@ class SqlService {
       first_name: patch.first_name ?? null,
       last_name: patch.last_name ?? null,
       passport_id: patch.passport_id ?? null,
-      card_id: patch.card_id ?? null,
       car_id: patch.car_id ?? null,
+      card_id: patch.card_id ?? null,
       daily_rate: patch.daily_rate ?? null,
       login: patch.login ?? null,
       password_hash: patch.password_hash ?? null,
@@ -174,12 +177,10 @@ class SqlService {
     const q = `
       SELECT
         we.id,
-        we.id AS entry_id,
         CONVERT(varchar(10), we.work_date, 23) AS work_date,
         CONVERT(varchar(8), we.start_time, 108) AS start_time,
         CONVERT(varchar(8), we.end_time, 108) AS end_time,
         we.notes,
-        CONVERT(varchar(19), we.created_at, 126) AS created_at,
         we.employee_id, we.project_id,
         p.name AS project_name
       FROM dbo.[work_entries] we
@@ -202,8 +203,7 @@ class SqlService {
         CONVERT(varchar(10), work_date, 23) AS work_date,
         CONVERT(varchar(8), start_time, 108) AS start_time,
         CONVERT(varchar(8), end_time, 108) AS end_time,
-        notes,
-        CONVERT(varchar(19), created_at, 126) AS created_at
+        notes
       FROM dbo.[work_entries]
       WHERE id = @id;
     `;
@@ -235,10 +235,10 @@ class SqlService {
       UPDATE dbo.[work_entries]
       SET
         project_id = COALESCE(@project_id, project_id),
+        work_date  = COALESCE(@work_date, work_date),
         start_time = COALESCE(@start_time, start_time),
         end_time   = COALESCE(@end_time, end_time),
-        notes      = COALESCE(@notes, notes),
-        updated_at = SYSUTCDATETIME()
+        notes      = COALESCE(@notes, notes)
       WHERE id = @id;
 
       SELECT @@ROWCOUNT AS affected;
@@ -246,6 +246,7 @@ class SqlService {
     const r = await db.execute(q, {
       id,
       project_id: patch.project_id ?? null,
+      work_date: patch.work_date ?? null,
       start_time: patch.start_time ?? null,
       end_time: patch.end_time ?? null,
       notes: patch.notes ?? null,
@@ -262,39 +263,6 @@ class SqlService {
     return r?.recordset?.[0]?.affected ?? 0;
   }
 
-
-async findOverlappingWorkEntries(employeeId, workDate, startTime, endTime, excludeId = null) {
-  const q = `
-    SELECT TOP 1 we.id
-    FROM dbo.[work_entries] we
-    WHERE we.employee_id = @employee_id
-      AND we.work_date = @work_date
-      AND (@exclude_id IS NULL OR we.id <> @exclude_id)
-      AND (@start_time < we.end_time AND @end_time > we.start_time);
-  `;
-  const r = await db.execute(q, {
-    employee_id: employeeId,
-    work_date: workDate,
-    start_time: startTime,
-    end_time: endTime,
-    exclude_id: excludeId,
-  });
-  return r?.recordset?.[0]?.id ?? null;
-}
-
-async updateWorkEntryAdminNotes(id, adminNotes) {
-  const q = `
-    UPDATE dbo.[work_entries]
-    SET admin_notes = COALESCE(@admin_notes, admin_notes),
-        updated_at = SYSUTCDATETIME()
-    WHERE id = @id;
-
-    SELECT @@ROWCOUNT AS affected;
-  `;
-  const r = await db.execute(q, { id, admin_notes: adminNotes ?? "" });
-  return r?.recordset?.[0]?.affected ?? 0;
-}
-
   /* =========================
      REPORTS
      ========================= */
@@ -303,12 +271,10 @@ async updateWorkEntryAdminNotes(id, adminNotes) {
     // Returns per-entry rows + totals can be computed in service layer.
     const q = `
       SELECT
-        we.id AS entry_id,
         CONVERT(varchar(10), we.work_date, 23) AS work_date,
         CONVERT(varchar(8), we.start_time, 108) AS start_time,
         CONVERT(varchar(8), we.end_time, 108) AS end_time,
         we.notes,
-        we.admin_notes,
         p.name AS project_name
       FROM dbo.[work_entries] we
       INNER JOIN dbo.[projects] p ON p.id = we.project_id
@@ -328,7 +294,6 @@ async updateWorkEntryAdminNotes(id, adminNotes) {
         e.first_name,
         e.last_name,
         e.daily_rate,
-        we.id AS entry_id,
         CONVERT(varchar(10), we.work_date, 23) AS work_date,
         CONVERT(varchar(8), we.start_time, 108) AS start_time,
         CONVERT(varchar(8), we.end_time, 108) AS end_time,

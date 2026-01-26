@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.0.5
+**Version:** v1.0.6.1
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -12,9 +12,7 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 
 ### Employee
 - Login with personal credentials
-- Create work entries
-- Edit only **today** entries (until end of local day). Work date is locked.
-- Cannot delete work entries (admin-only)
+- Create / edit / delete their own work entries
 - Multiple entries per day (e.g. half day project A + half day project B)
 - Mobile-friendly UI with 2 tabs:
   - Register day (add a new entry)
@@ -26,6 +24,10 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 - Statistics:
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
+
+v1.0.6 improvements:
+- Admin UI: Employee add/edit form is now arranged horizontally in rows (First/Last, Passport/Car, Card/Rate, Login/Password).
+- Employees: added optional identifiers (passport_id, car_id, card_id).
 
 v1.0.3 improvements:
 - UI: removed JS-injected inline display styles; tab visibility is controlled by CSS classes.
@@ -44,9 +46,6 @@ v1.0.3 improvements:
 ### employees
 - first_name
 - last_name
-- passport_id
-- card_id
-- car_id (optional)
 - daily_rate (daily shift rate)
 - login
 - password_hash
@@ -104,22 +103,3 @@ The SQL script creates a bootstrap admin user:
 - password: `admin`
 
 **Important:** change it immediately in production.
-
-
-## Changelog
-
-### v1.0.4
-- Admin: accordion sections (only one open at a time; all closed on load and on tab switch)
-- Admin: Statistics renamed to Reports
-- Employees: added Passport ID + Card ID fields; Daily rate must be > 0; removed Active from UI
-- Reports (admin): per-entry Admin notes (admin-only) + row delete
-- Validations: prevent future dates; prevent employee deletion of work entries; employee edit window limited to creation day (backend)
-- Logging: added audit logs for major admin and user actions
-
-### v1.0.5
-- Employee UI: added **Edit entry** flow (only for entries created today)
-- Employee edit: work date is locked (not editable)
-- Employees: added optional **Car ID** field (DB + admin UI)
-- DB create script updated to v1.0.5
-- Employee UI: edit form matches the "Create new entry" UI; work date is not editable
-- Employees: added **car_id** (optional) field + full wiring (UI → routes → services → SQL + DB create script)

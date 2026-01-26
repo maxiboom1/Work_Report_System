@@ -1,3 +1,20 @@
+Version: v1.0.6.1
+Date: 2026-01-26
+Done:
+- Admin UI: enforce accordion behavior for all `<details>` blocks (only one open at a time; all closed on load and on tab switch).
+- Admin UI: enable vertical scrolling inside accordion bodies.
+
+----------------------------------------
+
+Version: v1.0.6
+Date: 2026-01-25
+Done:
+- Admin UI: employee add/edit form fields are arranged horizontally in 2-column rows.
+- Employees: added optional identifiers (passport_id, car_id, card_id) across UI/API/SQL.
+- Database: updated employees schema to include the new columns.
+
+----------------------------------------
+
 Version: v1.0.3
 Date: 2026-01-07
 Done:

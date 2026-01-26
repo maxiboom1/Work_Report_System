@@ -91,22 +91,6 @@ router.delete("/admin/projects/:id", requireAuth, requireAdmin, asyncHandler(asy
   return res.status(result.ok ? 200 : (result.status || 500)).json(result);
 }));
 
-
-
-// =========================
-// ADMIN: Work Entries (maintenance)
-// =========================
-
-router.put("/admin/work-entries/:id/admin-notes", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const result = await appService.adminUpdateWorkEntryAdminNotes(req.params.id, req.body?.admin_notes);
-  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
-}));
-
-router.delete("/admin/work-entries/:id", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const result = await appService.adminDeleteWorkEntry(req.params.id);
-  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
-}));
-
 // =========================
 // ADMIN: Reports
 // =========================

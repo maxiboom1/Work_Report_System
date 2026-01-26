@@ -346,7 +346,19 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .section.acc .section-title{margin:0}
-  .section.acc .section-body{padding:10px 12px 12px}
+  /* Allow vertical scroll inside opened accordion bodies */
+  .section.acc .section-body{
+    padding:10px 12px 12px;
+    max-height: 62vh;
+    overflow:auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .section.acc .section-body::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+  }
   
   .section-title{
     font-weight:700;
@@ -363,6 +375,25 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
     flex-direction:column;
     gap:6px;
     margin-bottom:10px;
+  }
+
+  /* Two-column horizontal form layout (Employee add/edit) */
+  .form-grid-2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+    margin-bottom:10px;
+  }
+
+  .form-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:0;
+  }
+
+  @media (max-width: 860px){
+    .form-grid-2{ grid-template-columns: 1fr; }
   }
   
   .actions{
@@ -497,10 +528,3 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
   border-bottom: none;
 }
 .table tbody tr.summary-row:hover{ background: rgba(79,140,255,0.12); }
-
-
-/* --- Reports table inline controls --- */
-.btn.btn-mini{ padding: 6px 10px; font-size: 12px; line-height: 1; }
-.input.input-compact{ padding: 6px 10px; font-size: 12px; width: 100%; }
-.actions-td{ white-space: nowrap; }
-.actions-td .btn{ margin-right: 6px; }

@@ -1,22 +1,3 @@
-function closeAllAccordions(scopeEl = document) {
-  scopeEl.querySelectorAll("details.acc").forEach((d) => { d.open = false; });
-}
-
-function initAccordions() {
-  // Start with all closed
-  closeAllAccordions(document);
-
-  document.querySelectorAll("details.acc").forEach((d) => {
-    d.addEventListener("toggle", () => {
-      if (!d.open) return;
-      // Close other accordions inside the same tab panel
-      const panel = d.closest(".tab-panel") || document;
-      panel.querySelectorAll("details.acc").forEach((other) => {
-        if (other !== d) other.open = false;
-      });
-    });
-  });
-}
 /* =========================================================
    Employee Work Report System — Admin UI
    ========================================================= */
@@ -51,12 +32,41 @@ function initTabs() {
   const tabs = Array.from(document.querySelectorAll(".nav-tab"));
   const panels = Array.from(document.querySelectorAll(".tab-panel"));
 
+  // Accordion behavior for <details> sections:
+  // - only one open at a time per visible panel
+  // - start with all closed
+  function closeAllDetails(scope = document) {
+    scope.querySelectorAll("details").forEach((d) => { d.open = false; });
+  }
+
+  function wireAccordion(scope = document) {
+    const all = Array.from(scope.querySelectorAll("details"));
+    for (const d of all) {
+      if (d.dataset.accWired === "1") continue;
+      d.dataset.accWired = "1";
+      d.addEventListener("toggle", () => {
+        if (!d.open) return;
+        // Close other details in the same tab-panel (preferred), otherwise in provided scope.
+        const panel = d.closest(".tab-panel") || scope;
+        panel.querySelectorAll("details").forEach((other) => {
+          if (other !== d) other.open = false;
+        });
+      });
+    }
+  }
+
   function show(key) {
     tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === key));
     panels.forEach((p) => p.classList.toggle("is-active", p.dataset.panel === key));
+
+    // When switching tabs, ensure all <details> are closed.
+    closeAllDetails(document);
   }
 
   tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab)));
+  // Wire accordion behavior once, then start from a fully collapsed state.
+  wireAccordion(document);
+  closeAllDetails(document);
   show("employees");
 }
 
@@ -94,9 +104,13 @@ function fillEmployeeEdit(e) {
   $id("emp-selected").textContent = e ? `${e.last_name}, ${e.first_name}` : "None";
   $id("emp-edit-first").value = e?.first_name || "";
   $id("emp-edit-last").value = e?.last_name || "";
-  $id("emp-edit-passport").value = e?.passport_id || "";
-  $id("emp-edit-card").value = e?.card_id || "";
-  $id("emp-edit-car").value = e?.car_id || "";
+  // Optional IDs
+  const passportEl = document.getElementById("emp-edit-passport");
+  const carEl = document.getElementById("emp-edit-car");
+  const cardEl = document.getElementById("emp-edit-card");
+  if (passportEl) passportEl.value = e?.passport_id || "";
+  if (carEl) carEl.value = e?.car_id || "";
+  if (cardEl) cardEl.value = e?.card_id || "";
   $id("emp-edit-rate").value = (e?.daily_rate ?? "");
   $id("emp-edit-login").value = e?.login || "";
   $id("emp-edit-pass").value = "";
@@ -123,9 +137,9 @@ async function createEmployee() {
   const payload = {
     first_name: $id("emp-add-first").value,
     last_name: $id("emp-add-last").value,
-    passport_id: $id("emp-add-passport").value,
-    card_id: $id("emp-add-card").value,
-    car_id: $id("emp-add-car").value,
+    passport_id: ($id("emp-add-passport")?.value || ""),
+    car_id: ($id("emp-add-car")?.value || ""),
+    card_id: ($id("emp-add-card")?.value || ""),
     daily_rate: Number($id("emp-add-rate").value),
     login: $id("emp-add-login").value,
     password: $id("emp-add-pass").value,
@@ -141,9 +155,9 @@ async function saveEmployee() {
   const payload = {
     first_name: $id("emp-edit-first").value,
     last_name: $id("emp-edit-last").value,
-    passport_id: $id("emp-edit-passport").value,
-    card_id: $id("emp-edit-card").value,
-    car_id: $id("emp-edit-car").value,
+    passport_id: ($id("emp-edit-passport")?.value || ""),
+    car_id: ($id("emp-edit-car")?.value || ""),
+    card_id: ($id("emp-edit-card")?.value || ""),
     daily_rate: Number($id("emp-edit-rate").value),
     login: $id("emp-edit-login").value,
     password: $id("emp-edit-pass").value,
@@ -325,115 +339,24 @@ async function runStats() {
 
     const r = await api(`/admin/reports/employee/${empId}?month=${encodeURIComponent(month)}`);
 
-    const rows = (r.rows || []);
+    const rows = (r.rows || []).map((x) => [
+      String(x.work_date).slice(0, 10),
+      String(x.start_time).slice(0, 5),
+      String(x.end_time).slice(0, 5),
+      x.project_name,
+      x.notes || "",
+    ]);
 
-    // Build table with editable admin notes + row delete (admin only)
-    const table = document.createElement("table");
-    table.className = "table";
-
-    const thead = document.createElement("thead");
-    const trh = document.createElement("tr");
-    ["Date", "Start", "End", "Project", "Notes", "Admin notes", "Actions"].forEach((h) => {
-      const th = document.createElement("th");
-      th.textContent = h;
-      trh.appendChild(th);
-    });
-    thead.appendChild(trh);
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-
-    rows.forEach((x) => {
-      const tr = document.createElement("tr");
-
-      const d = String(x.work_date).slice(0, 10);
-      const st = String(x.start_time).slice(0, 5);
-      const et = String(x.end_time).slice(0, 5);
-
-      const cells = [
-        d,
-        st,
-        et,
-        x.project_name,
-        x.notes || "",
-      ];
-
-      for (const c of cells) {
-        const td = document.createElement("td");
-        td.textContent = c;
-        tr.appendChild(td);
-      }
-
-      // admin notes editable
-      const tdAdmin = document.createElement("td");
-      const inp = document.createElement("input");
-      inp.className = "input input-compact";
-      inp.type = "text";
-      inp.value = x.admin_notes || "";
-      inp.placeholder = "Admin notes…";
-      tdAdmin.appendChild(inp);
-      tr.appendChild(tdAdmin);
-
-      const tdAct = document.createElement("td");
-      tdAct.className = "actions-td";
-
-      const btnSave = document.createElement("button");
-      btnSave.className = "btn btn-mini";
-      btnSave.type = "button";
-      btnSave.textContent = "Save";
-      btnSave.addEventListener("click", async () => {
-        await api(`/admin/work-entries/${x.entry_id}/admin-notes`, {
-          method: "PUT",
-          body: JSON.stringify({ admin_notes: inp.value }),
-        });
-        $id("stats-summary").textContent = "Admin notes saved.";
-      });
-
-      inp.addEventListener("keydown", async (ev) => {
-        if (ev.key === "Enter") {
-          ev.preventDefault();
-          btnSave.click();
-        }
-      });
-
-      const btnDel = document.createElement("button");
-      btnDel.className = "btn btn-mini btn-danger";
-      btnDel.type = "button";
-      btnDel.textContent = "Delete";
-      btnDel.addEventListener("click", async () => {
-        if (!confirm("Delete this entry?")) return;
-        await api(`/admin/work-entries/${x.entry_id}`, { method: "DELETE" });
-        await runStats();
-      });
-
-      tdAct.appendChild(btnSave);
-      tdAct.appendChild(btnDel);
-      tr.appendChild(tdAct);
-
-      tbody.appendChild(tr);
-    });
-
-    // Summary row
     const totalDays = r.totals?.days ?? 0;
     const totalHours = r.totals?.hours ?? 0;
 
-    const trSum = document.createElement("tr");
-    trSum.className = "summary-row";
-    const sumCells = ["Summary", "", "", "", "", `Total days: ${totalDays} | Total hours: ${totalHours}`, ""];
-    sumCells.forEach((c) => {
-      const td = document.createElement("td");
-      td.textContent = c;
-      trSum.appendChild(td);
-    });
-    tbody.appendChild(trSum);
+    const summaryRow = ["Summary", "", "", "", `Total days: ${totalDays}`];
 
-    table.appendChild(tbody);
-
+    const table = renderTable(["Date", "Start", "End", "Project", "Notes"], rows, summaryRow);
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
     $id("stats-summary").textContent = `Total days: ${totalDays} | Total hours: ${totalHours}`;
   } else {
-
     const prjId = $id("stats-prj").value;
     if (!prjId) throw new Error("Please select project");
 
@@ -479,7 +402,6 @@ async function logout() {
 // =========================
 
 async function init() {
-  initAccordions();
   initTabs();
 
   $id("btn-logout").addEventListener("click", logout);

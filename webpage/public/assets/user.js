@@ -39,39 +39,6 @@ function setStatus(msg) {
   if (el) el.textContent = msg;
 }
 
-function setEditStatus(msg) {
-  const el = $id("edit-status");
-  if (el) el.textContent = msg;
-}
-
-function openEditModal(entry) {
-  $id("edit-entry-id").value = String(entry.entry_id || entry.id || "");
-  $id("edit-work-date").value = String(entry.work_date || "");
-  $id("edit-start-time").value = String(entry.start_time || "").slice(0, 5);
-  $id("edit-end-time").value = String(entry.end_time || "").slice(0, 5);
-  $id("edit-notes").value = String(entry.notes || "");
-
-  // Populate projects dropdown (active only)
-  const sel = $id("edit-project");
-  sel.innerHTML = "";
-  for (const p of projects) {
-    if (p.is_active === 0) continue;
-    const opt = document.createElement("option");
-    opt.value = String(p.id);
-    opt.textContent = p.name;
-    sel.appendChild(opt);
-  }
-  sel.value = String(entry.project_id || "");
-
-  setEditStatus("Ready.");
-  $id("edit-modal").hidden = false;
-}
-
-function closeEditModal() {
-  $id("edit-modal").hidden = true;
-  setEditStatus(" ");
-}
-
 function makeEntryCard(e) {
   const card = document.createElement("div");
   card.className = "entry-card";
@@ -97,21 +64,22 @@ function makeEntryCard(e) {
   meta.appendChild(time);
   if (notes.textContent.trim()) meta.appendChild(notes);
 
-  card.appendChild(meta);
-
   const actions = document.createElement("div");
   actions.className = "entry-actions";
 
-  if (e.can_edit) {
-    const btnEdit = document.createElement("button");
-    btnEdit.className = "btn btn-mini";
-    btnEdit.type = "button";
-    btnEdit.textContent = "Edit";
-    btnEdit.addEventListener("click", () => openEditModal(e));
-    actions.appendChild(btnEdit);
-  }
+  const btnDel = document.createElement("button");
+  btnDel.className = "btn";
+  btnDel.type = "button";
+  btnDel.textContent = "Delete";
+  btnDel.addEventListener("click", async () => {
+    if (!confirm("Delete this entry?")) return;
+    await api(`/my/work-entries/${e.id}`, { method: "DELETE" });
+    await loadEntries();
+  });
 
-  if (actions.children.length) card.appendChild(actions);
+  actions.appendChild(btnDel);
+  card.appendChild(meta);
+  card.appendChild(actions);
   return card;
 }
 
@@ -129,27 +97,6 @@ async function loadProjects() {
     opt.textContent = p.name;
     sel.appendChild(opt);
   }
-}
-
-async function saveEdit() {
-  const entryId = Number($id("edit-entry-id").value || 0);
-  if (!entryId) throw new Error("Invalid entry id");
-
-  const payload = {
-    project_id: Number($id("edit-project").value || 0),
-    start_time: $id("edit-start-time").value,
-    end_time: $id("edit-end-time").value,
-    notes: $id("edit-notes").value,
-  };
-
-  await api(`/my/work-entries/${entryId}`, {
-    method: "PUT",
-    body: JSON.stringify(payload),
-  });
-
-  await loadEntries();
-  closeEditModal();
-  setStatus("Entry updated.");
 }
 
 async function loadMe() {
@@ -176,14 +123,9 @@ async function loadEntries() {
 }
 
 async function addEntry() {
-  const wd = $id("work-date").value;
-  if (wd && wd > todayISO()) {
-    throw new Error("Work date cannot be in the future");
-  }
-
   const payload = {
     project_id: Number($id("project").value || 0),
-    work_date: wd,
+    work_date: $id("work-date").value,
     start_time: $id("start-time").value,
     end_time: $id("end-time").value,
     notes: $id("notes").value,
@@ -207,7 +149,6 @@ async function logout() {
 async function init() {
   $id("rep-month").value = todayMonth();
   $id("work-date").value = todayISO();
-  $id("work-date").max = todayISO();
   $id("start-time").value = "09:00";
   $id("end-time").value = "17:00";
 
@@ -240,24 +181,8 @@ async function init() {
     }
   });
 
-  // Edit modal wiring
-  $id("btn-edit-save").addEventListener("click", async () => {
-    try {
-      setEditStatus("Saving...");
-      await saveEdit();
-    } catch (e) {
-      setEditStatus(e.message);
-    }
-  });
-
-  document.querySelectorAll("[data-close='1']").forEach((el) => {
-    el.addEventListener("click", () => closeEditModal());
-  });
-
   $id("rep-month").addEventListener("change", () => loadEntries().catch(() => {}));
   $id("btn-logout").addEventListener("click", logout);
-
-  // (edit modal close is handled by [data-close="1"] listeners)
 
   await loadMe();
   await loadProjects();
