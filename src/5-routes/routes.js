@@ -44,6 +44,20 @@ router.delete("/my/work-entries/:id", requireAuth, asyncHandler(async (req, res)
 }));
 
 // =========================
+// ADMIN: Settings
+// =========================
+
+router.get("/admin/settings", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const result = await appService.getSettings();
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
+router.put("/admin/settings", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const result = await appService.updateSettings(req.body);
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
+// =========================
 // ADMIN: Employees CRUD
 // =========================
 

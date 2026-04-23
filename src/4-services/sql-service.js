@@ -5,6 +5,39 @@ import db from "../1-dal/sql.js";
 
 class SqlService {
   /* =========================
+     SETTINGS
+     ========================= */
+
+  async listSettings() {
+    const q = `
+      SELECT setting_key, setting_value
+      FROM dbo.[app_settings]
+      ORDER BY setting_key;
+    `;
+    const r = await db.execute(q);
+    return r?.recordset || [];
+  }
+
+  async setSetting(key, value) {
+    const q = `
+      UPDATE dbo.[app_settings]
+      SET setting_value = @value,
+          updated_at = SYSDATETIME()
+      WHERE setting_key = @key;
+
+      IF @@ROWCOUNT = 0
+      BEGIN
+        INSERT INTO dbo.[app_settings] (setting_key, setting_value)
+        VALUES (@key, @value);
+      END;
+
+      SELECT 1 AS affected;
+    `;
+    const r = await db.execute(q, { key, value });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  /* =========================
      EMPLOYEES
      ========================= */
 

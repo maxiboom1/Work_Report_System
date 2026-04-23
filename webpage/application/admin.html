@@ -21,6 +21,7 @@
         <button class="nav-tab active" data-tab="employees">Employees</button>
         <button class="nav-tab" data-tab="projects">Projects</button>
         <button class="nav-tab" data-tab="stats">Statistics</button>
+        <button class="nav-tab" data-tab="settings">System settings</button>
       </nav>
 
       <div class="nav-bottom">
@@ -296,27 +297,32 @@
           </div>
 
           <div class="section-body padded">
-            <div class="form-row">
-              <label class="label" for="stats-mode">Type</label>
-              <select id="stats-mode" class="select">
-                <option value="employee" selected>Employee monthly report</option>
-                <option value="project">Project monthly report</option>
-              </select>
-            </div>
+            <div class="stats-controls">
+              <div class="form-row">
+                <label class="label" for="stats-mode">Type</label>
+                <select id="stats-mode" class="select">
+                  <option value="employee" selected>Employee monthly report</option>
+                  <option value="project">Project monthly report</option>
+                </select>
+              </div>
 
-            <div class="form-row">
-              <label class="label" for="stats-month">Month</label>
-              <input id="stats-month" class="input" type="month" />
-            </div>
+              <div class="form-row">
+                <label class="label" for="stats-month">Month</label>
+                <div class="month-control">
+                  <input id="stats-month" class="input" type="month" />
+                  <button class="month-picker-button" type="button" data-month-picker="stats-month" aria-label="Open month picker"></button>
+                </div>
+              </div>
 
-            <div class="form-row" id="stats-emp-row">
-              <label class="label" for="stats-emp">Employee</label>
-              <select id="stats-emp" class="select"></select>
-            </div>
+              <div class="form-row" id="stats-emp-row">
+                <label class="label" for="stats-emp">Employee</label>
+                <select id="stats-emp" class="select"></select>
+              </div>
 
-            <div class="form-row is-hidden" id="stats-prj-row">
-              <label class="label" for="stats-prj">Project</label>
-              <select id="stats-prj" class="select"></select>
+              <div class="form-row is-hidden" id="stats-prj-row">
+                <label class="label" for="stats-prj">Project</label>
+                <select id="stats-prj" class="select"></select>
+              </div>
             </div>
 
             <div class="actions">
@@ -327,6 +333,38 @@
 
           <div class="pane-foot bordered stats-results">
             <div id="stats-table" class="full-width"></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- =========================
+           TAB: SETTINGS
+           ========================= -->
+      <section class="tab-panel" data-panel="settings">
+        <div class="page-header">
+          <h1>System settings</h1>
+          <div class="page-hint">Choose the admin language and workday length.</div>
+        </div>
+
+        <section class="pane settings-pane">
+          <div class="settings-grid">
+            <div class="form-row">
+              <label class="label" for="setting-language">Language</label>
+              <select id="setting-language" class="select">
+                <option value="en">English</option>
+                <option value="he">עברית</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="setting-workday-hours">Workday length (hours)</label>
+              <input id="setting-workday-hours" class="input" type="number" min="1" max="24" step="0.25" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btn-settings-save" class="btn">Save settings</button>
+            <div id="settings-note" class="hint"></div>
           </div>
         </section>
       </section>

@@ -24,6 +24,315 @@ function todayMonth() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+const DEFAULT_ADMIN_SETTINGS = {
+  admin_language: "en",
+  workday_hours: 9,
+};
+
+let ADMIN_SETTINGS = { ...DEFAULT_ADMIN_SETTINGS };
+
+const I18N = {
+  en: {
+    appTitle: "Work Reports",
+    adminPanel: "Admin panel",
+    employees: "Employees",
+    projects: "Projects",
+    stats: "Reports",
+    settings: "System settings",
+    logout: "Logout",
+    employeeTitle: "Employees",
+    employeeHint: "Create, edit, and delete employee accounts.",
+    employeeList: "Employee list",
+    search: "Search...",
+    refresh: "Refresh",
+    addEmployee: "Add employee",
+    editSelected: "Edit selected",
+    firstName: "First name",
+    lastName: "Last name",
+    passport: "Passport ID",
+    car: "Car ID",
+    card: "Card ID",
+    phone: "Phone",
+    email: "Email",
+    dailyRate: "Daily rate",
+    login: "Login",
+    password: "Password",
+    newPassword: "New password (optional)",
+    selected: "Selected",
+    none: "None",
+    add: "Add",
+    save: "Save",
+    delete: "Delete",
+    optional: "optional",
+    keepEmpty: "leave empty to keep",
+    projectTitle: "Projects",
+    projectHint: "Create, edit, and delete projects.",
+    projectList: "Project list",
+    addProject: "Add project",
+    projectName: "Project name",
+    active: "Active",
+    activeValue: "active",
+    disabledValue: "disabled",
+    statsTitle: "Reports",
+    statsHint: "Monthly employee or project report.",
+    report: "Report",
+    type: "Report type",
+    month: "Month",
+    employee: "Employee",
+    project: "Project",
+    run: "Show report",
+    employeeMonthly: "Employee report",
+    projectMonthly: "Project report",
+    selectPrompt: "Select...",
+    date: "Date",
+    start: "Start",
+    end: "End",
+    notes: "Notes",
+    summary: "Summary",
+    days: "Days",
+    totalDays: "Total days",
+    totalHours: "Total hours",
+    extraHours: "Extra hours",
+    dailyRateHeader: "Daily rate",
+    hours: "Hours",
+    cost: "Cost",
+    employeeCount: "Employees",
+    settingsTitle: "System settings",
+    settingsHint: "Choose the admin language and workday length.",
+    language: "Language",
+    workdayHours: "Workday length (hours)",
+    saveSettings: "Save settings",
+    settingsSaved: "Settings saved",
+    ready: "Ready.",
+    missingMonth: "Please select month",
+    missingEmployee: "Please select employee",
+    missingProject: "Please select project",
+    deleteEmployeeConfirm: "Delete employee",
+    deleteProjectConfirm: "Delete project",
+    employeeCreated: "Employee created",
+    employeeSaved: "Employee updated",
+    employeeDeleted: "Employee deleted",
+    projectCreated: "Project created",
+    projectSaved: "Project updated",
+    projectDeleted: "Project deleted",
+  },
+  he: {
+    appTitle: "דיווחי עבודה",
+    adminPanel: "ניהול",
+    employees: "עובדים",
+    projects: "פרויקטים",
+    stats: "דוחות",
+    settings: "הגדרות מערכת",
+    logout: "יציאה",
+    employeeTitle: "עובדים",
+    employeeHint: "ניהול עובדים ופרטי התחברות.",
+    employeeList: "רשימת עובדים",
+    search: "חיפוש...",
+    refresh: "רענון",
+    addEmployee: "עובד חדש",
+    editSelected: "עריכת עובד",
+    firstName: "שם פרטי",
+    lastName: "שם משפחה",
+    passport: "מספר דרכון",
+    car: "מספר רכב",
+    card: "מספר כרטיס",
+    phone: "טלפון",
+    email: "אימייל",
+    dailyRate: "תעריף יומי",
+    login: "שם משתמש",
+    password: "סיסמה",
+    newPassword: "סיסמה חדשה (לא חובה)",
+    selected: "נבחר",
+    none: "לא נבחר",
+    add: "הוספה",
+    save: "שמירה",
+    delete: "מחיקה",
+    optional: "לא חובה",
+    keepEmpty: "להשאיר ריק אם אין שינוי",
+    projectTitle: "פרויקטים",
+    projectHint: "ניהול רשימת הפרויקטים.",
+    projectList: "רשימת פרויקטים",
+    addProject: "פרויקט חדש",
+    projectName: "שם פרויקט",
+    active: "פעיל",
+    activeValue: "פעיל",
+    disabledValue: "לא פעיל",
+    statsTitle: "דוחות",
+    statsHint: "דוח חודשי לעובד או לפרויקט.",
+    report: "דוח",
+    type: "סוג דוח",
+    month: "חודש",
+    employee: "עובד",
+    project: "פרויקט",
+    run: "הצג דוח",
+    employeeMonthly: "דוח עובד",
+    projectMonthly: "דוח פרויקט",
+    selectPrompt: "בחירה...",
+    date: "תאריך",
+    start: "התחלה",
+    end: "סיום",
+    notes: "הערות",
+    summary: "סה״כ",
+    days: "ימים",
+    totalDays: "סה״כ ימים",
+    totalHours: "סה״כ שעות",
+    extraHours: "שעות נוספות",
+    dailyRateHeader: "תעריף יומי",
+    hours: "שעות",
+    cost: "עלות",
+    employeeCount: "עובדים",
+    settingsTitle: "הגדרות מערכת",
+    settingsHint: "בחירת שפה ואורך משמרת לחישוב שעות נוספות.",
+    language: "שפה",
+    workdayHours: "אורך משמרת (בשעות)",
+    saveSettings: "שמירת הגדרות",
+    settingsSaved: "ההגדרות נשמרו",
+    ready: "מוכן.",
+    missingMonth: "יש לבחור חודש",
+    missingEmployee: "יש לבחור עובד",
+    missingProject: "יש לבחור פרויקט",
+    deleteEmployeeConfirm: "למחוק עובד",
+    deleteProjectConfirm: "למחוק פרויקט",
+    employeeCreated: "העובד נוסף",
+    employeeSaved: "העובד נשמר",
+    employeeDeleted: "העובד נמחק",
+    projectCreated: "הפרויקט נוסף",
+    projectSaved: "הפרויקט נשמר",
+    projectDeleted: "הפרויקט נמחק",
+  },
+};
+
+function currentLang() {
+  return ADMIN_SETTINGS.admin_language === "he" ? "he" : "en";
+}
+
+function t(key) {
+  return I18N[currentLang()]?.[key] || I18N.en[key] || key;
+}
+
+function setText(selector, key) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = t(key);
+}
+
+function setLabel(forId, key) {
+  setText(`label[for="${forId}"]`, key);
+}
+
+function setPlaceholder(id, key) {
+  const el = $id(id);
+  if (el) el.placeholder = t(key);
+}
+
+function updateStaticText() {
+  document.documentElement.lang = currentLang();
+  document.documentElement.dir = currentLang() === "he" ? "rtl" : "ltr";
+
+  setText(".brand-title", "appTitle");
+  setText(".brand-sub", "adminPanel");
+  setText('.nav-tab[data-tab="employees"]', "employees");
+  setText('.nav-tab[data-tab="projects"]', "projects");
+  setText('.nav-tab[data-tab="stats"]', "stats");
+  setText('.nav-tab[data-tab="settings"]', "settings");
+  setText("#btn-logout", "logout");
+
+  setText('.tab-panel[data-panel="employees"] .page-header h1', "employeeTitle");
+  setText('.tab-panel[data-panel="employees"] .page-hint', "employeeHint");
+  setText('.tab-panel[data-panel="employees"] .pane-title', "employeeList");
+  setText("#btn-emp-reload", "refresh");
+  setText('.tab-panel[data-panel="employees"] details:nth-of-type(1) summary', "addEmployee");
+  setText('.tab-panel[data-panel="employees"] details:nth-of-type(2) summary', "editSelected");
+
+  setLabel("emp-add-first", "firstName");
+  setLabel("emp-add-last", "lastName");
+  setLabel("emp-add-passport", "passport");
+  setLabel("emp-add-car", "car");
+  setLabel("emp-add-card", "card");
+  setLabel("emp-add-phone", "phone");
+  setLabel("emp-add-email", "email");
+  setLabel("emp-add-rate", "dailyRate");
+  setLabel("emp-add-login", "login");
+  setLabel("emp-add-pass", "password");
+  setText("#btn-emp-create", "add");
+
+  setLabel("emp-edit-first", "firstName");
+  setLabel("emp-edit-last", "lastName");
+  setLabel("emp-edit-passport", "passport");
+  setLabel("emp-edit-car", "car");
+  setLabel("emp-edit-card", "card");
+  setLabel("emp-edit-phone", "phone");
+  setLabel("emp-edit-email", "email");
+  setLabel("emp-edit-rate", "dailyRate");
+  setLabel("emp-edit-login", "login");
+  setLabel("emp-edit-pass", "newPassword");
+  setText("#btn-emp-save", "save");
+  setText("#btn-emp-delete", "delete");
+  setText('.tab-panel[data-panel="employees"] .form-row .label', "selected");
+
+  setText('.tab-panel[data-panel="projects"] .page-header h1', "projectTitle");
+  setText('.tab-panel[data-panel="projects"] .page-hint', "projectHint");
+  setText('.tab-panel[data-panel="projects"] .pane-title', "projectList");
+  setText("#btn-prj-reload", "refresh");
+  setText('.tab-panel[data-panel="projects"] details:nth-of-type(1) summary', "addProject");
+  setText('.tab-panel[data-panel="projects"] details:nth-of-type(2) summary', "editSelected");
+  setText('.tab-panel[data-panel="projects"] details:nth-of-type(2) .form-row .label', "selected");
+  setLabel("prj-add-name", "projectName");
+  setLabel("prj-edit-name", "projectName");
+  setLabel("prj-edit-active", "active");
+  setText("#btn-prj-create", "add");
+  setText("#btn-prj-save", "save");
+  setText("#btn-prj-delete", "delete");
+
+  setText('.tab-panel[data-panel="stats"] .page-header h1', "statsTitle");
+  setText('.tab-panel[data-panel="stats"] .page-hint', "statsHint");
+  setText('.tab-panel[data-panel="stats"] .pane-title', "report");
+  setLabel("stats-mode", "type");
+  setLabel("stats-month", "month");
+  setLabel("stats-emp", "employee");
+  setLabel("stats-prj", "project");
+  setText("#btn-stats-run", "run");
+
+  setText('.tab-panel[data-panel="settings"] .page-header h1', "settingsTitle");
+  setText('.tab-panel[data-panel="settings"] .page-hint', "settingsHint");
+  setLabel("setting-language", "language");
+  setLabel("setting-workday-hours", "workdayHours");
+  setText("#btn-settings-save", "saveSettings");
+
+  setText("#admin-status", "ready");
+
+  setPlaceholder("emp-search", "search");
+  setPlaceholder("prj-search", "search");
+  setPlaceholder("emp-add-passport", "optional");
+  setPlaceholder("emp-add-car", "optional");
+  setPlaceholder("emp-add-card", "optional");
+  setPlaceholder("emp-add-phone", "optional");
+  setPlaceholder("emp-add-email", "optional");
+  setPlaceholder("emp-edit-passport", "optional");
+  setPlaceholder("emp-edit-car", "optional");
+  setPlaceholder("emp-edit-card", "optional");
+  setPlaceholder("emp-edit-phone", "optional");
+  setPlaceholder("emp-edit-email", "optional");
+  setPlaceholder("emp-edit-pass", "keepEmpty");
+
+  const statsMode = $id("stats-mode");
+  if (statsMode) {
+    statsMode.querySelector('option[value="employee"]').textContent = t("employeeMonthly");
+    statsMode.querySelector('option[value="project"]').textContent = t("projectMonthly");
+  }
+
+  const activeOpt = $id("prj-edit-active");
+  if (activeOpt) {
+    activeOpt.querySelector('option[value="1"]').textContent = t("activeValue");
+    activeOpt.querySelector('option[value="0"]').textContent = t("disabledValue");
+  }
+
+  fillStatsPickers();
+  fillEmployeeEdit(selectedEmployee);
+  fillProjectEdit(selectedProject);
+  if ($id("emp-list")) renderEmployeeList($id("emp-search")?.value || "");
+  if ($id("prj-list")) renderProjectList($id("prj-search")?.value || "");
+}
+
 // =========================
 // Tabs
 // =========================
@@ -101,7 +410,7 @@ function renderEmployeeList(filter = "") {
 }
 
 function fillEmployeeEdit(e) {
-  $id("emp-selected").textContent = e ? `${e.last_name}, ${e.first_name}` : "None";
+  $id("emp-selected").textContent = e ? `${e.last_name}, ${e.first_name}` : t("none");
   $id("emp-edit-first").value = e?.first_name || "";
   $id("emp-edit-last").value = e?.last_name || "";
   // Optional IDs
@@ -151,7 +460,7 @@ async function createEmployee() {
     password: $id("emp-add-pass").value,
   };
   const r = await api("/admin/employees", { method: "POST", body: JSON.stringify(payload) });
-  $id("emp-add-note").textContent = r.message || "Created";
+  $id("emp-add-note").textContent = r.message ? t("employeeCreated") : t("employeeCreated");
   $id("emp-add-pass").value = "";
   await loadEmployees();
 }
@@ -171,15 +480,15 @@ async function saveEmployee() {
     password: $id("emp-edit-pass").value,
   };
   const r = await api(`/admin/employees/${selectedEmployee.id}`, { method: "PUT", body: JSON.stringify(payload) });
-  $id("emp-edit-note").textContent = r.message || "Saved";
+  $id("emp-edit-note").textContent = r.message ? t("employeeSaved") : t("employeeSaved");
   await loadEmployees();
 }
 
 async function deleteEmployee() {
   if (!selectedEmployee) return;
-  if (!confirm(`Delete employee ${selectedEmployee.first_name} ${selectedEmployee.last_name}?`)) return;
+  if (!confirm(`${t("deleteEmployeeConfirm")} ${selectedEmployee.first_name} ${selectedEmployee.last_name}?`)) return;
   const r = await api(`/admin/employees/${selectedEmployee.id}`, { method: "DELETE" });
-  $id("emp-edit-note").textContent = r.message || "Deleted";
+  $id("emp-edit-note").textContent = r.message ? t("employeeDeleted") : t("employeeDeleted");
   selectedEmployee = null;
   await loadEmployees();
 }
@@ -201,7 +510,7 @@ function renderProjectList(filter = "") {
     const item = document.createElement("button");
     item.className = "vitem";
     item.type = "button";
-    const suffix = p.is_active ? "" : " (disabled)";
+    const suffix = p.is_active ? "" : ` (${t("disabledValue")})`;
     item.textContent = `${p.name}${suffix}`;
     if (selectedProject?.id === p.id) item.classList.add("active");
     item.addEventListener("click", () => selectProject(p.id));
@@ -210,7 +519,7 @@ function renderProjectList(filter = "") {
 }
 
 function fillProjectEdit(p) {
-  $id("prj-selected").textContent = p ? p.name : "None";
+  $id("prj-selected").textContent = p ? p.name : t("none");
   $id("prj-edit-name").value = p?.name || "";
   $id("prj-edit-active").value = p?.is_active ? "1" : "0";
 }
@@ -236,7 +545,7 @@ async function loadProjects() {
 async function createProject() {
   const name = $id("prj-add-name").value;
   const r = await api("/admin/projects", { method: "POST", body: JSON.stringify({ name }) });
-  $id("prj-add-note").textContent = r.message || "Created";
+  $id("prj-add-note").textContent = r.message ? t("projectCreated") : t("projectCreated");
   $id("prj-add-name").value = "";
   await loadProjects();
 }
@@ -248,15 +557,15 @@ async function saveProject() {
     is_active: $id("prj-edit-active").value === "1",
   };
   const r = await api(`/admin/projects/${selectedProject.id}`, { method: "PUT", body: JSON.stringify(payload) });
-  $id("prj-edit-note").textContent = r.message || "Saved";
+  $id("prj-edit-note").textContent = r.message ? t("projectSaved") : t("projectSaved");
   await loadProjects();
 }
 
 async function deleteProject() {
   if (!selectedProject) return;
-  if (!confirm(`Delete project ${selectedProject.name}?`)) return;
+  if (!confirm(`${t("deleteProjectConfirm")} ${selectedProject.name}?`)) return;
   const r = await api(`/admin/projects/${selectedProject.id}`, { method: "DELETE" });
-  $id("prj-edit-note").textContent = r.message || "Deleted";
+  $id("prj-edit-note").textContent = r.message ? t("projectDeleted") : t("projectDeleted");
   selectedProject = null;
   await loadProjects();
 }
@@ -268,22 +577,35 @@ async function deleteProject() {
 function fillStatsPickers() {
   const empSel = $id("stats-emp");
   const prjSel = $id("stats-prj");
+  if (!empSel || !prjSel) return;
+  const selectedEmp = empSel.value;
+  const selectedPrj = prjSel.value;
 
-  empSel.innerHTML = '<option value="">Select...</option>';
+  empSel.innerHTML = "";
+  const empPrompt = document.createElement("option");
+  empPrompt.value = "";
+  empPrompt.textContent = t("selectPrompt");
+  empSel.appendChild(empPrompt);
   for (const e of EMPLOYEES) {
     const opt = document.createElement("option");
     opt.value = e.id;
     opt.textContent = `${e.last_name}, ${e.first_name}`;
     empSel.appendChild(opt);
   }
+  if (selectedEmp) empSel.value = selectedEmp;
 
-  prjSel.innerHTML = '<option value="">Select...</option>';
+  prjSel.innerHTML = "";
+  const prjPrompt = document.createElement("option");
+  prjPrompt.value = "";
+  prjPrompt.textContent = t("selectPrompt");
+  prjSel.appendChild(prjPrompt);
   for (const p of PROJECTS) {
     const opt = document.createElement("option");
     opt.value = p.id;
     opt.textContent = p.name;
     prjSel.appendChild(opt);
   }
+  if (selectedPrj) prjSel.value = selectedPrj;
 }
 
 function setStatsMode(mode) {
@@ -292,6 +614,24 @@ function setStatsMode(mode) {
   $id("stats-prj-row").classList.toggle("is-hidden", isEmp);
   $id("stats-table").innerHTML = "";
   $id("stats-summary").textContent = "";
+}
+
+function initMonthPickers() {
+  document.querySelectorAll("[data-month-picker]").forEach((button) => {
+    const input = $id(button.dataset.monthPicker);
+    if (!input) return;
+
+    button.addEventListener("click", () => {
+      input.focus({ preventScroll: true });
+      try {
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+          return;
+        }
+      } catch {}
+      input.click();
+    });
+  });
 }
 
 function formatHours(value) {
@@ -348,11 +688,11 @@ async function runStats() {
   const mode = $id("stats-mode").value;
   const month = $id("stats-month").value;
 
-  if (!month) throw new Error("Please select month");
+  if (!month) throw new Error(t("missingMonth"));
 
   if (mode === "employee") {
     const empId = $id("stats-emp").value;
-    if (!empId) throw new Error("Please select employee");
+    if (!empId) throw new Error(t("missingEmployee"));
 
     const r = await api(`/admin/reports/employee/${empId}?month=${encodeURIComponent(month)}`);
 
@@ -371,18 +711,18 @@ async function runStats() {
     const totalHours = r.totals?.hours ?? 0;
     const totalExtraHours = r.totals?.extra_hours ?? 0;
 
-    const summaryRow = ["Summary", "", "", "", `Days: ${totalDays} | Extra hours: ${formatHours(totalExtraHours)}`];
+    const summaryRow = [t("summary"), "", "", "", `${t("days")}: ${totalDays} | ${t("extraHours")}: ${formatHours(totalExtraHours)}`];
 
-    const table = renderTable(["Date", "Start", "End", "Project", "Notes"], rows, {
+    const table = renderTable([t("date"), t("start"), t("end"), t("project"), t("notes")], rows, {
       summaryRow,
       rowClassName: (row) => row.isExtraHours ? "overtime-row" : "",
     });
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
-    $id("stats-summary").textContent = `Total days: ${totalDays} | Total hours: ${formatHours(totalHours)} | Extra hours: ${formatHours(totalExtraHours)}`;
+    $id("stats-summary").textContent = `${t("totalDays")}: ${totalDays} | ${t("totalHours")}: ${formatHours(totalHours)} | ${t("extraHours")}: ${formatHours(totalExtraHours)}`;
   } else {
     const prjId = $id("stats-prj").value;
-    if (!prjId) throw new Error("Please select project");
+    if (!prjId) throw new Error(t("missingProject"));
 
     const r = await api(`/admin/reports/project/${prjId}?month=${encodeURIComponent(month)}`);
 
@@ -398,20 +738,50 @@ async function runStats() {
 
     const totals = r.totals || {};
     const summaryRow = [
-      "Summary",
+      t("summary"),
       "",
       String(totals.days ?? 0),
       String(totals.hours ?? 0),
       String(totals.cost ?? 0),
     ];
 
-    const table = renderTable(["Employee", "Daily rate", "Days", "Hours", "Cost"], rows, { summaryRow });
+    const table = renderTable([t("employee"), t("dailyRateHeader"), t("days"), t("hours"), t("cost")], rows, { summaryRow });
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
 
     // Required top line
-    $id("stats-summary").textContent = `Employees: ${totals.employeeCount ?? 0} | Total hours: ${formatHours(totals.hours)} | Total cost: ${formatHours(totals.cost)}`;
+    $id("stats-summary").textContent = `${t("employeeCount")}: ${totals.employeeCount ?? 0} | ${t("totalHours")}: ${formatHours(totals.hours)} | ${t("cost")}: ${formatHours(totals.cost)}`;
   }
+}
+
+// =========================
+// Settings
+// =========================
+
+async function loadSettings() {
+  const r = await api("/admin/settings");
+  ADMIN_SETTINGS = { ...DEFAULT_ADMIN_SETTINGS, ...(r.settings || {}) };
+  fillSettingsForm();
+  updateStaticText();
+}
+
+function fillSettingsForm() {
+  if ($id("setting-language")) $id("setting-language").value = ADMIN_SETTINGS.admin_language || "en";
+  if ($id("setting-workday-hours")) $id("setting-workday-hours").value = ADMIN_SETTINGS.workday_hours ?? 9;
+}
+
+async function saveSettings() {
+  const payload = {
+    admin_language: $id("setting-language").value,
+    workday_hours: Number($id("setting-workday-hours").value),
+  };
+  const r = await api("/admin/settings", { method: "PUT", body: JSON.stringify(payload) });
+  ADMIN_SETTINGS = { ...DEFAULT_ADMIN_SETTINGS, ...(r.settings || {}) };
+  fillSettingsForm();
+  updateStaticText();
+  $id("settings-note").textContent = t("settingsSaved");
+  $id("stats-table").innerHTML = "";
+  $id("stats-summary").textContent = "";
 }
 
 // =========================
@@ -428,7 +798,9 @@ async function logout() {
 // =========================
 
 async function init() {
+  await loadSettings();
   initTabs();
+  updateStaticText();
 
   $id("btn-logout").addEventListener("click", logout);
 
@@ -458,8 +830,18 @@ async function init() {
     try { await deleteProject(); } catch (e) { $id("prj-edit-note").textContent = e.message; }
   });
 
+  // Settings
+  $id("setting-language").addEventListener("change", () => {
+    ADMIN_SETTINGS.admin_language = $id("setting-language").value;
+    updateStaticText();
+  });
+  $id("btn-settings-save").addEventListener("click", async () => {
+    try { await saveSettings(); } catch (e) { $id("settings-note").textContent = e.message; }
+  });
+
   // Stats
   $id("stats-month").value = todayMonth();
+  initMonthPickers();
   $id("stats-mode").addEventListener("change", () => setStatsMode($id("stats-mode").value));
   $id("btn-stats-run").addEventListener("click", async () => {
     try { await runStats(); } catch (e) { $id("stats-summary").textContent = e.message; }

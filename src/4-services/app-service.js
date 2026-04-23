@@ -55,7 +55,62 @@ function monthRange(month) {
   return { from, to };
 }
 
+const DEFAULT_SETTINGS = {
+  admin_language: "en",
+  workday_hours: "9",
+};
+
+function normalizeSettings(rows) {
+  const raw = { ...DEFAULT_SETTINGS };
+  for (const row of rows || []) {
+    raw[row.setting_key] = String(row.setting_value ?? "");
+  }
+
+  const language = raw.admin_language === "he" ? "he" : "en";
+  const workdayHours = Number(raw.workday_hours);
+
+  return {
+    admin_language: language,
+    workday_hours: Number.isFinite(workdayHours) && workdayHours > 0 ? workdayHours : Number(DEFAULT_SETTINGS.workday_hours),
+  };
+}
+
 class AppService {
+  /* =========================
+     SETTINGS (ADMIN)
+     ========================= */
+
+  async getSettings() {
+    const rows = await sqlService.listSettings();
+    return { ok: true, settings: normalizeSettings(rows) };
+  }
+
+  async updateSettings(payload) {
+    const settings = {};
+
+    if (payload?.admin_language !== undefined) {
+      const language = String(payload.admin_language || "").trim();
+      if (!["en", "he"].includes(language)) {
+        return { ok: false, status: 400, message: "Invalid language" };
+      }
+      settings.admin_language = language;
+    }
+
+    if (payload?.workday_hours !== undefined) {
+      const hours = Number(payload.workday_hours);
+      if (!Number.isFinite(hours) || hours <= 0 || hours > 24) {
+        return { ok: false, status: 400, message: "Invalid workday hours" };
+      }
+      settings.workday_hours = String(round2(hours));
+    }
+
+    for (const [key, value] of Object.entries(settings)) {
+      await sqlService.setSetting(key, value);
+    }
+
+    return this.getSettings();
+  }
+
   /* =========================
      EMPLOYEES (ADMIN)
      ========================= */
@@ -310,6 +365,8 @@ class AppService {
     if (!range) return { ok: false, status: 400, message: "Invalid month" };
 
     const rows = await sqlService.employeeMonthlyReport(id, range.from, range.to);
+    const settings = normalizeSettings(await sqlService.listSettings());
+    const overtimeThresholdMinutes = Math.round(settings.workday_hours * 60);
 
     let totalMinutes = 0;
     const daySet = new Set();
@@ -325,13 +382,13 @@ class AppService {
 
     let totalExtraMinutes = 0;
     for (const minutes of dayMinutes.values()) {
-      if (minutes > 600) totalExtraMinutes += (minutes - 600);
+      if (minutes > overtimeThresholdMinutes) totalExtraMinutes += (minutes - overtimeThresholdMinutes);
     }
 
     const decoratedRows = rows.map((r) => {
       const workDate = String(r.work_date).slice(0, 10);
       const dayTotalMinutes = dayMinutes.get(workDate) || 0;
-      const extraMinutes = Math.max(dayTotalMinutes - 600, 0);
+      const extraMinutes = Math.max(dayTotalMinutes - overtimeThresholdMinutes, 0);
       return {
         ...r,
         row_minutes: minutesBetween(String(r.start_time), String(r.end_time)),
@@ -352,6 +409,7 @@ class AppService {
         hours: round2(totalMinutes / 60),
         extra_minutes: totalExtraMinutes,
         extra_hours: round2(totalExtraMinutes / 60),
+        workday_hours: settings.workday_hours,
       },
     };
   }

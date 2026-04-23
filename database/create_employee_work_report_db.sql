@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.2
+   Version: v1.1.3
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -22,6 +22,7 @@ GO
    ======================= */
 
 IF OBJECT_ID(N'dbo.[work_entries]', N'U') IS NOT NULL DROP TABLE dbo.[work_entries];
+IF OBJECT_ID(N'dbo.[app_settings]', N'U') IS NOT NULL DROP TABLE dbo.[app_settings];
 IF OBJECT_ID(N'dbo.[projects]', N'U') IS NOT NULL DROP TABLE dbo.[projects];
 IF OBJECT_ID(N'dbo.[employees]', N'U') IS NOT NULL DROP TABLE dbo.[employees];
 GO
@@ -64,6 +65,14 @@ GO
 CREATE UNIQUE INDEX UX_projects_name ON dbo.[projects]([name]);
 GO
 
+-- App settings
+CREATE TABLE dbo.[app_settings] (
+  [setting_key]   NVARCHAR(80)  NOT NULL CONSTRAINT PK_app_settings PRIMARY KEY,
+  [setting_value] NVARCHAR(400) NOT NULL,
+  [updated_at]    DATETIME2(0)  NOT NULL CONSTRAINT DF_app_settings_updated_at DEFAULT (SYSDATETIME())
+);
+GO
+
 -- Work entries
 CREATE TABLE dbo.[work_entries] (
   [id]          INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_work_entries PRIMARY KEY,
@@ -104,4 +113,10 @@ INSERT INTO dbo.[employees]
   ([first_name],[last_name],[passport_id],[car_id],[card_id],[phone],[email],[daily_rate],[login],[password_hash],[role],[is_active])
 VALUES
   (N'Admin', N'User', NULL, NULL, NULL, NULL, NULL, 1.00, N'admin', N'admin', N'admin', 1);
+GO
+
+INSERT INTO dbo.[app_settings] ([setting_key], [setting_value])
+VALUES
+  (N'admin_language', N'en'),
+  (N'workday_hours', N'9');
 GO

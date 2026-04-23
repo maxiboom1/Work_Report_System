@@ -1,3 +1,14 @@
+Version: v1.1.3
+Date: 2026-04-23
+Done:
+- Added admin system settings for interface language and standard workday length.
+- Added Hebrew admin UI labels with less technical wording for day-to-day use.
+- Extra-hours reporting now uses the configured standard workday length.
+- Statistics filters now stay on one horizontal line on desktop to leave more room for reports.
+- Fixed the Statistics month picker icon so it is visible and clickable.
+
+----------------------------------------
+
 Version: v1.1.2
 Date: 2026-04-23
 Done:

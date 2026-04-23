@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.2
+**Version:** v1.1.3
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -26,6 +26,13 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.3 improvements:
+- Added admin system settings for interface language and standard workday length.
+- Added Hebrew admin UI labels with less technical wording for day-to-day use.
+- Extra-hours reporting now uses the configured standard workday length.
+- Statistics filters now stay on one horizontal line on desktop to leave more room for reports.
+- Fixed the Statistics month picker icon so it is visible and clickable.
 
 v1.1.2 improvements:
 - Employees now support optional phone and email fields across SQL, API, and admin UI.
