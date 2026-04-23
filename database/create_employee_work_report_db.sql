@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.6
+   Version: v1.1.7
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -22,6 +22,7 @@ GO
    ======================= */
 
 IF OBJECT_ID(N'dbo.[work_entries]', N'U') IS NOT NULL DROP TABLE dbo.[work_entries];
+IF OBJECT_ID(N'dbo.[contractor_entries]', N'U') IS NOT NULL DROP TABLE dbo.[contractor_entries];
 IF OBJECT_ID(N'dbo.[app_settings]', N'U') IS NOT NULL DROP TABLE dbo.[app_settings];
 IF OBJECT_ID(N'dbo.[projects]', N'U') IS NOT NULL DROP TABLE dbo.[projects];
 IF OBJECT_ID(N'dbo.[employees]', N'U') IS NOT NULL DROP TABLE dbo.[employees];
@@ -102,6 +103,38 @@ GO
 
 CREATE INDEX IX_work_entries_employee_date ON dbo.[work_entries]([employee_id],[work_date]);
 CREATE INDEX IX_work_entries_project_date ON dbo.[work_entries]([project_id],[work_date]);
+GO
+
+-- Contractor entries
+CREATE TABLE dbo.[contractor_entries] (
+  [id]                  INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_contractor_entries PRIMARY KEY,
+  [manager_employee_id] INT NOT NULL,
+  [project_id]          INT NOT NULL,
+  [service_date]        DATE NOT NULL CONSTRAINT DF_contractor_entries_service_date DEFAULT (CONVERT(date, SYSDATETIME())),
+  [start_time]          TIME(0) NULL,
+  [end_time]            TIME(0) NULL,
+  [contractor_name]     NVARCHAR(120) NOT NULL,
+  [service_description] NVARCHAR(600) NOT NULL,
+  [service_cost]        DECIMAL(10,2) NULL,
+  [created_at]          DATETIME2(0) NOT NULL CONSTRAINT DF_contractor_entries_created_at DEFAULT (SYSDATETIME()),
+  [updated_at]          DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[contractor_entries]
+  ADD CONSTRAINT FK_contractor_entries_manager
+  FOREIGN KEY([manager_employee_id]) REFERENCES dbo.[employees]([id])
+  ON DELETE NO ACTION;
+GO
+
+ALTER TABLE dbo.[contractor_entries]
+  ADD CONSTRAINT FK_contractor_entries_project
+  FOREIGN KEY([project_id]) REFERENCES dbo.[projects]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE INDEX IX_contractor_entries_service_date ON dbo.[contractor_entries]([service_date]);
+CREATE INDEX IX_contractor_entries_project_date ON dbo.[contractor_entries]([project_id],[service_date]);
 GO
 
 /* =======================

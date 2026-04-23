@@ -75,7 +75,7 @@ const I18N = {
     activeValue: "active",
     disabledValue: "disabled",
     statsTitle: "Reports",
-    statsHint: "Monthly employee or project report.",
+    statsHint: "Monthly employee, project, or external contractor report.",
     report: "Report",
     type: "Report type",
     month: "Month",
@@ -84,6 +84,7 @@ const I18N = {
     run: "Show report",
     employeeMonthly: "Employee report",
     projectMonthly: "Project report",
+    contractorsMonthly: "External contractors",
     selectPrompt: "Select...",
     date: "Date",
     start: "Start",
@@ -98,6 +99,14 @@ const I18N = {
     hours: "Hours",
     cost: "Cost",
     employeeCount: "Employees",
+    contractorName: "Contractor",
+    serviceDescription: "Service description",
+    serviceCost: "Service cost",
+    managerAddedBy: "Registered by",
+    entries: "Entries",
+    editCost: "Edit cost",
+    costUpdateConfirm: "Update contractor service cost?",
+    costUpdated: "Cost updated",
     settingsTitle: "System settings",
     settingsHint: "Choose the admin language and workday length.",
     language: "Language",
@@ -160,7 +169,7 @@ const I18N = {
     activeValue: "פעיל",
     disabledValue: "לא פעיל",
     statsTitle: "דוחות",
-    statsHint: "דוח חודשי לעובד או לפרויקט.",
+    statsHint: "דוח חודשי לעובד, לפרויקט או לקבלנים חיצוניים.",
     report: "דוח",
     type: "סוג דוח",
     month: "חודש",
@@ -169,6 +178,7 @@ const I18N = {
     run: "הצג דוח",
     employeeMonthly: "דוח עובד",
     projectMonthly: "דוח פרויקט",
+    contractorsMonthly: "קבלנים חיצוניים",
     selectPrompt: "בחירה...",
     date: "תאריך",
     start: "התחלה",
@@ -183,6 +193,14 @@ const I18N = {
     hours: "שעות",
     cost: "עלות",
     employeeCount: "עובדים",
+    contractorName: "שם קבלן",
+    serviceDescription: "תיאור שירות",
+    serviceCost: "עלות שירות",
+    managerAddedBy: "נרשם על ידי",
+    entries: "רשומות",
+    editCost: "עריכת עלות",
+    costUpdateConfirm: "לעדכן את עלות השירות של הקבלן?",
+    costUpdated: "העלות עודכנה",
     settingsTitle: "הגדרות מערכת",
     settingsHint: "בחירת שפה ואורך משמרת לחישוב שעות נוספות.",
     language: "שפה",
@@ -324,6 +342,7 @@ function updateStaticText() {
   if (statsMode) {
     statsMode.querySelector('option[value="employee"]').textContent = t("employeeMonthly");
     statsMode.querySelector('option[value="project"]').textContent = t("projectMonthly");
+    statsMode.querySelector('option[value="contractors"]').textContent = t("contractorsMonthly");
   }
 
   const activeOpt = $id("prj-edit-active");
@@ -637,8 +656,9 @@ function fillStatsPickers() {
 
 function setStatsMode(mode) {
   const isEmp = mode === "employee";
+  const isProject = mode === "project";
   $id("stats-emp-row").classList.toggle("is-hidden", !isEmp);
-  $id("stats-prj-row").classList.toggle("is-hidden", isEmp);
+  $id("stats-prj-row").classList.toggle("is-hidden", !isProject);
   $id("stats-table").innerHTML = "";
   $id("stats-summary").textContent = "";
 }
@@ -662,6 +682,11 @@ function initMonthPickers() {
 }
 
 function formatHours(value) {
+  return Number(value || 0).toFixed(2).replace(/\.00$/, "");
+}
+
+function formatMoney(value) {
+  if (value === null || value === undefined || value === "") return "-";
   return Number(value || 0).toFixed(2).replace(/\.00$/, "");
 }
 
@@ -797,6 +822,39 @@ function renderTable(headers, rows, options = {}) {
   return table;
 }
 
+function createContractorCostCell(row) {
+  const wrap = document.createElement("div");
+  wrap.className = "cost-cell";
+
+  const value = document.createElement("span");
+  value.className = "cost-value";
+  value.textContent = formatMoney(row.service_cost);
+
+  const btn = document.createElement("button");
+  btn.className = "btn btn-small";
+  btn.type = "button";
+  btn.textContent = t("editCost");
+  btn.addEventListener("click", async () => {
+    const currentValue = row.service_cost === null || row.service_cost === undefined ? "" : String(row.service_cost);
+    const nextValue = prompt(`${t("costUpdateConfirm")}\n${t("serviceCost")}:`, currentValue);
+    if (nextValue === null) return;
+
+    try {
+      await api(`/admin/contractors/${row.id}/cost`, {
+        method: "PUT",
+        body: JSON.stringify({ service_cost: nextValue }),
+      });
+      $id("stats-summary").textContent = t("costUpdated");
+      await runStats();
+    } catch (e) {
+      $id("stats-summary").textContent = e.message;
+    }
+  });
+
+  wrap.append(value, btn);
+  return wrap;
+}
+
 async function runStats() {
   const mode = $id("stats-mode").value;
   const month = $id("stats-month").value;
@@ -855,7 +913,7 @@ async function runStats() {
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
     $id("stats-summary").textContent = `${t("totalDays")}: ${totalDays} | ${t("totalHours")}: ${formatHours(totalHours)} | ${t("extraHours")}: ${formatHours(totalExtraHours)}`;
-  } else {
+  } else if (mode === "project") {
     const prjId = $id("stats-prj").value;
     if (!prjId) throw new Error(t("missingProject"));
 
@@ -886,6 +944,47 @@ async function runStats() {
 
     // Required top line
     $id("stats-summary").textContent = `${t("employeeCount")}: ${totals.employeeCount ?? 0} | ${t("totalHours")}: ${formatHours(totals.hours)} | ${t("cost")}: ${formatHours(totals.cost)}`;
+  } else {
+    const r = await api(`/admin/reports/contractors?month=${encodeURIComponent(month)}`);
+    const rows = (r.rows || []).map((entry) => ({
+      cells: [
+        createDateCell(String(entry.service_date).slice(0, 10)),
+        String(entry.start_time || "").slice(0, 5) || "-",
+        String(entry.end_time || "").slice(0, 5) || "-",
+        entry.project_name || "",
+        entry.contractor_name || "",
+        entry.service_description || "",
+        `${entry.manager_last_name || ""}, ${entry.manager_first_name || ""}`.replace(/^, /, "").trim() || "-",
+        createContractorCostCell(entry),
+      ],
+    }));
+
+    const totals = r.totals || {};
+    const summaryRow = [
+      { content: t("summary"), className: "summary-title" },
+      {
+        colSpan: 7,
+        content: createSummaryMetrics([
+          { label: t("entries"), value: String(totals.entries ?? 0) },
+          { label: t("cost"), value: formatMoney(totals.cost) },
+        ]),
+      },
+    ];
+
+    const table = renderTable([
+      t("date"),
+      t("start"),
+      t("end"),
+      t("project"),
+      t("contractorName"),
+      t("serviceDescription"),
+      t("managerAddedBy"),
+      t("serviceCost"),
+    ], rows, { summaryRow });
+
+    $id("stats-table").innerHTML = "";
+    $id("stats-table").appendChild(table);
+    $id("stats-summary").textContent = `${t("entries")}: ${totals.entries ?? 0} | ${t("cost")}: ${formatMoney(totals.cost)}`;
   }
 }
 

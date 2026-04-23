@@ -1,3 +1,12 @@
+Version: v1.1.7
+Date: 2026-04-23
+Done:
+- Split manager tools into internal tabs for car lists and external contractors.
+- Contractor entries now support optional start/end time.
+- External contractor reports now show the manager who registered each entry.
+
+----------------------------------------
+
 Version: v1.1.6
 Date: 2026-04-23
 Done:

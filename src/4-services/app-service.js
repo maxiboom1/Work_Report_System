@@ -40,6 +40,13 @@ function round2(value) {
   return Math.round(Number(value) * 100) / 100;
 }
 
+function parseOptionalMoney(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return null;
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount < 0) return NaN;
+  return round2(amount);
+}
+
 function monthRange(month) {
   // month: YYYY-MM
   if (!isNonEmptyString(month) || !/^\d{4}-\d{2}$/.test(month)) return null;
@@ -233,6 +240,53 @@ class AppService {
 
     const employees = await sqlService.listEmployeesForManagerCarList();
     return { ok: true, employees };
+  }
+
+  async createManagerContractorEntry(user, payload) {
+    const current = await sqlService.getEmployeeById(user?.uid);
+    if (!current || String(current.role).toLowerCase() !== "employee" || !current.is_active || !current.is_manager) {
+      return { ok: false, status: 403, message: "Manager access required" };
+    }
+
+    const project_id = toInt(payload?.project_id);
+    const start_time = String(payload?.start_time || "").trim() ? parseTime(payload.start_time) : null;
+    const end_time = String(payload?.end_time || "").trim() ? parseTime(payload.end_time) : null;
+    const contractor_name = String(payload?.contractor_name || "").trim();
+    const service_description = String(payload?.service_description || "").trim();
+    const service_cost = parseOptionalMoney(payload?.service_cost);
+
+    if (!project_id || !contractor_name || !service_description) {
+      return { ok: false, status: 400, message: "Missing contractor details" };
+    }
+    if (Number.isNaN(service_cost)) {
+      return { ok: false, status: 400, message: "Invalid service cost" };
+    }
+    if ((payload?.start_time && !start_time) || (payload?.end_time && !end_time)) {
+      return { ok: false, status: 400, message: "Invalid contractor time" };
+    }
+    if ((start_time && !end_time) || (!start_time && end_time)) {
+      return { ok: false, status: 400, message: "Start and end time must be filled together" };
+    }
+    if (start_time && end_time && minutesBetween(start_time, end_time) <= 0) {
+      return { ok: false, status: 400, message: "end_time must be after start_time" };
+    }
+
+    const project = await sqlService.getProjectById(project_id);
+    if (!project) return { ok: false, status: 400, message: "Invalid project" };
+    if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
+
+    const id = await sqlService.createContractorEntry({
+      manager_employee_id: current.id,
+      project_id,
+      start_time,
+      end_time,
+      contractor_name,
+      service_description,
+      service_cost,
+    });
+
+    if (!id) return { ok: false, status: 500, message: "Failed to create contractor entry" };
+    return { ok: true, id, message: "Contractor entry created" };
   }
 
   /* =========================
@@ -491,6 +545,37 @@ class AppService {
         cost: round2(totalCost),
       },
     };
+  }
+
+  async getContractorMonthlyReport(month) {
+    const range = monthRange(month);
+    if (!range) return { ok: false, status: 400, message: "Invalid month" };
+
+    const rows = await sqlService.contractorMonthlyReport(range.from, range.to);
+    const totalCost = rows.reduce((sum, row) => sum + Number(row.service_cost || 0), 0);
+
+    return {
+      ok: true,
+      rows,
+      totals: {
+        entries: rows.length,
+        cost: round2(totalCost),
+      },
+    };
+  }
+
+  async updateContractorServiceCost(id, payload) {
+    const contractorId = toInt(id);
+    if (!contractorId) return { ok: false, status: 400, message: "Invalid contractor entry id" };
+
+    const service_cost = parseOptionalMoney(payload?.service_cost);
+    if (Number.isNaN(service_cost)) {
+      return { ok: false, status: 400, message: "Invalid service cost" };
+    }
+
+    const affected = await sqlService.updateContractorServiceCost(contractorId, service_cost);
+    if (!affected) return { ok: false, status: 404, message: "Contractor entry not found" };
+    return { ok: true, message: "Contractor cost updated" };
   }
 }
 

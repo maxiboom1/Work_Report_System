@@ -92,13 +92,22 @@ async function loadProjects() {
   const r = await api("/projects");
   projects = r.projects || [];
   const sel = $id("project");
+  const contractorSel = $id("contractor-project");
   sel.innerHTML = "";
+  if (contractorSel) contractorSel.innerHTML = "";
   for (const p of projects) {
     if (p.is_active === 0) continue;
     const opt = document.createElement("option");
     opt.value = String(p.id);
     opt.textContent = p.name;
     sel.appendChild(opt);
+
+    if (contractorSel) {
+      const contractorOpt = document.createElement("option");
+      contractorOpt.value = String(p.id);
+      contractorOpt.textContent = p.name;
+      contractorSel.appendChild(contractorOpt);
+    }
   }
 }
 
@@ -199,6 +208,29 @@ async function loadManagerEmployees() {
   const r = await api("/my/manager/car-list");
   managerEmployees = r.employees || [];
   renderManagerEmployees();
+}
+
+async function saveContractorEntry() {
+  const payload = {
+    project_id: Number($id("contractor-project").value || 0),
+    start_time: $id("contractor-start-time").value,
+    end_time: $id("contractor-end-time").value,
+    contractor_name: $id("contractor-name").value,
+    service_description: $id("contractor-description").value,
+    service_cost: $id("contractor-cost").value,
+  };
+
+  const r = await api("/my/manager/contractors", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  $id("contractor-name").value = "";
+  $id("contractor-description").value = "";
+  $id("contractor-start-time").value = "";
+  $id("contractor-end-time").value = "";
+  $id("contractor-cost").value = "";
+  $id("contractor-status").textContent = r.message ? "הקבלן נרשם." : "הקבלן נרשם.";
 }
 
 function showCarList() {
@@ -327,6 +359,16 @@ function enableManagerTools() {
   if (tab) tab.hidden = false;
 }
 
+function showManagerTool(which) {
+  const isCars = which === "cars";
+  $id("manager-subtab-cars").classList.toggle("active", isCars);
+  $id("manager-subtab-contractors").classList.toggle("active", !isCars);
+  $id("manager-subtab-cars").setAttribute("aria-selected", isCars ? "true" : "false");
+  $id("manager-subtab-contractors").setAttribute("aria-selected", !isCars ? "true" : "false");
+  $id("manager-panel-cars").hidden = !isCars;
+  $id("manager-panel-contractors").hidden = isCars;
+}
+
 async function logout() {
   try { await api("/auth/logout", { method: "POST" }); } catch {}
   location.href = "/login.html";
@@ -369,6 +411,9 @@ async function init() {
   tabReg.addEventListener("click", () => show("register"));
   tabRep.addEventListener("click", () => show("reports"));
   tabManager.addEventListener("click", () => show("manager"));
+  $id("manager-subtab-cars").addEventListener("click", () => showManagerTool("cars"));
+  $id("manager-subtab-contractors").addEventListener("click", () => showManagerTool("contractors"));
+  showManagerTool("cars");
   show("register");
 
   $id("btn-add").addEventListener("click", async () => {
@@ -382,6 +427,14 @@ async function init() {
 
   $id("rep-month").addEventListener("change", () => loadEntries().catch(() => {}));
   $id("btn-show-car-list").addEventListener("click", showCarList);
+  $id("btn-save-contractor").addEventListener("click", async () => {
+    try {
+      $id("contractor-status").textContent = "שומר...";
+      await saveContractorEntry();
+    } catch (e) {
+      $id("contractor-status").textContent = e.message;
+    }
+  });
   $id("btn-close-car-list").addEventListener("click", closeCarList);
   $id("btn-share-car-list").addEventListener("click", () => {
     shareCarList().catch((e) => {

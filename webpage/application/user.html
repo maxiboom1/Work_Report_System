@@ -24,7 +24,7 @@
       <div class="tabbar" role="tablist" aria-label="Employee tabs">
         <button id="tab-register" class="tabbtn active" type="button" role="tab" aria-selected="true">Register day</button>
         <button id="tab-reports" class="tabbtn" type="button" role="tab" aria-selected="false">View reports</button>
-        <button id="tab-manager" class="tabbtn" type="button" role="tab" aria-selected="false" hidden>רשימת רכבים</button>
+        <button id="tab-manager" class="tabbtn" type="button" role="tab" aria-selected="false" hidden>ניהול</button>
       </div>
 
       <!-- TAB: Register day -->
@@ -61,6 +61,7 @@
             <div id="status" class="crumb">Ready.</div>
           </div>
         </div>
+
       </section>
 
       <!-- TAB: View reports -->
@@ -86,7 +87,12 @@
 
       <!-- TAB: Manager tools -->
       <section id="panel-manager" class="panel" role="tabpanel" hidden>
-        <div class="card manager-card">
+        <div class="manager-subtabs" role="tablist" aria-label="Manager tools">
+          <button id="manager-subtab-cars" class="manager-subtab active" type="button" role="tab" aria-selected="true">רשימת רכבים</button>
+          <button id="manager-subtab-contractors" class="manager-subtab" type="button" role="tab" aria-selected="false">קבלנים</button>
+        </div>
+
+        <div id="manager-panel-cars" class="card manager-card manager-tool-panel" role="tabpanel">
           <div class="card-title">רשימת רכבים</div>
           <div class="manager-hint">בחר עובדים והפק רשימת שמות, דרכונים ומספרי רכב לשליחה ללקוח.</div>
 
@@ -96,7 +102,50 @@
             <button id="btn-show-car-list" class="btn btn-open" type="button">הצג רשימת רכבים</button>
             <div id="manager-status" class="crumb">בחר עובד אחד או יותר.</div>
           </div>
+        </div>
 
+        <div id="manager-panel-contractors" class="card manager-card manager-tool-panel contractor-card" role="tabpanel" hidden>
+          <div class="card-title">רישום קבלן</div>
+          <div class="manager-hint">רישום עבודה שבוצעה על ידי קבלן חיצוני בפרויקט.</div>
+
+          <div class="form-grid mt-12">
+            <div class="field">
+              <div class="field-label">פרויקט</div>
+              <select id="contractor-project" class="select select-md"></select>
+            </div>
+            <div class="field">
+              <div class="field-label">שם קבלן</div>
+              <input id="contractor-name" class="select select-md" type="text" />
+            </div>
+          </div>
+
+          <div class="field mt-10">
+            <div class="field-label">תיאור שירות</div>
+            <textarea id="contractor-description" class="select select-md textarea" rows="3"></textarea>
+          </div>
+
+          <div class="form-grid mt-10">
+            <div class="field">
+              <div class="field-label">שעת התחלה (לא חובה)</div>
+              <input id="contractor-start-time" class="select select-md" type="time" />
+            </div>
+            <div class="field">
+              <div class="field-label">שעת סיום (לא חובה)</div>
+              <input id="contractor-end-time" class="select select-md" type="time" />
+            </div>
+          </div>
+
+          <div class="form-grid mt-10">
+            <div class="field">
+              <div class="field-label">עלות שירות (לא חובה)</div>
+              <input id="contractor-cost" class="select select-md" type="number" min="0" step="0.01" />
+            </div>
+          </div>
+
+          <div class="row-actions">
+            <button id="btn-save-contractor" class="btn btn-open" type="button">שמור קבלן</button>
+            <div id="contractor-status" class="crumb">מוכן.</div>
+          </div>
         </div>
       </section>
 

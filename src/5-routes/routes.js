@@ -52,6 +52,11 @@ router.get("/my/manager/car-list", requireAuth, asyncHandler(async (req, res) =>
   return res.status(result.ok ? 200 : (result.status || 500)).json(result);
 }));
 
+router.post("/my/manager/contractors", requireAuth, asyncHandler(async (req, res) => {
+  const result = await appService.createManagerContractorEntry(req.user, req.body);
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
 // =========================
 // ADMIN: Settings
 // =========================
@@ -127,6 +132,17 @@ router.get("/admin/reports/employee/:id", requireAuth, requireAdmin, asyncHandle
 router.get("/admin/reports/project/:id", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
   const month = String(req.query.month || "");
   const result = await appService.getProjectReport(req.params.id, month);
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
+router.get("/admin/reports/contractors", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const month = String(req.query.month || "");
+  const result = await appService.getContractorMonthlyReport(month);
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
+router.put("/admin/contractors/:id/cost", requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const result = await appService.updateContractorServiceCost(req.params.id, req.body);
   return res.status(result.ok ? 200 : (result.status || 500)).json(result);
 }));
 

@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.6
+**Version:** v1.1.7
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -18,7 +18,9 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Register day (add a new entry)
   - View reports (monthly entries)
 - Worker screens must remain responsive because employees mostly enter reports from mobile phones.
-- Employees marked as managers can open a manager-only car list tool and generate selected workers' name/passport/car details.
+- Employees marked as managers can open manager-only tools:
+  - Generate selected workers' name/passport/car details for client parking access.
+  - Register external contractor work by project, contractor name, optional start/end time, service description, and optional cost.
 
 ### Admin
 - CRUD Employees
@@ -26,7 +28,13 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 - Statistics:
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
+  - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.7 improvements:
+- Split manager tools into internal tabs for car lists and external contractors.
+- Contractor entries now support optional start/end time.
+- External contractor reports now show the manager who registered each entry.
 
 v1.1.6 improvements:
 - Added employee manager permissions and a manager-only car list tool.
@@ -111,6 +119,16 @@ v1.0.3 improvements:
 - employee_id
 - project_id
 - notes
+
+### contractor_entries
+- service_date (DATE)
+- start_time (TIME, optional)
+- end_time (TIME, optional)
+- manager_employee_id
+- project_id
+- contractor_name
+- service_description
+- service_cost (optional)
 
 ---
 

@@ -176,6 +176,37 @@ body{
   direction:rtl;
 }
 
+.manager-subtabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:12px;
+  direction:rtl;
+}
+
+.manager-subtab{
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,#1a2636,#111a25);
+  color:var(--text);
+  padding:12px 10px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.manager-subtab.active{
+  border-color: rgba(29,125,255,.55);
+  box-shadow:0 0 0 2px rgba(29,125,255,.18);
+}
+
+.manager-tool-panel[hidden]{
+  display:none;
+}
+
+.contractor-card{
+  margin-top:0;
+}
+
 .manager-hint{
   margin-top:6px;
   color:var(--muted);
@@ -416,6 +447,11 @@ body[data-view="devices"] .main{
 }
 .select.select-lg{padding:14px 14px; font-size:16px}
 .select.select-md{padding:12px 14px; font-size:14px}
+.textarea{
+  min-height:92px;
+  resize:vertical;
+  line-height:1.45;
+}
 .btn-open{align-self:flex-start; min-width:120px}
 
 .grid{

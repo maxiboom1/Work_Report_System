@@ -311,6 +311,69 @@ class SqlService {
   }
 
   /* =========================
+     CONTRACTOR ENTRIES
+     ========================= */
+
+  async createContractorEntry(entry) {
+    const q = `
+      INSERT INTO dbo.[contractor_entries]
+        (manager_employee_id, project_id, start_time, end_time, contractor_name, service_description, service_cost)
+      OUTPUT inserted.id
+      VALUES
+        (@manager_employee_id, @project_id, @start_time, @end_time, @contractor_name, @service_description, @service_cost);
+    `;
+    const r = await db.execute(q, {
+      manager_employee_id: entry.manager_employee_id,
+      project_id: entry.project_id,
+      start_time: entry.start_time ?? null,
+      end_time: entry.end_time ?? null,
+      contractor_name: entry.contractor_name,
+      service_description: entry.service_description,
+      service_cost: entry.service_cost ?? null,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async contractorMonthlyReport(fromDate, toDateExclusive) {
+    const q = `
+      SELECT
+        ce.id,
+        CONVERT(varchar(10), ce.service_date, 23) AS service_date,
+        CONVERT(varchar(8), ce.start_time, 108) AS start_time,
+        CONVERT(varchar(8), ce.end_time, 108) AS end_time,
+        ce.contractor_name,
+        ce.service_description,
+        ce.service_cost,
+        ce.project_id,
+        p.name AS project_name,
+        ce.manager_employee_id,
+        e.first_name AS manager_first_name,
+        e.last_name AS manager_last_name
+      FROM dbo.[contractor_entries] ce
+      INNER JOIN dbo.[projects] p ON p.id = ce.project_id
+      INNER JOIN dbo.[employees] e ON e.id = ce.manager_employee_id
+      WHERE ce.service_date >= @from
+        AND ce.service_date < @to
+      ORDER BY ce.service_date DESC, ce.id DESC;
+    `;
+    const r = await db.execute(q, { from: fromDate, to: toDateExclusive });
+    return r?.recordset || [];
+  }
+
+  async updateContractorServiceCost(id, serviceCost) {
+    const q = `
+      UPDATE dbo.[contractor_entries]
+      SET service_cost = @service_cost,
+          updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, { id, service_cost: serviceCost ?? null });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  /* =========================
      REPORTS
      ========================= */
 

@@ -95,6 +95,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   background: rgba(255,80,80,0.22);
 }
 
+.btn-small{
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:12px;
+}
+
 .badge{
   font-size: 12px;
   color: var(--muted);
@@ -753,6 +759,19 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   line-height:1;
   letter-spacing:0;
   text-transform:lowercase;
+}
+
+.cost-cell{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:150px;
+}
+
+.cost-value{
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
 }
 
 html[dir="rtl"] .table tbody tr.same-day-continuation{
