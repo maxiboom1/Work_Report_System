@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.1
+   Version: v1.1.2
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -38,6 +38,8 @@ CREATE TABLE dbo.[employees] (
   [passport_id]  NVARCHAR(40)  NULL,
   [car_id]       NVARCHAR(40)  NULL,
   [card_id]      NVARCHAR(40)  NULL,
+  [phone]        NVARCHAR(40)  NULL,
+  [email]        NVARCHAR(120) NULL,
   [daily_rate]   DECIMAL(10,2) NOT NULL,
   [login]        NVARCHAR(80)  NOT NULL,
   [password_hash] NVARCHAR(255) NOT NULL,
@@ -99,7 +101,7 @@ GO
 -- Default admin: login=admin password=admin (hash should be replaced by app on first run if you implement that later)
 -- For now, store as plain text to allow initial bootstrap; app should hash on first login/change.
 INSERT INTO dbo.[employees]
-  ([first_name],[last_name],[passport_id],[car_id],[card_id],[daily_rate],[login],[password_hash],[role],[is_active])
+  ([first_name],[last_name],[passport_id],[car_id],[card_id],[phone],[email],[daily_rate],[login],[password_hash],[role],[is_active])
 VALUES
-  (N'Admin', N'User', NULL, NULL, NULL, 1.00, N'admin', N'admin', N'admin', 1);
+  (N'Admin', N'User', NULL, NULL, NULL, NULL, NULL, 1.00, N'admin', N'admin', N'admin', 1);
 GO

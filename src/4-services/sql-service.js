@@ -10,7 +10,7 @@ class SqlService {
 
   async getEmployeeByLogin(login) {
     const q = `
-      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+      SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
              daily_rate, login, password_hash, role, is_active
       FROM dbo.[employees]
       WHERE login = @login;
@@ -21,7 +21,7 @@ class SqlService {
 
   async listEmployees() {
     const q = `
-      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+      SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
              daily_rate, login, role, is_active
       FROM dbo.[employees]
       WHERE role = 'employee'
@@ -33,7 +33,7 @@ class SqlService {
 
   async getEmployeeById(id) {
     const q = `
-      SELECT id, first_name, last_name, passport_id, car_id, card_id,
+      SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
              daily_rate, login, password_hash, role, is_active
       FROM dbo.[employees]
       WHERE id = @id;
@@ -45,10 +45,10 @@ class SqlService {
   async createEmployee(e) {
     const q = `
       INSERT INTO dbo.[employees]
-        (first_name, last_name, passport_id, car_id, card_id, daily_rate, login, password_hash, role, is_active)
+        (first_name, last_name, passport_id, car_id, card_id, phone, email, daily_rate, login, password_hash, role, is_active)
       OUTPUT inserted.id
       VALUES
-        (@first_name, @last_name, @passport_id, @car_id, @card_id, @daily_rate, @login, @password_hash, @role, @is_active);
+        (@first_name, @last_name, @passport_id, @car_id, @card_id, @phone, @email, @daily_rate, @login, @password_hash, @role, @is_active);
     `;
     const r = await db.execute(q, {
       first_name: e.first_name,
@@ -56,6 +56,8 @@ class SqlService {
       passport_id: e.passport_id ?? null,
       car_id: e.car_id ?? null,
       card_id: e.card_id ?? null,
+      phone: e.phone ?? null,
+      email: e.email ?? null,
       daily_rate: e.daily_rate,
       login: e.login,
       password_hash: e.password_hash,
@@ -66,37 +68,35 @@ class SqlService {
   }
 
   async updateEmployee(id, patch) {
+    const allowed = [
+      "first_name",
+      "last_name",
+      "passport_id",
+      "car_id",
+      "card_id",
+      "phone",
+      "email",
+      "daily_rate",
+      "login",
+      "password_hash",
+      "role",
+      "is_active",
+    ];
+    const setFields = allowed.filter((field) => Object.prototype.hasOwnProperty.call(patch, field));
+    if (setFields.length === 0) return 0;
+
     const q = `
       UPDATE dbo.[employees]
-      SET
-        first_name    = COALESCE(@first_name, first_name),
-        last_name     = COALESCE(@last_name, last_name),
-        passport_id   = COALESCE(@passport_id, passport_id),
-        car_id        = COALESCE(@car_id, car_id),
-        card_id       = COALESCE(@card_id, card_id),
-        daily_rate   = COALESCE(@daily_rate, daily_rate),
-        login         = COALESCE(@login, login),
-        password_hash = COALESCE(@password_hash, password_hash),
-        role          = COALESCE(@role, role),
-        is_active     = COALESCE(@is_active, is_active)
+      SET ${setFields.map((field) => `${field} = @${field}`).join(",\n          ")}
       WHERE id = @id;
 
       SELECT @@ROWCOUNT AS affected;
     `;
 
-    const r = await db.execute(q, {
-      id,
-      first_name: patch.first_name ?? null,
-      last_name: patch.last_name ?? null,
-      passport_id: patch.passport_id ?? null,
-      car_id: patch.car_id ?? null,
-      card_id: patch.card_id ?? null,
-      daily_rate: patch.daily_rate ?? null,
-      login: patch.login ?? null,
-      password_hash: patch.password_hash ?? null,
-      role: patch.role ?? null,
-      is_active: patch.is_active ?? null,
-    });
+    const values = { id };
+    for (const field of setFields) values[field] = patch[field];
+
+    const r = await db.execute(q, values);
     return r?.recordset?.[0]?.affected ?? 0;
   }
 

@@ -71,6 +71,8 @@ class AppService {
     const passport_id = String(payload?.passport_id || "").trim() || null;
     const car_id = String(payload?.car_id || "").trim() || null;
     const card_id = String(payload?.card_id || "").trim() || null;
+    const phone = String(payload?.phone || "").trim() || null;
+    const email = String(payload?.email || "").trim() || null;
     const login = String(payload?.login || "").trim();
     const password = String(payload?.password || "");
     // Admin is a system user and is not managed from the Employees tab.
@@ -97,6 +99,8 @@ class AppService {
       passport_id,
       car_id,
       card_id,
+      phone,
+      email,
       daily_rate,
       login,
       password_hash,
@@ -124,6 +128,8 @@ class AppService {
     if (payload?.passport_id !== undefined) patch.passport_id = String(payload.passport_id || "").trim() || null;
     if (payload?.car_id !== undefined) patch.car_id = String(payload.car_id || "").trim() || null;
     if (payload?.card_id !== undefined) patch.card_id = String(payload.card_id || "").trim() || null;
+    if (payload?.phone !== undefined) patch.phone = String(payload.phone || "").trim() || null;
+    if (payload?.email !== undefined) patch.email = String(payload.email || "").trim() || null;
     if (payload?.login !== undefined) patch.login = String(payload.login || "").trim();
     // role is not editable for employees in this system
     if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;

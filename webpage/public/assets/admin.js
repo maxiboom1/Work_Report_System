@@ -108,9 +108,13 @@ function fillEmployeeEdit(e) {
   const passportEl = document.getElementById("emp-edit-passport");
   const carEl = document.getElementById("emp-edit-car");
   const cardEl = document.getElementById("emp-edit-card");
+  const phoneEl = document.getElementById("emp-edit-phone");
+  const emailEl = document.getElementById("emp-edit-email");
   if (passportEl) passportEl.value = e?.passport_id || "";
   if (carEl) carEl.value = e?.car_id || "";
   if (cardEl) cardEl.value = e?.card_id || "";
+  if (phoneEl) phoneEl.value = e?.phone || "";
+  if (emailEl) emailEl.value = e?.email || "";
   $id("emp-edit-rate").value = (e?.daily_rate ?? "");
   $id("emp-edit-login").value = e?.login || "";
   $id("emp-edit-pass").value = "";
@@ -140,6 +144,8 @@ async function createEmployee() {
     passport_id: ($id("emp-add-passport")?.value || ""),
     car_id: ($id("emp-add-car")?.value || ""),
     card_id: ($id("emp-add-card")?.value || ""),
+    phone: ($id("emp-add-phone")?.value || ""),
+    email: ($id("emp-add-email")?.value || ""),
     daily_rate: Number($id("emp-add-rate").value),
     login: $id("emp-add-login").value,
     password: $id("emp-add-pass").value,
@@ -158,6 +164,8 @@ async function saveEmployee() {
     passport_id: ($id("emp-edit-passport")?.value || ""),
     car_id: ($id("emp-edit-car")?.value || ""),
     card_id: ($id("emp-edit-card")?.value || ""),
+    phone: ($id("emp-edit-phone")?.value || ""),
+    email: ($id("emp-edit-email")?.value || ""),
     daily_rate: Number($id("emp-edit-rate").value),
     login: $id("emp-edit-login").value,
     password: $id("emp-edit-pass").value,

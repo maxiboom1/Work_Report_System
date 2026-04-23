@@ -1,3 +1,11 @@
+Version: v1.1.2
+Date: 2026-04-23
+Done:
+- Employees now support optional phone and email fields across SQL, API, and admin UI.
+- Optional employee fields can now be cleared back to blank/null from the admin UI.
+
+----------------------------------------
+
 Version: v1.1.1
 Date: 2026-04-23
 Done:
