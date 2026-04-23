@@ -1,3 +1,14 @@
+Version: v1.1.4
+Date: 2026-04-23
+Done:
+- Improved employee monthly report table readability for multiple entries on the same date.
+- Added weekday badges next to report dates in the active admin language.
+- Styled the report total row with clearer summary metrics.
+- Fixed Hebrew RTL indentation for same-day continuation rows.
+- Report weekday badges now update correctly when switching admin language.
+
+----------------------------------------
+
 Version: v1.1.3
 Date: 2026-04-23
 Done:

@@ -333,6 +333,15 @@ function updateStaticText() {
   if ($id("prj-list")) renderProjectList($id("prj-search")?.value || "");
 }
 
+async function refreshStatsIfRendered() {
+  if (!$id("stats-table")?.querySelector("table")) return;
+  try {
+    await runStats();
+  } catch (e) {
+    $id("stats-summary").textContent = e.message;
+  }
+}
+
 // =========================
 // Tabs
 // =========================
@@ -638,6 +647,76 @@ function formatHours(value) {
   return Number(value || 0).toFixed(2).replace(/\.00$/, "");
 }
 
+const DAY_NAMES = {
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  he: ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
+};
+
+function dayNameFromDate(value) {
+  const dateText = String(value || "").slice(0, 10);
+  const date = new Date(`${dateText}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  if (document.documentElement.lang === "he") {
+    return [
+      "\u05e8\u05d0\u05e9\u05d5\u05df",
+      "\u05e9\u05e0\u05d9",
+      "\u05e9\u05dc\u05d9\u05e9\u05d9",
+      "\u05e8\u05d1\u05d9\u05e2\u05d9",
+      "\u05d7\u05de\u05d9\u05e9\u05d9",
+      "\u05e9\u05d9\u05e9\u05d9",
+      "\u05e9\u05d1\u05ea",
+    ][date.getDay()];
+  }
+  return DAY_NAMES.en[date.getDay()];
+}
+
+function createDateCell(dateText, isContinuation = false) {
+  const wrap = document.createElement("div");
+  wrap.className = `date-stack${isContinuation ? " is-continuation" : ""}`;
+
+  const date = document.createElement("span");
+  date.className = "date-text";
+  date.textContent = dateText;
+
+  const day = document.createElement("span");
+  day.className = "day-badge";
+  day.textContent = dayNameFromDate(dateText);
+
+  wrap.append(date, day);
+  return wrap;
+}
+
+function createMetric(label, value) {
+  const metric = document.createElement("span");
+  metric.className = "summary-metric";
+
+  const labelEl = document.createElement("span");
+  labelEl.className = "summary-metric-label";
+  labelEl.textContent = label;
+
+  const valueEl = document.createElement("span");
+  valueEl.className = "summary-metric-value";
+  valueEl.textContent = value;
+
+  metric.append(labelEl, valueEl);
+  return metric;
+}
+
+function createSummaryMetrics(metrics) {
+  const wrap = document.createElement("div");
+  wrap.className = "summary-metrics";
+  metrics.forEach(({ label, value }) => wrap.appendChild(createMetric(label, value)));
+  return wrap;
+}
+
+function appendCellContent(td, content) {
+  if (content instanceof Node) {
+    td.appendChild(content);
+    return;
+  }
+  td.textContent = content ?? "";
+}
+
 function renderTable(headers, rows, options = {}) {
   const { summaryRow = null, rowClassName = null } = options;
   const table = document.createElement("table");
@@ -662,7 +741,7 @@ function renderTable(headers, rows, options = {}) {
     }
     r.cells.forEach((c) => {
       const td = document.createElement("td");
-      td.textContent = c;
+      appendCellContent(td, c);
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -673,7 +752,13 @@ function renderTable(headers, rows, options = {}) {
     tr.className = "summary-row";
     summaryRow.forEach((c) => {
       const td = document.createElement("td");
-      td.textContent = c;
+      if (c && typeof c === "object" && !(c instanceof Node)) {
+        if (c.colSpan) td.colSpan = c.colSpan;
+        if (c.className) td.className = c.className;
+        appendCellContent(td, c.content);
+      } else {
+        appendCellContent(td, c);
+      }
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -696,26 +781,46 @@ async function runStats() {
 
     const r = await api(`/admin/reports/employee/${empId}?month=${encodeURIComponent(month)}`);
 
-    const rows = (r.rows || []).map((x) => ({
-      isExtraHours: Boolean(x.is_extra_hours),
-      cells: [
-        String(x.work_date).slice(0, 10),
+    const sourceRows = r.rows || [];
+    const rows = sourceRows.map((x, index) => {
+      const dateText = String(x.work_date).slice(0, 10);
+      const previousDate = index > 0 ? String(sourceRows[index - 1].work_date).slice(0, 10) : "";
+      const isSameDayContinuation = dateText === previousDate;
+      return {
+        isExtraHours: Boolean(x.is_extra_hours),
+        isSameDayContinuation,
+        cells: [
+        createDateCell(dateText, isSameDayContinuation),
         String(x.start_time).slice(0, 5),
         String(x.end_time).slice(0, 5),
         x.project_name,
         x.notes || "",
       ],
-    }));
+      };
+    });
 
     const totalDays = r.totals?.days ?? 0;
     const totalHours = r.totals?.hours ?? 0;
     const totalExtraHours = r.totals?.extra_hours ?? 0;
 
-    const summaryRow = [t("summary"), "", "", "", `${t("days")}: ${totalDays} | ${t("extraHours")}: ${formatHours(totalExtraHours)}`];
+    const summaryRow = [
+      { content: t("summary"), className: "summary-title" },
+      {
+        colSpan: 4,
+        content: createSummaryMetrics([
+          { label: t("totalDays"), value: String(totalDays) },
+          { label: t("totalHours"), value: formatHours(totalHours) },
+          { label: t("extraHours"), value: formatHours(totalExtraHours) },
+        ]),
+      },
+    ];
 
     const table = renderTable([t("date"), t("start"), t("end"), t("project"), t("notes")], rows, {
       summaryRow,
-      rowClassName: (row) => row.isExtraHours ? "overtime-row" : "",
+      rowClassName: (row) => [
+        row.isSameDayContinuation ? "same-day-continuation" : "",
+        row.isExtraHours ? "overtime-row" : "",
+      ].filter(Boolean).join(" "),
     });
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
@@ -738,11 +843,11 @@ async function runStats() {
 
     const totals = r.totals || {};
     const summaryRow = [
-      t("summary"),
+      { content: t("summary"), className: "summary-title" },
       "",
       String(totals.days ?? 0),
-      String(totals.hours ?? 0),
-      String(totals.cost ?? 0),
+      formatHours(totals.hours),
+      formatHours(totals.cost),
     ];
 
     const table = renderTable([t("employee"), t("dailyRateHeader"), t("days"), t("hours"), t("cost")], rows, { summaryRow });
@@ -834,6 +939,7 @@ async function init() {
   $id("setting-language").addEventListener("change", () => {
     ADMIN_SETTINGS.admin_language = $id("setting-language").value;
     updateStaticText();
+    refreshStatsIfRendered();
   });
   $id("btn-settings-save").addEventListener("click", async () => {
     try { await saveSettings(); } catch (e) { $id("settings-note").textContent = e.message; }
