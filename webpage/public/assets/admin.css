@@ -325,6 +325,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     flex: 1;
     min-height: 0;
     overflow: auto;
+    position:relative;
     justify-content: stretch;
     align-items: stretch;
     scrollbar-width: none;
@@ -551,11 +552,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   /* Statistics tables */
   .table{
     width:100%;
-    border-collapse:collapse;
+    border-collapse:separate;
+    border-spacing:0;
     border: 1px solid rgba(255,255,255,0.10);
     border-radius:12px;
-    overflow:hidden;
-    background: rgba(255,255,255,0.02);
+    background: rgb(24 131 207 / 14%);
   }
 
   .table th,
@@ -567,10 +568,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   }
 
 .table th{
+    position:sticky;
+    top:0;
+    z-index:4;
     text-align:left;
     color: var(--muted);
     font-weight:700;
-    background: rgba(255,255,255,0.03);
+    background:#151a21;
+    box-shadow:0 1px 0 rgba(255,255,255,0.08), 0 10px 16px rgba(0,0,0,0.18);
   }
 
   .table tbody tr:hover{ background: rgba(255,255,255,0.03); }
@@ -625,18 +630,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   }
 
   .table tbody tr.same-day-continuation{
-    background:rgba(255,255,255,0.035);
     box-shadow:inset 3px 0 0 rgba(148,163,184,0.34);
   }
 
-  .table tbody tr.same-day-continuation td{
-    color:rgba(220,225,235,0.86);
-  }
-
-  .table tbody tr.same-day-continuation:hover{
-    background:rgba(255,255,255,0.055);
-  }
-  
   .admin-footer{
     margin-top:auto;
     padding-top:14px;
@@ -672,21 +668,25 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .is-hidden{ display:none !important; }
 
 /* Summary row for statistics tables */
-.table tbody tr.summary-row{
-  background: linear-gradient(90deg, rgba(79,140,255,0.16), rgba(79,140,255,0.08));
+.table tfoot tr.summary-row{
+  position:sticky;
+  bottom:0;
+  z-index:5;
   font-weight: 800;
 }
-.table tbody tr.summary-row td{
+.table tfoot tr.summary-row td{
+  position:sticky;
+  bottom:0;
+  z-index:5;
   border-bottom: none;
   padding:14px 12px;
   font-size:14px;
   vertical-align:middle;
-}
-.table tbody tr.summary-row:hover{
-  background: linear-gradient(90deg, rgba(79,140,255,0.20), rgba(79,140,255,0.10));
+  background:#151a21;
+  box-shadow:0 -1px 0 rgba(255,255,255,0.10), 0 -12px 18px rgba(0,0,0,0.20);
 }
 
-.table tbody tr.summary-row .summary-title{
+.table tfoot tr.summary-row .summary-title{
   color:#ffffff;
   font-size:15px;
 }
@@ -721,29 +721,25 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   font-variant-numeric: tabular-nums;
 }
 
-.table tbody tr.overtime-row{
-  background: rgba(160, 44, 44, 0.18);
-}
-
-.table tbody tr.overtime-row td{
-  color: rgba(255, 198, 198, 0.92);
-}
-
-.table tbody tr.overtime-row:hover{
-  background: rgba(160, 44, 44, 0.24);
-}
-
-.table tbody tr.same-day-continuation.overtime-row{
-  background:rgba(160, 44, 44, 0.20);
-  box-shadow:inset 3px 0 0 rgba(255, 198, 198, 0.36);
+.extra-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:22px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid rgba(255,193,7,0.42);
+  background:rgba(255,193,7,0.12);
+  color:rgba(255,230,156,0.96);
+  font-size:11px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:0;
+  text-transform:lowercase;
 }
 
 html[dir="rtl"] .table tbody tr.same-day-continuation{
   box-shadow:inset 3px 0 0 rgba(148,163,184,0.34);
-}
-
-html[dir="rtl"] .table tbody tr.same-day-continuation.overtime-row{
-  box-shadow:inset 3px 0 0 rgba(255, 198, 198, 0.36);
 }
 
 html[dir="rtl"] .date-stack.is-continuation{

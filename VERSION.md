@@ -1,3 +1,13 @@
+Version: v1.1.5
+Date: 2026-04-23
+Done:
+- Report tables now keep the header row and total row visible while scrolling.
+- Header and total rows now share the same background treatment.
+- Same-day continuation rows no longer use a gray background.
+- Extra-hours entries now use an English `extra` badge instead of red row styling.
+
+----------------------------------------
+
 Version: v1.1.4
 Date: 2026-04-23
 Done:

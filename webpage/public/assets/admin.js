@@ -670,7 +670,8 @@ function dayNameFromDate(value) {
   return DAY_NAMES.en[date.getDay()];
 }
 
-function createDateCell(dateText, isContinuation = false) {
+function createDateCell(dateText, options = {}) {
+  const { isContinuation = false, isExtraHours = false } = options;
   const wrap = document.createElement("div");
   wrap.className = `date-stack${isContinuation ? " is-continuation" : ""}`;
 
@@ -683,6 +684,12 @@ function createDateCell(dateText, isContinuation = false) {
   day.textContent = dayNameFromDate(dateText);
 
   wrap.append(date, day);
+  if (isExtraHours) {
+    const extra = document.createElement("span");
+    extra.className = "extra-badge";
+    extra.textContent = "extra";
+    wrap.appendChild(extra);
+  }
   return wrap;
 }
 
@@ -747,7 +754,9 @@ function renderTable(headers, rows, options = {}) {
     tbody.appendChild(tr);
   });
 
+  let tfoot = null;
   if (summaryRow) {
+    tfoot = document.createElement("tfoot");
     const tr = document.createElement("tr");
     tr.className = "summary-row";
     summaryRow.forEach((c) => {
@@ -761,11 +770,12 @@ function renderTable(headers, rows, options = {}) {
       }
       tr.appendChild(td);
     });
-    tbody.appendChild(tr);
+    tfoot.appendChild(tr);
   }
 
   table.appendChild(thead);
   table.appendChild(tbody);
+  if (tfoot) table.appendChild(tfoot);
   return table;
 }
 
@@ -790,7 +800,10 @@ async function runStats() {
         isExtraHours: Boolean(x.is_extra_hours),
         isSameDayContinuation,
         cells: [
-        createDateCell(dateText, isSameDayContinuation),
+        createDateCell(dateText, {
+          isContinuation: isSameDayContinuation,
+          isExtraHours: Boolean(x.is_extra_hours),
+        }),
         String(x.start_time).slice(0, 5),
         String(x.end_time).slice(0, 5),
         x.project_name,
@@ -819,7 +832,6 @@ async function runStats() {
       summaryRow,
       rowClassName: (row) => [
         row.isSameDayContinuation ? "same-day-continuation" : "",
-        row.isExtraHours ? "overtime-row" : "",
       ].filter(Boolean).join(" "),
     });
     $id("stats-table").innerHTML = "";
