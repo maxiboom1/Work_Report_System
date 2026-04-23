@@ -320,6 +320,21 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
     display:flex;
     justify-content:flex-end;
   }
+
+  .stats-results{
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    justify-content: stretch;
+    align-items: stretch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .stats-results::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+  }
   
   .section{
     padding:4px 2px;
@@ -528,3 +543,15 @@ input[type="date"]:hover::-webkit-calendar-picker-indicator{
   border-bottom: none;
 }
 .table tbody tr.summary-row:hover{ background: rgba(79,140,255,0.12); }
+
+.table tbody tr.overtime-row{
+  background: rgba(160, 44, 44, 0.18);
+}
+
+.table tbody tr.overtime-row td{
+  color: rgba(255, 198, 198, 0.92);
+}
+
+.table tbody tr.overtime-row:hover{
+  background: rgba(160, 44, 44, 0.24);
+}

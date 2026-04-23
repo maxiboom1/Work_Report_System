@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.0
+**Version:** v1.1.1
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -26,6 +26,12 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.1 improvements:
+- Employee monthly reports now calculate and display extra hours for days over 10 total hours.
+- Admin employee monthly reports highlight overtime rows in dim red.
+- Statistics report tables now scroll correctly when many rows are shown.
+- Test data was refreshed with Hebrew notes and overtime cases for realistic report testing.
 
 v1.1.0 improvements:
 - Added Codex project guidance in `AGENTS.md`, including version bump, database ownership, and frontend workflow rules.

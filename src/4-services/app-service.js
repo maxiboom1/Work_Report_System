@@ -36,6 +36,10 @@ function minutesBetween(startTime, endTime) {
   return e - s;
 }
 
+function round2(value) {
+  return Math.round(Number(value) * 100) / 100;
+}
+
 function monthRange(month) {
   // month: YYYY-MM
   if (!isNonEmptyString(month) || !/^\d{4}-\d{2}$/.test(month)) return null;
@@ -303,18 +307,45 @@ class AppService {
 
     let totalMinutes = 0;
     const daySet = new Set();
+    const dayMinutes = new Map();
+
     for (const r of rows) {
-      totalMinutes += minutesBetween(String(r.start_time), String(r.end_time));
-      if (r.work_date) daySet.add(String(r.work_date).slice(0, 10));
+      const workDate = String(r.work_date).slice(0, 10);
+      const minutes = minutesBetween(String(r.start_time), String(r.end_time));
+      totalMinutes += minutes;
+      if (workDate) daySet.add(workDate);
+      dayMinutes.set(workDate, (dayMinutes.get(workDate) || 0) + minutes);
     }
+
+    let totalExtraMinutes = 0;
+    for (const minutes of dayMinutes.values()) {
+      if (minutes > 600) totalExtraMinutes += (minutes - 600);
+    }
+
+    const decoratedRows = rows.map((r) => {
+      const workDate = String(r.work_date).slice(0, 10);
+      const dayTotalMinutes = dayMinutes.get(workDate) || 0;
+      const extraMinutes = Math.max(dayTotalMinutes - 600, 0);
+      return {
+        ...r,
+        row_minutes: minutesBetween(String(r.start_time), String(r.end_time)),
+        day_total_minutes: dayTotalMinutes,
+        day_total_hours: round2(dayTotalMinutes / 60),
+        day_extra_minutes: extraMinutes,
+        day_extra_hours: round2(extraMinutes / 60),
+        is_extra_hours: extraMinutes > 0,
+      };
+    });
 
     return {
       ok: true,
-      rows,
+      rows: decoratedRows,
       totals: {
         days: daySet.size,
         minutes: totalMinutes,
-        hours: Math.round((totalMinutes / 60) * 100) / 100,
+        hours: round2(totalMinutes / 60),
+        extra_minutes: totalExtraMinutes,
+        extra_hours: round2(totalExtraMinutes / 60),
       },
     };
   }
@@ -362,8 +393,8 @@ class AppService {
           daily_rate: e.daily_rate,
           days,
           minutes: e.minutes,
-          hours: Math.round(hours * 100) / 100,
-          cost: Math.round(cost * 100) / 100,
+          hours: round2(hours),
+          cost: round2(cost),
         };
       })
       .sort((a, b) => (a.last_name || "").localeCompare(b.last_name || ""));
@@ -379,8 +410,8 @@ class AppService {
         employeeCount: employees.length,
         days: totalDays,
         minutes: totalMinutes,
-        hours: Math.round((totalMinutes / 60) * 100) / 100,
-        cost: Math.round(totalCost * 100) / 100,
+        hours: round2(totalMinutes / 60),
+        cost: round2(totalCost),
       },
     };
   }

@@ -286,7 +286,12 @@ function setStatsMode(mode) {
   $id("stats-summary").textContent = "";
 }
 
-function renderTable(headers, rows, summaryRow = null) {
+function formatHours(value) {
+  return Number(value || 0).toFixed(2).replace(/\.00$/, "");
+}
+
+function renderTable(headers, rows, options = {}) {
+  const { summaryRow = null, rowClassName = null } = options;
   const table = document.createElement("table");
   table.className = "table";
 
@@ -303,7 +308,11 @@ function renderTable(headers, rows, summaryRow = null) {
 
   rows.forEach((r) => {
     const tr = document.createElement("tr");
-    r.forEach((c) => {
+    if (typeof rowClassName === "function") {
+      const className = rowClassName(r);
+      if (className) tr.className = className;
+    }
+    r.cells.forEach((c) => {
       const td = document.createElement("td");
       td.textContent = c;
       tr.appendChild(td);
@@ -339,36 +348,45 @@ async function runStats() {
 
     const r = await api(`/admin/reports/employee/${empId}?month=${encodeURIComponent(month)}`);
 
-    const rows = (r.rows || []).map((x) => [
-      String(x.work_date).slice(0, 10),
-      String(x.start_time).slice(0, 5),
-      String(x.end_time).slice(0, 5),
-      x.project_name,
-      x.notes || "",
-    ]);
+    const rows = (r.rows || []).map((x) => ({
+      isExtraHours: Boolean(x.is_extra_hours),
+      cells: [
+        String(x.work_date).slice(0, 10),
+        String(x.start_time).slice(0, 5),
+        String(x.end_time).slice(0, 5),
+        x.project_name,
+        x.notes || "",
+      ],
+    }));
 
     const totalDays = r.totals?.days ?? 0;
     const totalHours = r.totals?.hours ?? 0;
+    const totalExtraHours = r.totals?.extra_hours ?? 0;
 
-    const summaryRow = ["Summary", "", "", "", `Total days: ${totalDays}`];
+    const summaryRow = ["Summary", "", "", "", `Days: ${totalDays} | Extra hours: ${formatHours(totalExtraHours)}`];
 
-    const table = renderTable(["Date", "Start", "End", "Project", "Notes"], rows, summaryRow);
+    const table = renderTable(["Date", "Start", "End", "Project", "Notes"], rows, {
+      summaryRow,
+      rowClassName: (row) => row.isExtraHours ? "overtime-row" : "",
+    });
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
-    $id("stats-summary").textContent = `Total days: ${totalDays} | Total hours: ${totalHours}`;
+    $id("stats-summary").textContent = `Total days: ${totalDays} | Total hours: ${formatHours(totalHours)} | Extra hours: ${formatHours(totalExtraHours)}`;
   } else {
     const prjId = $id("stats-prj").value;
     if (!prjId) throw new Error("Please select project");
 
     const r = await api(`/admin/reports/project/${prjId}?month=${encodeURIComponent(month)}`);
 
-    const rows = (r.employees || []).map((e) => [
-      `${e.last_name}, ${e.first_name}`,
-      String(e.daily_rate),
-      String(e.days),
-      String(e.hours),
-      String(e.cost),
-    ]);
+    const rows = (r.employees || []).map((e) => ({
+      cells: [
+        `${e.last_name}, ${e.first_name}`,
+        String(e.daily_rate),
+        String(e.days),
+        formatHours(e.hours),
+        formatHours(e.cost),
+      ],
+    }));
 
     const totals = r.totals || {};
     const summaryRow = [
@@ -379,12 +397,12 @@ async function runStats() {
       String(totals.cost ?? 0),
     ];
 
-    const table = renderTable(["Employee", "Daily rate", "Days", "Hours", "Cost"], rows, summaryRow);
+    const table = renderTable(["Employee", "Daily rate", "Days", "Hours", "Cost"], rows, { summaryRow });
     $id("stats-table").innerHTML = "";
     $id("stats-table").appendChild(table);
 
     // Required top line
-    $id("stats-summary").textContent = `Employees: ${totals.employeeCount ?? 0} | Total hours: ${totals.hours ?? 0} | Total cost: ${totals.cost ?? 0}`;
+    $id("stats-summary").textContent = `Employees: ${totals.employeeCount ?? 0} | Total hours: ${formatHours(totals.hours)} | Total cost: ${formatHours(totals.cost)}`;
   }
 }
 

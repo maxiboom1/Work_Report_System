@@ -1,3 +1,13 @@
+Version: v1.1.1
+Date: 2026-04-23
+Done:
+- Employee monthly reports now calculate and display extra hours for days over 10 total hours.
+- Admin employee monthly reports highlight overtime rows in dim red.
+- Statistics report tables now scroll correctly when many rows are shown.
+- Test data was refreshed with Hebrew notes and overtime cases for realistic report testing.
+
+----------------------------------------
+
 Version: v1.1.0
 Date: 2026-04-23
 Done:
