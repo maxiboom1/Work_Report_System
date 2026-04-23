@@ -217,6 +217,337 @@ class SqlService {
   }
 
   /* =========================
+     CLIENTS
+     ========================= */
+
+  async listClients(activeOnly = false) {
+    const q = `
+      SELECT id, name, is_active, created_at, updated_at
+      FROM dbo.[clients]
+      WHERE (@active_only = 0 OR is_active = 1)
+      ORDER BY name;
+    `;
+    const r = await db.execute(q, { active_only: activeOnly ? 1 : 0 });
+    return r?.recordset || [];
+  }
+
+  async getClientById(id) {
+    const q = `
+      SELECT id, name, is_active
+      FROM dbo.[clients]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClient(name) {
+    const q = `
+      INSERT INTO dbo.[clients] (name, is_active)
+      OUTPUT inserted.id
+      VALUES (@name, 1);
+    `;
+    const r = await db.execute(q, { name });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateClient(id, patch) {
+    const q = `
+      UPDATE dbo.[clients]
+      SET
+        name = COALESCE(@name, name),
+        is_active = COALESCE(@is_active, is_active),
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, {
+      id,
+      name: patch.name ?? null,
+      is_active: patch.is_active ?? null,
+    });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async listClientSites(clientId = null, activeOnly = false) {
+    const q = `
+      SELECT id, client_id, name, is_active, created_at, updated_at
+      FROM dbo.[client_sites]
+      WHERE (@client_id IS NULL OR client_id = @client_id)
+        AND (@active_only = 0 OR is_active = 1)
+      ORDER BY name;
+    `;
+    const r = await db.execute(q, {
+      client_id: clientId ?? null,
+      active_only: activeOnly ? 1 : 0,
+    });
+    return r?.recordset || [];
+  }
+
+  async getClientSiteById(id) {
+    const q = `
+      SELECT id, client_id, name, is_active
+      FROM dbo.[client_sites]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClientSite(clientId, name) {
+    const q = `
+      INSERT INTO dbo.[client_sites] (client_id, name, is_active)
+      OUTPUT inserted.id
+      VALUES (@client_id, @name, 1);
+    `;
+    const r = await db.execute(q, { client_id: clientId, name });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateClientSite(id, patch) {
+    const q = `
+      UPDATE dbo.[client_sites]
+      SET
+        name = COALESCE(@name, name),
+        is_active = COALESCE(@is_active, is_active),
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, {
+      id,
+      name: patch.name ?? null,
+      is_active: patch.is_active ?? null,
+    });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async listClientContacts(clientId = null, activeOnly = false) {
+    const q = `
+      SELECT id, client_id, name, email, phone, is_active, created_at, updated_at
+      FROM dbo.[client_contacts]
+      WHERE (@client_id IS NULL OR client_id = @client_id)
+        AND (@active_only = 0 OR is_active = 1)
+      ORDER BY name, email;
+    `;
+    const r = await db.execute(q, {
+      client_id: clientId ?? null,
+      active_only: activeOnly ? 1 : 0,
+    });
+    return r?.recordset || [];
+  }
+
+  async getClientContactById(id) {
+    const q = `
+      SELECT id, client_id, name, email, phone, is_active
+      FROM dbo.[client_contacts]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClientContact(clientId, contact) {
+    const q = `
+      INSERT INTO dbo.[client_contacts] (client_id, name, email, phone, is_active)
+      OUTPUT inserted.id
+      VALUES (@client_id, @name, @email, @phone, 1);
+    `;
+    const r = await db.execute(q, {
+      client_id: clientId,
+      name: contact.name,
+      email: contact.email,
+      phone: contact.phone ?? null,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateClientContact(id, patch) {
+    const allowed = ["name", "email", "phone", "is_active"];
+    const setFields = allowed.filter((field) => Object.prototype.hasOwnProperty.call(patch, field));
+    if (setFields.length === 0) return 0;
+
+    const q = `
+      UPDATE dbo.[client_contacts]
+      SET ${setFields.map((field) => `${field} = @${field}`).join(",\n          ")},
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+
+    const values = { id };
+    for (const field of setFields) values[field] = patch[field];
+
+    const r = await db.execute(q, values);
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  /* =========================
+     FAULT EQUIPMENT HIERARCHY
+     ========================= */
+
+  async listFaultManufacturers(activeOnly = false) {
+    const q = `
+      SELECT id, name, is_active, created_at, updated_at
+      FROM dbo.[fault_manufacturers]
+      WHERE (@active_only = 0 OR is_active = 1)
+      ORDER BY name;
+    `;
+    const r = await db.execute(q, { active_only: activeOnly ? 1 : 0 });
+    return r?.recordset || [];
+  }
+
+  async getFaultManufacturerById(id) {
+    const q = `
+      SELECT id, name, is_active
+      FROM dbo.[fault_manufacturers]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultManufacturer(name) {
+    const q = `
+      INSERT INTO dbo.[fault_manufacturers] (name, is_active)
+      OUTPUT inserted.id
+      VALUES (@name, 1);
+    `;
+    const r = await db.execute(q, { name });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateFaultManufacturer(id, patch) {
+    const q = `
+      UPDATE dbo.[fault_manufacturers]
+      SET
+        name = COALESCE(@name, name),
+        is_active = COALESCE(@is_active, is_active),
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, {
+      id,
+      name: patch.name ?? null,
+      is_active: patch.is_active ?? null,
+    });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async listFaultEquipmentCategories(manufacturerId = null, activeOnly = false) {
+    const q = `
+      SELECT id, manufacturer_id, name, is_active, created_at, updated_at
+      FROM dbo.[fault_equipment_categories]
+      WHERE (@manufacturer_id IS NULL OR manufacturer_id = @manufacturer_id)
+        AND (@active_only = 0 OR is_active = 1)
+      ORDER BY name;
+    `;
+    const r = await db.execute(q, {
+      manufacturer_id: manufacturerId ?? null,
+      active_only: activeOnly ? 1 : 0,
+    });
+    return r?.recordset || [];
+  }
+
+  async getFaultEquipmentCategoryById(id) {
+    const q = `
+      SELECT id, manufacturer_id, name, is_active
+      FROM dbo.[fault_equipment_categories]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultEquipmentCategory(manufacturerId, name) {
+    const q = `
+      INSERT INTO dbo.[fault_equipment_categories] (manufacturer_id, name, is_active)
+      OUTPUT inserted.id
+      VALUES (@manufacturer_id, @name, 1);
+    `;
+    const r = await db.execute(q, { manufacturer_id: manufacturerId, name });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateFaultEquipmentCategory(id, patch) {
+    const q = `
+      UPDATE dbo.[fault_equipment_categories]
+      SET
+        name = COALESCE(@name, name),
+        is_active = COALESCE(@is_active, is_active),
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, {
+      id,
+      name: patch.name ?? null,
+      is_active: patch.is_active ?? null,
+    });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async listFaultEquipmentSubcategories(equipmentCategoryId = null, activeOnly = false) {
+    const q = `
+      SELECT id, equipment_category_id, name, is_active, created_at, updated_at
+      FROM dbo.[fault_equipment_subcategories]
+      WHERE (@equipment_category_id IS NULL OR equipment_category_id = @equipment_category_id)
+        AND (@active_only = 0 OR is_active = 1)
+      ORDER BY name;
+    `;
+    const r = await db.execute(q, {
+      equipment_category_id: equipmentCategoryId ?? null,
+      active_only: activeOnly ? 1 : 0,
+    });
+    return r?.recordset || [];
+  }
+
+  async getFaultEquipmentSubcategoryById(id) {
+    const q = `
+      SELECT id, equipment_category_id, name, is_active
+      FROM dbo.[fault_equipment_subcategories]
+      WHERE id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultEquipmentSubcategory(equipmentCategoryId, name) {
+    const q = `
+      INSERT INTO dbo.[fault_equipment_subcategories] (equipment_category_id, name, is_active)
+      OUTPUT inserted.id
+      VALUES (@equipment_category_id, @name, 1);
+    `;
+    const r = await db.execute(q, { equipment_category_id: equipmentCategoryId, name });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async updateFaultEquipmentSubcategory(id, patch) {
+    const q = `
+      UPDATE dbo.[fault_equipment_subcategories]
+      SET
+        name = COALESCE(@name, name),
+        is_active = COALESCE(@is_active, is_active),
+        updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, {
+      id,
+      name: patch.name ?? null,
+      is_active: patch.is_active ?? null,
+    });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  /* =========================
      WORK ENTRIES
      ========================= */
 

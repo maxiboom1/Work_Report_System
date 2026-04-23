@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.7
+   Version: v1.1.8
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -23,6 +23,12 @@ GO
 
 IF OBJECT_ID(N'dbo.[work_entries]', N'U') IS NOT NULL DROP TABLE dbo.[work_entries];
 IF OBJECT_ID(N'dbo.[contractor_entries]', N'U') IS NOT NULL DROP TABLE dbo.[contractor_entries];
+IF OBJECT_ID(N'dbo.[client_contacts]', N'U') IS NOT NULL DROP TABLE dbo.[client_contacts];
+IF OBJECT_ID(N'dbo.[client_sites]', N'U') IS NOT NULL DROP TABLE dbo.[client_sites];
+IF OBJECT_ID(N'dbo.[clients]', N'U') IS NOT NULL DROP TABLE dbo.[clients];
+IF OBJECT_ID(N'dbo.[fault_equipment_subcategories]', N'U') IS NOT NULL DROP TABLE dbo.[fault_equipment_subcategories];
+IF OBJECT_ID(N'dbo.[fault_equipment_categories]', N'U') IS NOT NULL DROP TABLE dbo.[fault_equipment_categories];
+IF OBJECT_ID(N'dbo.[fault_manufacturers]', N'U') IS NOT NULL DROP TABLE dbo.[fault_manufacturers];
 IF OBJECT_ID(N'dbo.[app_settings]', N'U') IS NOT NULL DROP TABLE dbo.[app_settings];
 IF OBJECT_ID(N'dbo.[projects]', N'U') IS NOT NULL DROP TABLE dbo.[projects];
 IF OBJECT_ID(N'dbo.[employees]', N'U') IS NOT NULL DROP TABLE dbo.[employees];
@@ -65,6 +71,63 @@ CREATE TABLE dbo.[projects] (
 GO
 
 CREATE UNIQUE INDEX UX_projects_name ON dbo.[projects]([name]);
+GO
+
+-- Clients
+CREATE TABLE dbo.[clients] (
+  [id]         INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_clients PRIMARY KEY,
+  [name]       NVARCHAR(120) NOT NULL,
+  [is_active]  BIT NOT NULL CONSTRAINT DF_clients_is_active DEFAULT(1),
+  [created_at] DATETIME2(0) NOT NULL CONSTRAINT DF_clients_created_at DEFAULT (SYSDATETIME()),
+  [updated_at] DATETIME2(0) NULL
+);
+GO
+
+CREATE UNIQUE INDEX UX_clients_name ON dbo.[clients]([name]);
+GO
+
+-- Client sites
+CREATE TABLE dbo.[client_sites] (
+  [id]         INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_client_sites PRIMARY KEY,
+  [client_id]  INT NOT NULL,
+  [name]       NVARCHAR(120) NOT NULL,
+  [is_active]  BIT NOT NULL CONSTRAINT DF_client_sites_is_active DEFAULT(1),
+  [created_at] DATETIME2(0) NOT NULL CONSTRAINT DF_client_sites_created_at DEFAULT (SYSDATETIME()),
+  [updated_at] DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[client_sites]
+  ADD CONSTRAINT FK_client_sites_client
+  FOREIGN KEY([client_id]) REFERENCES dbo.[clients]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE UNIQUE INDEX UX_client_sites_parent_name ON dbo.[client_sites]([client_id], [name]);
+CREATE INDEX IX_client_sites_client ON dbo.[client_sites]([client_id]);
+GO
+
+-- Client contact managers
+CREATE TABLE dbo.[client_contacts] (
+  [id]         INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_client_contacts PRIMARY KEY,
+  [client_id]  INT NOT NULL,
+  [name]       NVARCHAR(120) NOT NULL,
+  [email]      NVARCHAR(160) NOT NULL,
+  [phone]      NVARCHAR(40) NULL,
+  [is_active]  BIT NOT NULL CONSTRAINT DF_client_contacts_is_active DEFAULT(1),
+  [created_at] DATETIME2(0) NOT NULL CONSTRAINT DF_client_contacts_created_at DEFAULT (SYSDATETIME()),
+  [updated_at] DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[client_contacts]
+  ADD CONSTRAINT FK_client_contacts_client
+  FOREIGN KEY([client_id]) REFERENCES dbo.[clients]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE UNIQUE INDEX UX_client_contacts_parent_email ON dbo.[client_contacts]([client_id], [email]);
+CREATE INDEX IX_client_contacts_client ON dbo.[client_contacts]([client_id]);
 GO
 
 -- App settings
@@ -135,6 +198,61 @@ GO
 
 CREATE INDEX IX_contractor_entries_service_date ON dbo.[contractor_entries]([service_date]);
 CREATE INDEX IX_contractor_entries_project_date ON dbo.[contractor_entries]([project_id],[service_date]);
+GO
+
+-- Fault manufacturers
+CREATE TABLE dbo.[fault_manufacturers] (
+  [id]         INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_fault_manufacturers PRIMARY KEY,
+  [name]       NVARCHAR(120) NOT NULL,
+  [is_active]  BIT NOT NULL CONSTRAINT DF_fault_manufacturers_is_active DEFAULT(1),
+  [created_at] DATETIME2(0) NOT NULL CONSTRAINT DF_fault_manufacturers_created_at DEFAULT (SYSDATETIME()),
+  [updated_at] DATETIME2(0) NULL
+);
+GO
+
+CREATE UNIQUE INDEX UX_fault_manufacturers_name ON dbo.[fault_manufacturers]([name]);
+GO
+
+-- Fault equipment/model categories
+CREATE TABLE dbo.[fault_equipment_categories] (
+  [id]              INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_fault_equipment_categories PRIMARY KEY,
+  [manufacturer_id] INT NOT NULL,
+  [name]            NVARCHAR(120) NOT NULL,
+  [is_active]       BIT NOT NULL CONSTRAINT DF_fault_equipment_categories_is_active DEFAULT(1),
+  [created_at]      DATETIME2(0) NOT NULL CONSTRAINT DF_fault_equipment_categories_created_at DEFAULT (SYSDATETIME()),
+  [updated_at]      DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[fault_equipment_categories]
+  ADD CONSTRAINT FK_fault_equipment_categories_manufacturer
+  FOREIGN KEY([manufacturer_id]) REFERENCES dbo.[fault_manufacturers]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE UNIQUE INDEX UX_fault_equipment_categories_parent_name ON dbo.[fault_equipment_categories]([manufacturer_id], [name]);
+CREATE INDEX IX_fault_equipment_categories_manufacturer ON dbo.[fault_equipment_categories]([manufacturer_id]);
+GO
+
+-- Fault equipment/model subcategories
+CREATE TABLE dbo.[fault_equipment_subcategories] (
+  [id]                    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_fault_equipment_subcategories PRIMARY KEY,
+  [equipment_category_id] INT NOT NULL,
+  [name]                  NVARCHAR(120) NOT NULL,
+  [is_active]             BIT NOT NULL CONSTRAINT DF_fault_equipment_subcategories_is_active DEFAULT(1),
+  [created_at]            DATETIME2(0) NOT NULL CONSTRAINT DF_fault_equipment_subcategories_created_at DEFAULT (SYSDATETIME()),
+  [updated_at]            DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[fault_equipment_subcategories]
+  ADD CONSTRAINT FK_fault_equipment_subcategories_category
+  FOREIGN KEY([equipment_category_id]) REFERENCES dbo.[fault_equipment_categories]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE UNIQUE INDEX UX_fault_equipment_subcategories_parent_name ON dbo.[fault_equipment_subcategories]([equipment_category_id], [name]);
+CREATE INDEX IX_fault_equipment_subcategories_category ON dbo.[fault_equipment_subcategories]([equipment_category_id]);
 GO
 
 /* =======================

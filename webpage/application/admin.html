@@ -20,6 +20,8 @@
       <nav class="nav-tabs">
         <button class="nav-tab active" data-tab="employees">Employees</button>
         <button class="nav-tab" data-tab="projects">Projects</button>
+        <button class="nav-tab" data-tab="clients">Clients</button>
+        <button class="nav-tab" data-tab="manufacturers">Manufacturers</button>
         <button class="nav-tab" data-tab="stats">Statistics</button>
         <button class="nav-tab" data-tab="settings">System settings</button>
       </nav>
@@ -293,6 +295,229 @@
 
 
       <!-- =========================
+           TAB: CLIENTS
+           ========================= -->
+      <section class="tab-panel" data-panel="clients">
+        <div class="page-header">
+          <h1>Clients</h1>
+          <div class="page-hint">Manage clients, sites, and contact managers for fault forms.</div>
+        </div>
+
+        <div class="split-3 client-hierarchy">
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="clientList">Clients</div>
+              <input id="client-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="client-list" class="vlist" role="listbox" aria-label="Clients"></div>
+
+            <div class="hierarchy-editor">
+              <div class="section-subtitle" data-i18n-key="addClient">Add client</div>
+              <div class="form-row">
+                <label class="label" for="client-add-name">Add client</label>
+                <input id="client-add-name" class="input" type="text" />
+              </div>
+              <button id="btn-client-create" class="btn">Add</button>
+              <div class="actions">
+                <button id="btn-client-reload" class="btn">Refresh</button>
+              </div>
+              <div id="client-note" class="hint"></div>
+            </div>
+          </section>
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="clientSiteList">Sites</div>
+              <div id="client-site-context" class="pane-context">Select a client to view its sites.</div>
+              <input id="client-site-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="client-site-list" class="vlist" role="listbox" aria-label="Client sites"></div>
+
+            <div class="hierarchy-editor">
+              <div class="section-subtitle" data-i18n-key="addClientSite">Add site</div>
+              <div class="form-row">
+                <label class="label" for="client-site-add-name">Add site</label>
+                <input id="client-site-add-name" class="input" type="text" />
+              </div>
+              <div class="actions">
+                <button id="btn-client-site-create" class="btn">Add</button>
+                <button id="btn-client-site-reload" class="btn">Refresh</button>
+              </div>
+              <div id="client-site-note" class="hint"></div>
+            </div>
+          </section>
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="clientContactList">Contact managers</div>
+              <div id="client-contact-context" class="pane-context">Related to client only. Site selection does not change this list.</div>
+              <input id="client-contact-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="client-contact-list" class="vlist" role="listbox" aria-label="Client contact managers"></div>
+
+            <div class="hierarchy-editor">
+              <div class="section-subtitle" data-i18n-key="addContactManager">Add contact manager</div>
+              <div class="form-row">
+                <label class="label" for="client-contact-add-name">Contact name</label>
+                <input id="client-contact-add-name" class="input" type="text" />
+              </div>
+              <div class="form-row">
+                <label class="label" for="client-contact-add-email">Email</label>
+                <input id="client-contact-add-email" class="input" type="email" />
+              </div>
+              <div class="form-row">
+                <label class="label" for="client-contact-add-phone">Phone</label>
+                <input id="client-contact-add-phone" class="input" type="tel" placeholder="optional" />
+              </div>
+              <div class="actions">
+                <button id="btn-client-contact-create" class="btn">Add</button>
+                <button id="btn-client-contact-reload" class="btn">Refresh</button>
+              </div>
+              <div id="client-contact-note" class="hint"></div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+
+      <!-- =========================
+           TAB: MANUFACTURERS
+           ========================= -->
+      <section class="tab-panel" data-panel="manufacturers">
+        <div class="page-header">
+          <h1>Manufacturers</h1>
+          <div class="page-hint">Manage fault equipment hierarchy for field forms.</div>
+        </div>
+
+        <div class="split-3 fault-hierarchy">
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="manufacturersTitle">Manufacturers</div>
+              <input id="fault-mfr-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="fault-mfr-list" class="vlist" role="listbox" aria-label="Manufacturers"></div>
+
+            <div class="hierarchy-editor">
+              <div class="form-row">
+                <label class="label" for="fault-mfr-add-name">Add manufacturer</label>
+                <input id="fault-mfr-add-name" class="input" type="text" />
+              </div>
+              <button id="btn-fault-mfr-create" class="btn">Add</button>
+
+              <div class="divider"></div>
+
+              <div class="form-row">
+                <label class="label">Selected</label>
+                <div id="fault-mfr-selected" class="badge">None</div>
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-mfr-edit-name">Manufacturer name</label>
+                <input id="fault-mfr-edit-name" class="input" type="text" />
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-mfr-edit-active">Status</label>
+                <select id="fault-mfr-edit-active" class="select">
+                  <option value="1">active</option>
+                  <option value="0">disabled</option>
+                </select>
+              </div>
+              <div class="actions">
+                <button id="btn-fault-mfr-save" class="btn">Save</button>
+                <button id="btn-fault-mfr-toggle" class="btn danger">Disable</button>
+                <button id="btn-fault-mfr-reload" class="btn">Refresh</button>
+              </div>
+              <div id="fault-mfr-note" class="hint"></div>
+            </div>
+          </section>
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="equipmentCategoryTitle">Equipment/model</div>
+              <input id="fault-cat-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="fault-cat-list" class="vlist" role="listbox" aria-label="Equipment categories"></div>
+
+            <div class="hierarchy-editor">
+              <div class="form-row">
+                <label class="label" for="fault-cat-add-name">Add equipment/model</label>
+                <input id="fault-cat-add-name" class="input" type="text" />
+              </div>
+              <button id="btn-fault-cat-create" class="btn">Add</button>
+
+              <div class="divider"></div>
+
+              <div class="form-row">
+                <label class="label">Selected</label>
+                <div id="fault-cat-selected" class="badge">None</div>
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-cat-edit-name">Equipment/model name</label>
+                <input id="fault-cat-edit-name" class="input" type="text" />
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-cat-edit-active">Status</label>
+                <select id="fault-cat-edit-active" class="select">
+                  <option value="1">active</option>
+                  <option value="0">disabled</option>
+                </select>
+              </div>
+              <div class="actions">
+                <button id="btn-fault-cat-save" class="btn">Save</button>
+                <button id="btn-fault-cat-toggle" class="btn danger">Disable</button>
+                <button id="btn-fault-cat-reload" class="btn">Refresh</button>
+              </div>
+              <div id="fault-cat-note" class="hint"></div>
+            </div>
+          </section>
+
+          <section class="pane">
+            <div class="pane-head">
+              <div class="pane-title" data-i18n-key="equipmentSubcategoryTitle">Component/area</div>
+              <input id="fault-sub-search" class="input" type="text" placeholder="Search..." />
+            </div>
+            <div id="fault-sub-list" class="vlist" role="listbox" aria-label="Equipment subcategories"></div>
+
+            <div class="hierarchy-editor">
+              <div class="form-row">
+                <label class="label" for="fault-sub-add-name">Add component/area</label>
+                <input id="fault-sub-add-name" class="input" type="text" />
+              </div>
+              <button id="btn-fault-sub-create" class="btn">Add</button>
+
+              <div class="divider"></div>
+
+              <div class="form-row">
+                <label class="label">Selected</label>
+                <div id="fault-sub-selected" class="badge">None</div>
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-sub-edit-name">Component/area name</label>
+                <input id="fault-sub-edit-name" class="input" type="text" />
+              </div>
+              <div class="form-row">
+                <label class="label" for="fault-sub-edit-active">Status</label>
+                <select id="fault-sub-edit-active" class="select">
+                  <option value="1">active</option>
+                  <option value="0">disabled</option>
+                </select>
+              </div>
+              <div class="actions">
+                <button id="btn-fault-sub-save" class="btn">Save</button>
+                <button id="btn-fault-sub-toggle" class="btn danger">Disable</button>
+                <button id="btn-fault-sub-reload" class="btn">Refresh</button>
+              </div>
+              <div id="fault-sub-note" class="hint"></div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+
+      <!-- =========================
            TAB: STATISTICS
            ========================= -->
       <section class="tab-panel" data-panel="stats">
@@ -379,6 +604,51 @@
           </div>
         </section>
       </section>
+
+      <div id="client-edit-modal" class="modal-backdrop is-hidden" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="client-edit-modal-title">
+          <div class="modal-head">
+            <div>
+              <div id="client-edit-modal-title" class="modal-title">Edit</div>
+              <div id="client-edit-modal-context" class="modal-context"></div>
+            </div>
+            <button id="btn-client-edit-close" class="btn btn-icon" type="button" aria-label="Close">×</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="form-row">
+              <label id="client-edit-modal-name-label" class="label" for="client-edit-modal-name">Name</label>
+              <input id="client-edit-modal-name" class="input" type="text" />
+            </div>
+
+            <div id="client-edit-modal-email-row" class="form-row is-hidden">
+              <label class="label" for="client-edit-modal-email">Email</label>
+              <input id="client-edit-modal-email" class="input" type="email" />
+            </div>
+
+            <div id="client-edit-modal-phone-row" class="form-row is-hidden">
+              <label class="label" for="client-edit-modal-phone">Phone</label>
+              <input id="client-edit-modal-phone" class="input" type="tel" />
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="client-edit-modal-active">Status</label>
+              <select id="client-edit-modal-active" class="select">
+                <option value="1">active</option>
+                <option value="0">disabled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button id="btn-client-edit-save" class="btn" type="button">Save</button>
+            <button id="btn-client-edit-toggle" class="btn danger" type="button">Disable</button>
+            <button id="btn-client-edit-cancel" class="btn" type="button">Cancel</button>
+          </div>
+
+          <div id="client-edit-modal-note" class="hint"></div>
+        </div>
+      </div>
 
       <!-- Footer status bar (keeps layout anchored to bottom like MAG Control) -->
       <div class="admin-footer">

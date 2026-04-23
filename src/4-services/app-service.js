@@ -335,6 +335,299 @@ class AppService {
   }
 
   /* =========================
+     CLIENTS (ADMIN)
+     ========================= */
+
+  async listClients() {
+    const clients = await sqlService.listClients(false);
+    return { ok: true, clients };
+  }
+
+  async createClient(payload) {
+    const name = String(payload?.name || "").trim();
+    if (!name) return { ok: false, status: 400, message: "Missing client name" };
+
+    const id = await sqlService.createClient(name);
+    if (!id) return { ok: false, status: 500, message: "Failed to create client" };
+    return { ok: true, id, message: "Client created" };
+  }
+
+  async updateClient(id, payload) {
+    const clientId = toInt(id);
+    if (!clientId) return { ok: false, status: 400, message: "Invalid client id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing client name" };
+
+    const affected = await sqlService.updateClient(clientId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Client not found" };
+    return { ok: true, message: "Client updated" };
+  }
+
+  async disableClient(id) {
+    return this.updateClient(id, { is_active: 0 });
+  }
+
+  async listClientSites(clientId) {
+    const id = clientId ? toInt(clientId) : null;
+    if (clientId && !id) return { ok: false, status: 400, message: "Invalid client id" };
+    const sites = await sqlService.listClientSites(id, false);
+    return { ok: true, sites };
+  }
+
+  async createClientSite(payload) {
+    const clientId = toInt(payload?.client_id);
+    const name = String(payload?.name || "").trim();
+    if (!clientId || !name) return { ok: false, status: 400, message: "Missing client site details" };
+
+    const client = await sqlService.getClientById(clientId);
+    if (!client) return { ok: false, status: 400, message: "Invalid client" };
+    if (!client.is_active) return { ok: false, status: 400, message: "Client is disabled" };
+
+    const id = await sqlService.createClientSite(clientId, name);
+    if (!id) return { ok: false, status: 500, message: "Failed to create client site" };
+    return { ok: true, id, message: "Client site created" };
+  }
+
+  async updateClientSite(id, payload) {
+    const siteId = toInt(id);
+    if (!siteId) return { ok: false, status: 400, message: "Invalid client site id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing client site name" };
+
+    const affected = await sqlService.updateClientSite(siteId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Client site not found" };
+    return { ok: true, message: "Client site updated" };
+  }
+
+  async disableClientSite(id) {
+    return this.updateClientSite(id, { is_active: 0 });
+  }
+
+  async listClientContacts(clientId) {
+    const id = clientId ? toInt(clientId) : null;
+    if (clientId && !id) return { ok: false, status: 400, message: "Invalid client id" };
+    const contacts = await sqlService.listClientContacts(id, false);
+    return { ok: true, contacts };
+  }
+
+  async createClientContact(payload) {
+    const clientId = toInt(payload?.client_id);
+    const name = String(payload?.name || "").trim();
+    const email = String(payload?.email || "").trim();
+    const phone = String(payload?.phone || "").trim() || null;
+    if (!clientId || !name || !email) return { ok: false, status: 400, message: "Missing client contact details" };
+
+    const client = await sqlService.getClientById(clientId);
+    if (!client) return { ok: false, status: 400, message: "Invalid client" };
+    if (!client.is_active) return { ok: false, status: 400, message: "Client is disabled" };
+
+    const id = await sqlService.createClientContact(clientId, { name, email, phone });
+    if (!id) return { ok: false, status: 500, message: "Failed to create client contact" };
+    return { ok: true, id, message: "Client contact created" };
+  }
+
+  async updateClientContact(id, payload) {
+    const contactId = toInt(id);
+    if (!contactId) return { ok: false, status: 400, message: "Invalid client contact id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.email !== undefined) patch.email = String(payload.email || "").trim();
+    if (payload?.phone !== undefined) patch.phone = String(payload.phone || "").trim() || null;
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing client contact name" };
+    if (patch.email !== undefined && !patch.email) return { ok: false, status: 400, message: "Missing client contact email" };
+
+    const affected = await sqlService.updateClientContact(contactId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Client contact not found" };
+    return { ok: true, message: "Client contact updated" };
+  }
+
+  async disableClientContact(id) {
+    return this.updateClientContact(id, { is_active: 0 });
+  }
+
+  async getClientContactTree() {
+    const clients = await sqlService.listClients(true);
+    const sites = await sqlService.listClientSites(null, true);
+    const contacts = await sqlService.listClientContacts(null, true);
+
+    const sitesByClient = new Map();
+    for (const site of sites) {
+      const items = sitesByClient.get(site.client_id) || [];
+      items.push(site);
+      sitesByClient.set(site.client_id, items);
+    }
+
+    const contactsByClient = new Map();
+    for (const contact of contacts) {
+      const items = contactsByClient.get(contact.client_id) || [];
+      items.push(contact);
+      contactsByClient.set(contact.client_id, items);
+    }
+
+    return {
+      ok: true,
+      clients: clients.map((client) => ({
+        ...client,
+        sites: sitesByClient.get(client.id) || [],
+        contacts: contactsByClient.get(client.id) || [],
+      })),
+    };
+  }
+
+  /* =========================
+     FAULT EQUIPMENT HIERARCHY
+     ========================= */
+
+  async listFaultManufacturers() {
+    const manufacturers = await sqlService.listFaultManufacturers(false);
+    return { ok: true, manufacturers };
+  }
+
+  async createFaultManufacturer(payload) {
+    const name = String(payload?.name || "").trim();
+    if (!name) return { ok: false, status: 400, message: "Missing manufacturer name" };
+
+    const id = await sqlService.createFaultManufacturer(name);
+    if (!id) return { ok: false, status: 500, message: "Failed to create manufacturer" };
+    return { ok: true, id, message: "Manufacturer created" };
+  }
+
+  async updateFaultManufacturer(id, payload) {
+    const manufacturerId = toInt(id);
+    if (!manufacturerId) return { ok: false, status: 400, message: "Invalid manufacturer id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing manufacturer name" };
+
+    const affected = await sqlService.updateFaultManufacturer(manufacturerId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Manufacturer not found" };
+    return { ok: true, message: "Manufacturer updated" };
+  }
+
+  async disableFaultManufacturer(id) {
+    return this.updateFaultManufacturer(id, { is_active: 0 });
+  }
+
+  async listFaultEquipmentCategories(manufacturerId) {
+    const id = manufacturerId ? toInt(manufacturerId) : null;
+    if (manufacturerId && !id) return { ok: false, status: 400, message: "Invalid manufacturer id" };
+    const categories = await sqlService.listFaultEquipmentCategories(id, false);
+    return { ok: true, categories };
+  }
+
+  async createFaultEquipmentCategory(payload) {
+    const manufacturerId = toInt(payload?.manufacturer_id);
+    const name = String(payload?.name || "").trim();
+    if (!manufacturerId || !name) return { ok: false, status: 400, message: "Missing equipment category details" };
+
+    const manufacturer = await sqlService.getFaultManufacturerById(manufacturerId);
+    if (!manufacturer) return { ok: false, status: 400, message: "Invalid manufacturer" };
+    if (!manufacturer.is_active) return { ok: false, status: 400, message: "Manufacturer is disabled" };
+
+    const id = await sqlService.createFaultEquipmentCategory(manufacturerId, name);
+    if (!id) return { ok: false, status: 500, message: "Failed to create equipment category" };
+    return { ok: true, id, message: "Equipment category created" };
+  }
+
+  async updateFaultEquipmentCategory(id, payload) {
+    const categoryId = toInt(id);
+    if (!categoryId) return { ok: false, status: 400, message: "Invalid equipment category id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing equipment category name" };
+
+    const affected = await sqlService.updateFaultEquipmentCategory(categoryId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Equipment category not found" };
+    return { ok: true, message: "Equipment category updated" };
+  }
+
+  async disableFaultEquipmentCategory(id) {
+    return this.updateFaultEquipmentCategory(id, { is_active: 0 });
+  }
+
+  async listFaultEquipmentSubcategories(categoryId) {
+    const id = categoryId ? toInt(categoryId) : null;
+    if (categoryId && !id) return { ok: false, status: 400, message: "Invalid equipment category id" };
+    const subcategories = await sqlService.listFaultEquipmentSubcategories(id, false);
+    return { ok: true, subcategories };
+  }
+
+  async createFaultEquipmentSubcategory(payload) {
+    const categoryId = toInt(payload?.equipment_category_id);
+    const name = String(payload?.name || "").trim();
+    if (!categoryId || !name) return { ok: false, status: 400, message: "Missing equipment subcategory details" };
+
+    const category = await sqlService.getFaultEquipmentCategoryById(categoryId);
+    if (!category) return { ok: false, status: 400, message: "Invalid equipment category" };
+    if (!category.is_active) return { ok: false, status: 400, message: "Equipment category is disabled" };
+
+    const id = await sqlService.createFaultEquipmentSubcategory(categoryId, name);
+    if (!id) return { ok: false, status: 500, message: "Failed to create equipment subcategory" };
+    return { ok: true, id, message: "Equipment subcategory created" };
+  }
+
+  async updateFaultEquipmentSubcategory(id, payload) {
+    const subcategoryId = toInt(id);
+    if (!subcategoryId) return { ok: false, status: 400, message: "Invalid equipment subcategory id" };
+
+    const patch = {};
+    if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
+    if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
+    if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing equipment subcategory name" };
+
+    const affected = await sqlService.updateFaultEquipmentSubcategory(subcategoryId, patch);
+    if (!affected) return { ok: false, status: 404, message: "Equipment subcategory not found" };
+    return { ok: true, message: "Equipment subcategory updated" };
+  }
+
+  async disableFaultEquipmentSubcategory(id) {
+    return this.updateFaultEquipmentSubcategory(id, { is_active: 0 });
+  }
+
+  async getFaultEquipmentTree() {
+    const manufacturers = await sqlService.listFaultManufacturers(true);
+    const categories = await sqlService.listFaultEquipmentCategories(null, true);
+    const subcategories = await sqlService.listFaultEquipmentSubcategories(null, true);
+
+    const categoriesByManufacturer = new Map();
+    for (const category of categories) {
+      const items = categoriesByManufacturer.get(category.manufacturer_id) || [];
+      items.push({ ...category, subcategories: [] });
+      categoriesByManufacturer.set(category.manufacturer_id, items);
+    }
+
+    const categoriesById = new Map();
+    for (const categoryList of categoriesByManufacturer.values()) {
+      for (const category of categoryList) categoriesById.set(category.id, category);
+    }
+
+    for (const subcategory of subcategories) {
+      const category = categoriesById.get(subcategory.equipment_category_id);
+      if (category) category.subcategories.push(subcategory);
+    }
+
+    return {
+      ok: true,
+      manufacturers: manufacturers.map((manufacturer) => ({
+        ...manufacturer,
+        categories: categoriesByManufacturer.get(manufacturer.id) || [],
+      })),
+    };
+  }
+
+  /* =========================
      WORK ENTRIES (EMPLOYEE)
      ========================= */
 

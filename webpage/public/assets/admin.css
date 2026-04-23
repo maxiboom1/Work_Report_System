@@ -86,6 +86,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .btn:hover{ background: var(--btn-hover); }
 .btn:active{ transform: translateY(1px); }
 
+.btn-icon{
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+}
+
 .btn.danger{
   border-color: rgba(255,120,120,0.45);
   background: rgba(255,80,80,0.14);
@@ -277,6 +289,112 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     margin-top:10px;
   }
 
+  .fault-hierarchy{
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+  }
+
+  .client-hierarchy{
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+  }
+
+  .client-hierarchy .vlist{
+    flex: 0 0 240px;
+    min-height: 240px;
+  }
+
+  .client-hierarchy .hierarchy-editor{
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .client-hierarchy .hierarchy-editor::-webkit-scrollbar{
+    width: 0;
+    height: 0;
+  }
+
+  .modal-backdrop{
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(6, 9, 14, 0.68);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-card{
+    width: min(520px, 100%);
+    max-height: min(88vh, 760px);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    background: #151a21;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .modal-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px 18px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+
+  .modal-title{
+    font-size:18px;
+    font-weight:800;
+  }
+
+  .modal-context{
+    margin-top:4px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .modal-body{
+    padding:16px 18px 8px;
+    overflow:auto;
+    min-height:0;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+  }
+
+  .modal-body::-webkit-scrollbar{
+    width:0;
+    height:0;
+  }
+
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    padding:12px 18px 16px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+
+  #client-edit-modal-note{
+    padding:0 18px 16px;
+  }
+
+  .hierarchy-editor{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+
+  .hierarchy-editor .btn{
+    min-width:82px;
+  }
+
   .assign-actions{
     display:flex;
     flex-direction:column;
@@ -319,6 +437,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   
   .pane-title{
     font-weight:700;
+  }
+
+  .pane-context{
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
   }
   
   .pane-foot{
@@ -570,6 +694,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   .vitem .muted{
     opacity:0.75;
     font-size:12px;
+  }
+
+  .vitem-empty{
+    padding:12px 10px;
+    color: var(--muted);
+    font-size:13px;
   }
 
   /* Statistics tables */

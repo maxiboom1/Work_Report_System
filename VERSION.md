@@ -1,3 +1,12 @@
+Version: v1.1.8
+Date: 2026-04-23
+Done:
+- Client admin workspace now keeps only create forms inline.
+- Client, site, and contact editing now opens from a double-click modal instead of staying on the main pane.
+- Client contact lists stay clearly visible and remain client-scoped while switching between sites.
+
+----------------------------------------
+
 Version: v1.1.7
 Date: 2026-04-23
 Done:

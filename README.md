@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.7
+**Version:** v1.1.8
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -25,11 +25,24 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 ### Admin
 - CRUD Employees
 - CRUD Projects
+- CRUD fault client data:
+  - Clients
+  - Client sites
+  - Client contact managers
+- CRUD fault equipment hierarchy:
+  - Manufacturers
+  - Equipment/model categories
+  - Component/area subcategories
 - Statistics:
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.8 improvements:
+- Client admin workspace now keeps only create forms inline.
+- Client, site, and contact editing now opens from a double-click modal instead of staying on the main pane.
+- Client contact lists stay clearly visible and remain client-scoped while switching between sites.
 
 v1.1.7 improvements:
 - Split manager tools into internal tabs for car lists and external contractors.
@@ -112,6 +125,22 @@ v1.0.3 improvements:
 ### projects
 - name
 
+### clients
+- name
+- is_active
+
+### client_sites
+- client_id
+- name
+- is_active
+
+### client_contacts
+- client_id
+- name
+- email
+- phone
+- is_active
+
 ### work_entries
 - work_date (DATE)
 - start_time (TIME)
@@ -129,6 +158,20 @@ v1.0.3 improvements:
 - contractor_name
 - service_description
 - service_cost (optional)
+
+### fault_manufacturers
+- name
+- is_active
+
+### fault_equipment_categories
+- manufacturer_id
+- name
+- is_active
+
+### fault_equipment_subcategories
+- equipment_category_id
+- name
+- is_active
 
 ---
 
