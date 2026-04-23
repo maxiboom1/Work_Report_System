@@ -23,8 +23,8 @@ router.post("/logout", (req, res) => {
     return res.json(result);
 });
 
-router.get("/me", (req, res) => {
-    const result = authService.getMe(req);
+router.get("/me", async (req, res) => {
+    const result = await authService.getMe(req);
     if (!result.ok) return res.status(result.status || 401).json({ ok: false });
     return res.json({ ok: true, user: result.user });
 });

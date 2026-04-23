@@ -24,6 +24,7 @@
       <div class="tabbar" role="tablist" aria-label="Employee tabs">
         <button id="tab-register" class="tabbtn active" type="button" role="tab" aria-selected="true">Register day</button>
         <button id="tab-reports" class="tabbtn" type="button" role="tab" aria-selected="false">View reports</button>
+        <button id="tab-manager" class="tabbtn" type="button" role="tab" aria-selected="false" hidden>רשימת רכבים</button>
       </div>
 
       <!-- TAB: Register day -->
@@ -83,8 +84,39 @@
         </div>
       </section>
 
+      <!-- TAB: Manager tools -->
+      <section id="panel-manager" class="panel" role="tabpanel" hidden>
+        <div class="card manager-card">
+          <div class="card-title">רשימת רכבים</div>
+          <div class="manager-hint">בחר עובדים והפק רשימת שמות, דרכונים ומספרי רכב לשליחה ללקוח.</div>
+
+          <div id="manager-workers" class="manager-workers mt-12"></div>
+
+          <div class="row-actions">
+            <button id="btn-show-car-list" class="btn btn-open" type="button">הצג רשימת רכבים</button>
+            <div id="manager-status" class="crumb">בחר עובד אחד או יותר.</div>
+          </div>
+
+        </div>
+      </section>
+
     </section>
   </main>
+
+  <section id="car-list-screen" class="car-list-screen" role="dialog" aria-modal="true" aria-labelledby="car-list-title" hidden>
+    <div class="car-list-toolbar">
+      <button id="btn-close-car-list" class="btn" type="button">סגור</button>
+      <button id="btn-share-car-list" class="btn btn-open" type="button">שתף</button>
+    </div>
+
+    <div id="car-list-output" class="car-list-document"></div>
+
+    <div id="car-list-copy-panel" class="car-list-copy-panel" hidden>
+      <div class="copy-panel-title">העתקה ידנית</div>
+      <div class="copy-panel-hint">הדפדפן חסם שיתוף אוטומטי. סמן את הטקסט, העתק ושלח ב-WhatsApp.</div>
+      <textarea id="car-list-copy-text" class="car-list-copy-text" readonly></textarea>
+    </div>
+  </section>
 
   <script src="/assets/user.js"></script>
 </body>

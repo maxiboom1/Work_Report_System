@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.5
+   Version: v1.1.6
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -45,6 +45,7 @@ CREATE TABLE dbo.[employees] (
   [login]        NVARCHAR(80)  NOT NULL,
   [password_hash] NVARCHAR(255) NOT NULL,
   [role]         NVARCHAR(20)  NOT NULL CONSTRAINT DF_employees_role DEFAULT('employee'),
+  [is_manager]   BIT           NOT NULL CONSTRAINT DF_employees_is_manager DEFAULT(0),
   [is_active]    BIT           NOT NULL CONSTRAINT DF_employees_is_active DEFAULT(1),
   [created_at]   DATETIME2(0)  NOT NULL CONSTRAINT DF_employees_created_at DEFAULT (SYSDATETIME())
 );
@@ -110,9 +111,9 @@ GO
 -- Default admin: login=admin password=admin (hash should be replaced by app on first run if you implement that later)
 -- For now, store as plain text to allow initial bootstrap; app should hash on first login/change.
 INSERT INTO dbo.[employees]
-  ([first_name],[last_name],[passport_id],[car_id],[card_id],[phone],[email],[daily_rate],[login],[password_hash],[role],[is_active])
+  ([first_name],[last_name],[passport_id],[car_id],[card_id],[phone],[email],[daily_rate],[login],[password_hash],[role],[is_manager],[is_active])
 VALUES
-  (N'Admin', N'User', NULL, NULL, NULL, NULL, NULL, 1.00, N'admin', N'admin', N'admin', 1);
+  (N'Admin', N'User', NULL, NULL, NULL, NULL, NULL, 1.00, N'admin', N'admin', N'admin', 0, 1);
 GO
 
 INSERT INTO dbo.[app_settings] ([setting_key], [setting_value])

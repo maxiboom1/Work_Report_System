@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.5
+**Version:** v1.1.6
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -18,6 +18,7 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Register day (add a new entry)
   - View reports (monthly entries)
 - Worker screens must remain responsive because employees mostly enter reports from mobile phones.
+- Employees marked as managers can open a manager-only car list tool and generate selected workers' name/passport/car details.
 
 ### Admin
 - CRUD Employees
@@ -26,6 +27,10 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.6 improvements:
+- Added employee manager permissions and a manager-only car list tool.
+- Managers can select workers, open a fullscreen car/passport list, and share a WhatsApp-friendly Hebrew formatted message.
 
 v1.1.5 improvements:
 - Report tables now keep the header row and total row visible while scrolling.
@@ -94,6 +99,7 @@ v1.0.3 improvements:
 - login
 - password_hash
 - role (`admin` | `employee`)
+- is_manager (employee manager permissions)
 
 ### projects
 - name

@@ -1,3 +1,11 @@
+Version: v1.1.6
+Date: 2026-04-23
+Done:
+- Added employee manager permissions and a manager-only car list tool.
+- Managers can select workers, open a fullscreen car/passport list, and share a WhatsApp-friendly Hebrew formatted message.
+
+----------------------------------------
+
 Version: v1.1.5
 Date: 2026-04-23
 Done:

@@ -44,6 +44,15 @@ router.delete("/my/work-entries/:id", requireAuth, asyncHandler(async (req, res)
 }));
 
 // =========================
+// EMPLOYEE: Manager tools
+// =========================
+
+router.get("/my/manager/car-list", requireAuth, asyncHandler(async (req, res) => {
+  const result = await appService.listManagerCarEmployees(req.user);
+  return res.status(result.ok ? 200 : (result.status || 500)).json(result);
+}));
+
+// =========================
 // ADMIN: Settings
 // =========================
 

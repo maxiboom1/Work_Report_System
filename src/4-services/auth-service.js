@@ -78,6 +78,7 @@ function signToken(user) {
         role: user.role, // "admin" | "employee"
         firstName: user.first_name,
         lastName: user.last_name,
+        isManager: Boolean(user.is_manager),
     };
 
     return jwt.sign(payload, JWT_SECRET, { expiresIn: `${EXPIRES_MIN}m` });
@@ -107,13 +108,23 @@ function logout(res) {
     return { ok: true };
 }
 
-function getMe(req) {
+async function getMe(req) {
     const token = getTokenFromRequest(req);
     if (!token) return { ok: false, status: 401 };
 
     try {
         const decoded = verifyToken(token);
-        return { ok: true, user: decoded };
+        const user = await sqlService.getEmployeeById(decoded.uid);
+        if (!user) return { ok: false, status: 401 };
+        return {
+            ok: true,
+            user: {
+                ...decoded,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                isManager: Boolean(user.is_manager),
+            },
+        };
     } catch {
         return { ok: false, status: 401 };
     }

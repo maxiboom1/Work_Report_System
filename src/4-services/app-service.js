@@ -133,6 +133,7 @@ class AppService {
     // Admin is a system user and is not managed from the Employees tab.
     // All accounts created from the admin UI are employees.
     const role = "employee";
+    const is_manager = payload?.is_manager ? 1 : 0;
     const is_active = payload?.is_active === 0 ? 0 : 1;
 
     const daily_rate = Number(payload?.daily_rate);
@@ -160,6 +161,7 @@ class AppService {
       login,
       password_hash,
       role,
+      is_manager,
       is_active,
     });
 
@@ -187,6 +189,7 @@ class AppService {
     if (payload?.email !== undefined) patch.email = String(payload.email || "").trim() || null;
     if (payload?.login !== undefined) patch.login = String(payload.login || "").trim();
     // role is not editable for employees in this system
+    if (payload?.is_manager !== undefined) patch.is_manager = payload.is_manager ? 1 : 0;
     if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
     if (payload?.daily_rate !== undefined) patch.daily_rate = Number(payload.daily_rate);
     if (payload?.password !== undefined && String(payload.password).length > 0) {
@@ -220,6 +223,16 @@ class AppService {
     const affected = await sqlService.deleteEmployee(employeeId);
     if (!affected) return { ok: false, status: 404, message: "Employee not found" };
     return { ok: true, message: "Employee deleted" };
+  }
+
+  async listManagerCarEmployees(user) {
+    const current = await sqlService.getEmployeeById(user?.uid);
+    if (!current || String(current.role).toLowerCase() !== "employee" || !current.is_active || !current.is_manager) {
+      return { ok: false, status: 403, message: "Manager access required" };
+    }
+
+    const employees = await sqlService.listEmployeesForManagerCarList();
+    return { ok: true, employees };
   }
 
   /* =========================

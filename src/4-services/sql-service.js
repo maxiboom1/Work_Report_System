@@ -44,7 +44,7 @@ class SqlService {
   async getEmployeeByLogin(login) {
     const q = `
       SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
-             daily_rate, login, password_hash, role, is_active
+             daily_rate, login, password_hash, role, is_manager, is_active
       FROM dbo.[employees]
       WHERE login = @login;
     `;
@@ -55,7 +55,7 @@ class SqlService {
   async listEmployees() {
     const q = `
       SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
-             daily_rate, login, role, is_active
+             daily_rate, login, role, is_manager, is_active
       FROM dbo.[employees]
       WHERE role = 'employee'
       ORDER BY last_name, first_name;
@@ -67,7 +67,7 @@ class SqlService {
   async getEmployeeById(id) {
     const q = `
       SELECT id, first_name, last_name, passport_id, car_id, card_id, phone, email,
-             daily_rate, login, password_hash, role, is_active
+             daily_rate, login, password_hash, role, is_manager, is_active
       FROM dbo.[employees]
       WHERE id = @id;
     `;
@@ -78,10 +78,10 @@ class SqlService {
   async createEmployee(e) {
     const q = `
       INSERT INTO dbo.[employees]
-        (first_name, last_name, passport_id, car_id, card_id, phone, email, daily_rate, login, password_hash, role, is_active)
+        (first_name, last_name, passport_id, car_id, card_id, phone, email, daily_rate, login, password_hash, role, is_manager, is_active)
       OUTPUT inserted.id
       VALUES
-        (@first_name, @last_name, @passport_id, @car_id, @card_id, @phone, @email, @daily_rate, @login, @password_hash, @role, @is_active);
+        (@first_name, @last_name, @passport_id, @car_id, @card_id, @phone, @email, @daily_rate, @login, @password_hash, @role, @is_manager, @is_active);
     `;
     const r = await db.execute(q, {
       first_name: e.first_name,
@@ -95,6 +95,7 @@ class SqlService {
       login: e.login,
       password_hash: e.password_hash,
       role: e.role,
+      is_manager: e.is_manager ?? 0,
       is_active: e.is_active ?? 1,
     });
     return r?.recordset?.[0]?.id ?? null;
@@ -113,6 +114,7 @@ class SqlService {
       "login",
       "password_hash",
       "role",
+      "is_manager",
       "is_active",
     ];
     const setFields = allowed.filter((field) => Object.prototype.hasOwnProperty.call(patch, field));
@@ -131,6 +133,18 @@ class SqlService {
 
     const r = await db.execute(q, values);
     return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async listEmployeesForManagerCarList() {
+    const q = `
+      SELECT id, first_name, last_name, passport_id, car_id, is_manager
+      FROM dbo.[employees]
+      WHERE role = 'employee'
+        AND is_active = 1
+      ORDER BY last_name, first_name;
+    `;
+    const r = await db.execute(q);
+    return r?.recordset || [];
   }
 
   async deleteEmployee(id) {

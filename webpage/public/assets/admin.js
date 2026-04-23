@@ -54,6 +54,7 @@ const I18N = {
     card: "Card ID",
     phone: "Phone",
     email: "Email",
+    manager: "Manager",
     dailyRate: "Daily rate",
     login: "Login",
     password: "Password",
@@ -138,6 +139,7 @@ const I18N = {
     card: "מספר כרטיס",
     phone: "טלפון",
     email: "אימייל",
+    manager: "מנהל",
     dailyRate: "תעריף יומי",
     login: "שם משתמש",
     password: "סיסמה",
@@ -250,6 +252,7 @@ function updateStaticText() {
   setLabel("emp-add-card", "card");
   setLabel("emp-add-phone", "phone");
   setLabel("emp-add-email", "email");
+  setText('[data-i18n-key="manager"]', "manager");
   setLabel("emp-add-rate", "dailyRate");
   setLabel("emp-add-login", "login");
   setLabel("emp-add-pass", "password");
@@ -262,6 +265,9 @@ function updateStaticText() {
   setLabel("emp-edit-card", "card");
   setLabel("emp-edit-phone", "phone");
   setLabel("emp-edit-email", "email");
+  document.querySelectorAll('[data-i18n-key="manager"]').forEach((el) => {
+    el.textContent = t("manager");
+  });
   setLabel("emp-edit-rate", "dailyRate");
   setLabel("emp-edit-login", "login");
   setLabel("emp-edit-pass", "newPassword");
@@ -410,7 +416,15 @@ function renderEmployeeList(filter = "") {
     const item = document.createElement("button");
     item.className = "vitem";
     item.type = "button";
-    item.textContent = `${e.last_name}, ${e.first_name}`;
+    const name = document.createElement("span");
+    name.textContent = `${e.last_name}, ${e.first_name}`;
+    item.appendChild(name);
+    if (e.is_manager) {
+      const badge = document.createElement("span");
+      badge.className = "muted";
+      badge.textContent = ` ${t("manager")}`;
+      item.appendChild(badge);
+    }
     item.dataset.id = e.id;
     if (selectedEmployee?.id === e.id) item.classList.add("active");
     item.addEventListener("click", () => selectEmployee(e.id));
@@ -428,11 +442,13 @@ function fillEmployeeEdit(e) {
   const cardEl = document.getElementById("emp-edit-card");
   const phoneEl = document.getElementById("emp-edit-phone");
   const emailEl = document.getElementById("emp-edit-email");
+  const managerEl = document.getElementById("emp-edit-manager");
   if (passportEl) passportEl.value = e?.passport_id || "";
   if (carEl) carEl.value = e?.car_id || "";
   if (cardEl) cardEl.value = e?.card_id || "";
   if (phoneEl) phoneEl.value = e?.phone || "";
   if (emailEl) emailEl.value = e?.email || "";
+  if (managerEl) managerEl.checked = Boolean(e?.is_manager);
   $id("emp-edit-rate").value = (e?.daily_rate ?? "");
   $id("emp-edit-login").value = e?.login || "";
   $id("emp-edit-pass").value = "";
@@ -467,6 +483,7 @@ async function createEmployee() {
     daily_rate: Number($id("emp-add-rate").value),
     login: $id("emp-add-login").value,
     password: $id("emp-add-pass").value,
+    is_manager: $id("emp-add-manager")?.checked || false,
   };
   const r = await api("/admin/employees", { method: "POST", body: JSON.stringify(payload) });
   $id("emp-add-note").textContent = r.message ? t("employeeCreated") : t("employeeCreated");
@@ -487,6 +504,7 @@ async function saveEmployee() {
     daily_rate: Number($id("emp-edit-rate").value),
     login: $id("emp-edit-login").value,
     password: $id("emp-edit-pass").value,
+    is_manager: $id("emp-edit-manager")?.checked || false,
   };
   const r = await api(`/admin/employees/${selectedEmployee.id}`, { method: "PUT", body: JSON.stringify(payload) });
   $id("emp-edit-note").textContent = r.message ? t("employeeSaved") : t("employeeSaved");

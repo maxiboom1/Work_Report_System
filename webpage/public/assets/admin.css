@@ -480,6 +480,23 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     min-width:0;
   }
 
+  .check-field{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:8px 0 10px;
+    color:var(--text);
+    font-size:13px;
+    cursor:pointer;
+    user-select:none;
+  }
+
+  .check-field input{
+    width:18px;
+    height:18px;
+    accent-color:var(--accent);
+  }
+
   @media (max-width: 860px){
     .form-grid-2{ grid-template-columns: 1fr; }
     .stats-controls{ grid-template-columns: 1fr; }
