@@ -3,44 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Employee Work Report System — Login</title>
+  <title>Work Reports - Login</title>
   <link rel="stylesheet" href="/assets/login.css">
 </head>
 <body>
-  <header class="header" style="max-width: 520px;">
-    <h1>Employee Work Report System</h1>
-    <p class="subtitle">Please sign in to continue.</p>
-  </header>
-
-  <main style="max-width: 520px; margin: 0 auto;">
-    <section class="card">
-      <div class="card-header">
-        <h2>Login</h2>
-        <span class="badge">Production</span>
-      </div>
+  <main class="login-shell">
+    <section class="login-panel">
+      <img class="company-logo" src="/assets/company-logo.jpg" alt="I/O Systems" />
+      <h1>שעון נוכחות</h1>
 
       <form id="login-form" autocomplete="on">
-        <div class="row">
+        <div class="field">
           <label class="label" for="username">Username</label>
-          <input id="username" class="input" type="text" placeholder="e.g. john.smith" required />
+          <input id="username" class="input" type="text" required />
         </div>
 
-        <div class="row">
+        <div class="field">
           <label class="label" for="password">Password</label>
-          <input id="password" class="input" type="password" placeholder="••••••••" required />
+          <input id="password" class="input" type="password" required />
         </div>
 
-        <div class="row" style="margin-bottom:0;">
+        <div class="actions">
           <button id="btn-login" class="btn primary" type="submit">Login</button>
-          <p class="hint">Session expires automatically (e.g. 30 minutes).</p>
         </div>
       </form>
+
+      <div id="status" class="status"></div>
     </section>
   </main>
-
-  <footer class="footer" style="max-width: 520px;">
-    <div id="status" class="status">Ready.</div>
-  </footer>
 
   <script src="/assets/login.js"></script>
 </body>
