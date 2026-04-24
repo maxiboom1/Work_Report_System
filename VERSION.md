@@ -1,3 +1,10 @@
+Version: v1.1.15
+Date: 2026-04-24
+Done:
+- Fixed the fault detail treatment-process table so the `Active` badge is assigned to the newest event row when new events are added.
+
+----------------------------------------
+
 Version: v1.1.14
 Date: 2026-04-24
 Done:

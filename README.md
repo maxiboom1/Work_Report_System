@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.14
+**Version:** v1.1.15
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -44,6 +44,9 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.15 improvements:
+- Fixed the fault detail treatment-process table so the `Active` badge follows the newest event row instead of staying on the older bottom row.
 
 v1.1.14 improvements:
 - Synced the checked-in database create script with the live application schema so fresh installs match the current DB structure.
@@ -272,7 +275,7 @@ npm install
 
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
-- No database migration is required for v1.1.14.
+- No database migration is required for v1.1.15.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start

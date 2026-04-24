@@ -213,6 +213,13 @@ function makeProcessDescriptionCell(text) {
   return wrap;
 }
 
+function compareFaultEventsNewestFirst(left, right) {
+  const leftTime = Date.parse(left?.created_at || "") || 0;
+  const rightTime = Date.parse(right?.created_at || "") || 0;
+  if (leftTime !== rightTime) return rightTime - leftTime;
+  return Number(right?.id || 0) - Number(left?.id || 0);
+}
+
 function renderFaultEvents(events, fault) {
   const holder = $id("fault-detail-events");
   if (!holder) return;
@@ -223,10 +230,10 @@ function renderFaultEvents(events, fault) {
     return;
   }
 
-  const latestIndex = events.length - 1;
-  const rows = events.map((event, index) => ({
+  const orderedEvents = [...events].sort(compareFaultEventsNewestFirst);
+  const rows = orderedEvents.map((event, index) => ({
     cells: [
-      makeProcessBadge(index === latestIndex),
+      makeProcessBadge(index === 0),
       formatDateTime(event.created_at),
       event.title || "-",
       faultEventAuthor(event),

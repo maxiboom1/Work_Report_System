@@ -1,7 +1,7 @@
 ﻿/* =========================================================
    Employee Work Report System - data import snapshot
-   Source version: v1.1.14
-   Exported at: 2026-04-24 18:02:29
+   Source version: v1.1.15
+   Exported at: 2026-04-24 18:24:46
 
    Run this AFTER:
    - database/create_employee_work_report_db.sql
@@ -21,7 +21,7 @@
 - fault_equipment_subcategories: 15
 - faults: 4
 - fault_contacts: 5
-- fault_events: 12
+- fault_events: 13
 - work_entries: 186
 - contractor_entries: 3
    ========================================================= */
@@ -198,9 +198,10 @@ VALUES
   (12, 4, N'המשך טיפול', N'יש נפילות בתקשורת - בעיה כללית של המערכת - הוחלף ספק', NULL, 1, CAST(N'2026-04-24 18:50:13' AS datetime2)),
   (13, 5, N'Fault opened', NULL, NULL, 5, CAST(N'2026-04-24 18:58:30' AS datetime2)),
   (14, 3, N'Fault reopened', NULL, NULL, 1, CAST(N'2026-04-24 19:42:04' AS datetime2)),
-  (15, 3, N'Fault closed', NULL, NULL, 1, CAST(N'2026-04-24 19:42:08' AS datetime2));
+  (15, 3, N'Fault closed', NULL, NULL, 1, CAST(N'2026-04-24 19:42:08' AS datetime2)),
+  (16, 5, N'test', N'test', NULL, 1, CAST(N'2026-04-24 21:23:44' AS datetime2));
 SET IDENTITY_INSERT dbo.[fault_events] OFF;
-DBCC CHECKIDENT (N'dbo.[fault_events]', RESEED, 15) WITH NO_INFOMSGS;
+DBCC CHECKIDENT (N'dbo.[fault_events]', RESEED, 16) WITH NO_INFOMSGS;
 
 SET IDENTITY_INSERT dbo.[work_entries] ON;
 INSERT INTO dbo.[work_entries] ([id], [employee_id], [project_id], [work_date], [start_time], [end_time], [notes], [admin_notes], [created_at], [updated_at])
