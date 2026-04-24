@@ -173,15 +173,15 @@ body{
 .entry-actions{ display:flex; align-items:start; }
 
 .manager-card{
-  direction:rtl;
+  direction:ltr;
 }
 
 .manager-subtabs{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:8px;
   margin-bottom:12px;
-  direction:rtl;
+  direction:ltr;
 }
 
 .manager-subtab{
@@ -230,7 +230,7 @@ body{
 .manager-workers-table td{
   padding:12px 14px;
   border-bottom:1px solid rgba(255,255,255,.07);
-  text-align:right;
+  text-align:left;
 }
 
 .manager-workers-table th{
@@ -268,10 +268,85 @@ body{
 
 .manager-name-cell{
   font-weight:700;
-  text-align:right;
+  text-align:left;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+}
+
+.fault-contact-list,
+.fault-custom-contacts{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
+
+.fault-contact-list{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:10px;
+  background:rgba(255,255,255,.03);
+}
+
+.fault-contact-item{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+
+.fault-contact-item input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  margin-top:2px;
+  accent-color:var(--accent);
+}
+
+.fault-contact-copy{
+  min-width:0;
+}
+
+.fault-contact-name{
+  font-weight:700;
+}
+
+.fault-contact-meta{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+  word-break:break-word;
+}
+
+.fault-inline-hint{
+  margin-top:10px;
+}
+
+.fault-inline-btn{
+  margin-top:10px;
+  align-self:flex-start;
+}
+
+.fault-custom-contact{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr)) auto;
+  gap:10px;
+  align-items:end;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+}
+
+.fault-custom-contact .field{
+  min-width:0;
+}
+
+.fault-remove-btn{
+  min-width:52px;
 }
 
 .car-list-screen{
@@ -399,6 +474,9 @@ body{
   .entry-card{ flex-direction:row; align-items:flex-start; }
   .entry-meta{ flex:1 1 auto; }
   .entry-actions{ flex:0 0 auto; align-items:center; }
+  .manager-subtabs{ grid-template-columns:1fr; }
+  .fault-custom-contact{ grid-template-columns:1fr; }
+  .fault-remove-btn{ width:100%; }
 }
 
 /* In Devices view, the keypad uses the remaining height.

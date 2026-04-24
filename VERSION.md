@@ -1,3 +1,13 @@
+Version: v1.1.11
+Date: 2026-04-24
+Done:
+- Added manager-only Fault Registration Form (FRF) creation from the worker/manager app.
+- Added admin fault dashboard with a flat fault table, detail modal, timeline events, and open/closed handling.
+- Added SQL fault tables plus a safe migration script for upgrading existing databases.
+- Client contact email is now optional to support FRF contacts captured in the field.
+
+----------------------------------------
+
 Version: v1.1.10
 Date: 2026-04-24
 Done:

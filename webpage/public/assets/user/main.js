@@ -2,6 +2,7 @@ import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
 import { todayISO, todayMonth } from "../shared/dates.js";
 import { currentUser, managerEmployees } from "./state.js";
+import { initFaultRegistration, loadFaultFormLookups, saveFaultRegistration } from "./fault-registration.js";
 import { addEntry, loadEntries, loadMe, loadProjects, setStatus } from "./work-entries.js";
 import { enableManagerTools, loadManagerEmployees, saveContractorEntry, showManagerTool } from "./manager-tools.js";
 import { closeCarList, shareCarList, showCarList } from "./car-list.js";
@@ -45,8 +46,8 @@ async function init() {
   populateTimeSelect("end-time", "17:00");
   populateTimeSelect("contractor-start-time", "", { allowEmpty: true });
   populateTimeSelect("contractor-end-time", "", { allowEmpty: true });
+  initFaultRegistration();
 
-  // Tabs
   const tabReg = $id("tab-register");
   const tabRep = $id("tab-reports");
   const tabManager = $id("tab-manager");
@@ -79,6 +80,7 @@ async function init() {
   tabManager.addEventListener("click", () => show("manager"));
   $id("manager-subtab-cars").addEventListener("click", () => showManagerTool("cars"));
   $id("manager-subtab-contractors").addEventListener("click", () => showManagerTool("contractors"));
+  $id("manager-subtab-faults").addEventListener("click", () => showManagerTool("faults"));
   showManagerTool("cars");
   show("register");
 
@@ -95,10 +97,19 @@ async function init() {
   $id("btn-show-car-list").addEventListener("click", showCarList);
   $id("btn-save-contractor").addEventListener("click", async () => {
     try {
-      $id("contractor-status").textContent = "שומר...";
+      $id("contractor-status").textContent = "Saving...";
       await saveContractorEntry();
     } catch (e) {
       $id("contractor-status").textContent = e.message;
+    }
+  });
+  $id("btn-save-fault").addEventListener("click", async () => {
+    try {
+      $id("fault-status").textContent = "Saving...";
+      const result = await saveFaultRegistration();
+      $id("fault-status").textContent = result?.fault_ref ? `Fault ${result.fault_ref} registered.` : "Fault registered.";
+    } catch (e) {
+      $id("fault-status").textContent = e.message;
     }
   });
   $id("btn-close-car-list").addEventListener("click", closeCarList);
@@ -110,7 +121,10 @@ async function init() {
   $id("btn-logout").addEventListener("click", logout);
 
   const u = await loadMe();
-  if (u?.isManager) enableManagerTools();
+  if (u?.isManager) {
+    enableManagerTools();
+    await loadFaultFormLookups();
+  }
   await loadProjects();
   await loadEntries();
   setStatus("Ready.");

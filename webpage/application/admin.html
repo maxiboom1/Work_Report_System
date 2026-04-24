@@ -22,6 +22,7 @@
         <button class="nav-tab" data-tab="projects">Projects</button>
         <button class="nav-tab" data-tab="clients">Clients</button>
         <button class="nav-tab" data-tab="manufacturers">Manufacturers</button>
+        <button class="nav-tab" data-tab="faults">Faults</button>
         <button class="nav-tab" data-tab="stats">Statistics</button>
         <button class="nav-tab" data-tab="settings">System settings</button>
       </nav>
@@ -407,6 +408,77 @@
 
 
       <!-- =========================
+           TAB: FAULTS
+           ========================= -->
+      <section class="tab-panel" data-panel="faults">
+        <div class="page-header">
+          <h1>Faults</h1>
+          <div class="page-hint">Track manager-submitted fault cases and continue the handling timeline.</div>
+        </div>
+
+        <section class="pane">
+          <div class="pane-head">
+            <div class="pane-title">Fault list</div>
+            <div class="pane-context">The table stays flat. Double-click a fault row to open its detail view.</div>
+          </div>
+
+          <div class="section-body padded">
+            <div class="faults-controls">
+              <div class="form-row">
+                <label class="label" for="fault-filter-status">Status</label>
+                <select id="fault-filter-status" class="select">
+                  <option value="">All</option>
+                  <option value="open">Open</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="fault-filter-client">Client</label>
+                <select id="fault-filter-client" class="select"></select>
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="fault-filter-manufacturer">Manufacturer</label>
+                <select id="fault-filter-manufacturer" class="select"></select>
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="fault-filter-support">Support level</label>
+                <select id="fault-filter-support" class="select">
+                  <option value="">All</option>
+                  <option value="layer2_support">Under Layer-2 Support</option>
+                  <option value="under_support">Under Support</option>
+                  <option value="no_support">Not Under Support</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="fault-filter-date-from">From</label>
+                <input id="fault-filter-date-from" class="input" type="date" />
+              </div>
+
+              <div class="form-row">
+                <label class="label" for="fault-filter-date-to">To</label>
+                <input id="fault-filter-date-to" class="input" type="date" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="btn-faults-run" class="btn">Run</button>
+              <button id="btn-faults-clear" class="btn" type="button">Clear</button>
+              <div id="faults-summary" class="hint"></div>
+            </div>
+          </div>
+
+          <div class="pane-foot bordered stats-results">
+            <div id="faults-table" class="full-width"></div>
+          </div>
+        </section>
+      </section>
+
+
+      <!-- =========================
            TAB: STATISTICS
            ========================= -->
       <section class="tab-panel" data-panel="stats">
@@ -571,6 +643,123 @@
           </div>
 
           <div id="fault-edit-modal-note" class="hint"></div>
+        </div>
+      </div>
+
+      <div id="fault-detail-modal" class="modal-backdrop is-hidden" aria-hidden="true">
+        <div class="modal-card fault-detail-modal-card" role="dialog" aria-modal="true" aria-labelledby="fault-detail-title">
+          <div class="modal-head">
+            <div>
+              <div id="fault-detail-title" class="modal-title">Fault detail</div>
+              <div id="fault-detail-context" class="modal-context"></div>
+            </div>
+            <button id="btn-fault-detail-close" class="btn btn-icon" type="button" aria-label="Close">×</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="fault-detail-grid">
+              <div class="fault-detail-item">
+                <div class="label">Reference</div>
+                <div id="fault-detail-ref" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Created</div>
+                <div id="fault-detail-created" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Status</div>
+                <div id="fault-detail-status" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Created by</div>
+                <div id="fault-detail-created-by" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Client</div>
+                <div id="fault-detail-client" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Site</div>
+                <div id="fault-detail-site" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Manufacturer</div>
+                <div id="fault-detail-manufacturer" class="fault-detail-value">-</div>
+              </div>
+              <div class="fault-detail-item">
+                <div class="label">Category / subcategory</div>
+                <div id="fault-detail-category" class="fault-detail-value">-</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="label" for="fault-detail-support">Support level</label>
+                <select id="fault-detail-support" class="select">
+                  <option value="layer2_support">Under Layer-2 Support</option>
+                  <option value="under_support">Under Support</option>
+                  <option value="no_support">Not Under Support</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="label" for="fault-detail-serial">Serial / unit ID</label>
+                <input id="fault-detail-serial" class="input" type="text" />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="label" for="fault-detail-ticket">Manufacturer ticket ID</label>
+                <input id="fault-detail-ticket" class="input" type="text" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="fault-detail-description">Fault description</label>
+              <textarea id="fault-detail-description" class="input fault-textarea" rows="4"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="label">Contacts</div>
+              <div id="fault-detail-contacts" class="fault-detail-stack"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="form-row">
+              <div class="label">Timeline</div>
+              <div id="fault-detail-events" class="fault-detail-stack"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label class="label" for="fault-event-title">Event title</label>
+                <input id="fault-event-title" class="input" type="text" />
+              </div>
+              <div class="form-field">
+                <label class="label" for="fault-event-order-id">Order ID / tracking</label>
+                <input id="fault-event-order-id" class="input" type="text" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label class="label" for="fault-event-details">Event details</label>
+              <textarea id="fault-event-details" class="input fault-textarea" rows="3"></textarea>
+            </div>
+
+            <div id="fault-detail-note" class="hint"></div>
+          </div>
+
+          <div class="modal-actions">
+            <button id="btn-fault-detail-save" class="btn" type="button">Save fault</button>
+            <button id="btn-fault-detail-add-event" class="btn" type="button">Add event</button>
+            <button id="btn-fault-detail-toggle-status" class="btn danger" type="button">Close fault</button>
+            <button id="btn-fault-detail-cancel" class="btn" type="button">Close</button>
+          </div>
         </div>
       </div>
 

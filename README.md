@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.10
+**Version:** v1.1.11
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -21,6 +21,7 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 - Employees marked as managers can open manager-only tools:
   - Generate selected workers' name/passport/car details for client parking access.
   - Register external contractor work by project, contractor name, optional start/end time, service description, and optional cost.
+  - Submit a new Fault Registration Form (FRF) for admin follow-up.
 
 ### Admin
 - CRUD Employees
@@ -33,11 +34,23 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Manufacturers
   - Equipment/model categories
   - Component/area subcategories
+- Faults:
+  - Review manager-submitted FRFs in a flat fault table
+  - Filter by status, client, manufacturer, support level, and date range
+  - Open a dedicated fault detail view
+  - Add fault timeline events and close / reopen a fault
 - Statistics:
   - Employee monthly report
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.11 improvements:
+- Added manager-only Fault Registration Form creation from the worker/manager app.
+- Added admin fault dashboard with flat fault table filters and a separate detail modal.
+- Added fault timeline events and open / closed fault handling.
+- Added SQL fault tables and a safe migration script for upgrading existing databases.
+- Client contact email is now optional to support FRF contact capture from the field.
 
 v1.1.10 improvements:
 - Refactored the frontend into smaller admin, worker, and shared JavaScript modules without changing user workflows.
@@ -146,7 +159,7 @@ v1.0.3 improvements:
 ### client_contacts
 - client_id
 - name
-- email
+- email (optional)
 - phone
 - is_active
 
@@ -182,6 +195,43 @@ v1.0.3 improvements:
 - name
 - is_active
 
+### faults
+- fault_ref
+- client_id
+- client_custom
+- site_id
+- site_custom
+- manufacturer_id
+- manufacturer_custom
+- equipment_category_id
+- equipment_category_custom
+- equipment_subcategory_id
+- equipment_subcategory_custom
+- support_level
+- serial_number
+- manufacturer_ticket_id
+- fault_description
+- status
+- created_by
+- created_at
+- updated_at
+- closed_at
+
+### fault_contacts
+- fault_id
+- contact_id
+- contact_name
+- contact_email
+- contact_phone
+
+### fault_events
+- fault_id
+- title
+- details
+- order_id
+- created_by
+- created_at
+
 ---
 
 ## Architecture Rules
@@ -205,6 +255,7 @@ npm install
 
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
+- For an existing database upgrade to v1.1.11, run: `database/update_employee_work_report_to_v1.1.11_frf.sql`
 
 4) Start
 ```bash

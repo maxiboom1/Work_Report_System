@@ -24,27 +24,61 @@ const poolPromise = new sql.ConnectionPool(config)
     throw err;
   });
 
-async function execute(query, values) {
-  try {
-    const pool = await poolPromise;
-    const request = pool.request();
+function bindInputs(request, values) {
+  if (!values || typeof values !== "object") return;
 
-    if (values && typeof values === "object") {
-      for (const key in values) {
-        if (Object.prototype.hasOwnProperty.call(values, key)) {
-          request.input(key, values[key]);
-        }
-      }
+  for (const key in values) {
+    if (Object.prototype.hasOwnProperty.call(values, key)) {
+      request.input(key, values[key]);
     }
+  }
+}
 
+async function executeWithRequestFactory(makeRequest, query, values) {
+  try {
+    const request = await makeRequest();
+    bindInputs(request, values);
     const result = await request.query(query);
-    return result; // ALWAYS full result (has .recordset)
+    return result;
   } catch (err) {
     logger(`[SQL EXECUTER] Error executing query: ${err}`, "red");
     throw err;
   }
 }
 
+async function execute(query, values) {
+  return executeWithRequestFactory(async () => {
+    const pool = await poolPromise;
+    return pool.request();
+  }, query, values);
+}
+
+async function executeTransaction(run) {
+  const pool = await poolPromise;
+  const transaction = new sql.Transaction(pool);
+  await transaction.begin();
+
+  const txExecute = async (query, values) => executeWithRequestFactory(
+    async () => new sql.Request(transaction),
+    query,
+    values
+  );
+
+  try {
+    const result = await run(txExecute);
+    await transaction.commit();
+    return result;
+  } catch (err) {
+    try {
+      if (!transaction._aborted) await transaction.rollback();
+    } catch (rollbackErr) {
+      logger(`[SQL EXECUTER] Error rolling back transaction: ${rollbackErr}`, "red");
+    }
+    throw err;
+  }
+}
+
 export default {
-  execute
+  execute,
+  executeTransaction,
 };

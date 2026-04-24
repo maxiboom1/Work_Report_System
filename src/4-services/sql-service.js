@@ -241,13 +241,23 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createClient(name) {
+  async findClientByName(name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, name, is_active
+      FROM dbo.[clients]
+      WHERE name = @name;
+    `;
+    const r = await execute(q, { name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClient(name, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[clients] (name, is_active)
       OUTPUT inserted.id
       VALUES (@name, 1);
     `;
-    const r = await db.execute(q, { name });
+    const r = await execute(q, { name });
     return r?.recordset?.[0]?.id ?? null;
   }
 
@@ -295,13 +305,24 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createClientSite(clientId, name) {
+  async findClientSiteByName(clientId, name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, client_id, name, is_active
+      FROM dbo.[client_sites]
+      WHERE client_id = @client_id
+        AND name = @name;
+    `;
+    const r = await execute(q, { client_id: clientId, name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClientSite(clientId, name, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[client_sites] (client_id, name, is_active)
       OUTPUT inserted.id
       VALUES (@client_id, @name, 1);
     `;
-    const r = await db.execute(q, { client_id: clientId, name });
+    const r = await execute(q, { client_id: clientId, name });
     return r?.recordset?.[0]?.id ?? null;
   }
 
@@ -349,16 +370,28 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createClientContact(clientId, contact) {
+  async findClientContactByName(clientId, name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, client_id, name, email, phone, is_active
+      FROM dbo.[client_contacts]
+      WHERE client_id = @client_id
+        AND name = @name
+      ORDER BY id DESC;
+    `;
+    const r = await execute(q, { client_id: clientId, name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createClientContact(clientId, contact, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[client_contacts] (client_id, name, email, phone, is_active)
       OUTPUT inserted.id
       VALUES (@client_id, @name, @email, @phone, 1);
     `;
-    const r = await db.execute(q, {
+    const r = await execute(q, {
       client_id: clientId,
       name: contact.name,
-      email: contact.email,
+      email: contact.email ?? null,
       phone: contact.phone ?? null,
     });
     return r?.recordset?.[0]?.id ?? null;
@@ -410,13 +443,23 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createFaultManufacturer(name) {
+  async findFaultManufacturerByName(name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, name, is_active
+      FROM dbo.[fault_manufacturers]
+      WHERE name = @name;
+    `;
+    const r = await execute(q, { name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultManufacturer(name, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[fault_manufacturers] (name, is_active)
       OUTPUT inserted.id
       VALUES (@name, 1);
     `;
-    const r = await db.execute(q, { name });
+    const r = await execute(q, { name });
     return r?.recordset?.[0]?.id ?? null;
   }
 
@@ -464,13 +507,24 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createFaultEquipmentCategory(manufacturerId, name) {
+  async findFaultEquipmentCategoryByName(manufacturerId, name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, manufacturer_id, name, is_active
+      FROM dbo.[fault_equipment_categories]
+      WHERE manufacturer_id = @manufacturer_id
+        AND name = @name;
+    `;
+    const r = await execute(q, { manufacturer_id: manufacturerId, name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultEquipmentCategory(manufacturerId, name, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[fault_equipment_categories] (manufacturer_id, name, is_active)
       OUTPUT inserted.id
       VALUES (@manufacturer_id, @name, 1);
     `;
-    const r = await db.execute(q, { manufacturer_id: manufacturerId, name });
+    const r = await execute(q, { manufacturer_id: manufacturerId, name });
     return r?.recordset?.[0]?.id ?? null;
   }
 
@@ -518,13 +572,24 @@ class SqlService {
     return r?.recordset?.[0] || null;
   }
 
-  async createFaultEquipmentSubcategory(equipmentCategoryId, name) {
+  async findFaultEquipmentSubcategoryByName(equipmentCategoryId, name, execute = db.execute) {
+    const q = `
+      SELECT TOP 1 id, equipment_category_id, name, is_active
+      FROM dbo.[fault_equipment_subcategories]
+      WHERE equipment_category_id = @equipment_category_id
+        AND name = @name;
+    `;
+    const r = await execute(q, { equipment_category_id: equipmentCategoryId, name });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createFaultEquipmentSubcategory(equipmentCategoryId, name, execute = db.execute) {
     const q = `
       INSERT INTO dbo.[fault_equipment_subcategories] (equipment_category_id, name, is_active)
       OUTPUT inserted.id
       VALUES (@equipment_category_id, @name, 1);
     `;
-    const r = await db.execute(q, { equipment_category_id: equipmentCategoryId, name });
+    const r = await execute(q, { equipment_category_id: equipmentCategoryId, name });
     return r?.recordset?.[0]?.id ?? null;
   }
 
@@ -544,6 +609,306 @@ class SqlService {
       name: patch.name ?? null,
       is_active: patch.is_active ?? null,
     });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  /* =========================
+     FAULTS
+     ========================= */
+
+  async countFaultsForYear(year, execute = db.execute) {
+    const q = `
+      SELECT COUNT(*) AS total
+      FROM dbo.[faults]
+      WHERE YEAR(created_at) = @year;
+    `;
+    const r = await execute(q, { year });
+    return Number(r?.recordset?.[0]?.total || 0);
+  }
+
+  async createFault(fault, execute = db.execute) {
+    const q = `
+      INSERT INTO dbo.[faults] (
+        fault_ref,
+        client_id,
+        client_custom,
+        site_id,
+        site_custom,
+        manufacturer_id,
+        manufacturer_custom,
+        equipment_category_id,
+        equipment_category_custom,
+        equipment_subcategory_id,
+        equipment_subcategory_custom,
+        support_level,
+        serial_number,
+        manufacturer_ticket_id,
+        fault_description,
+        status,
+        created_by
+      )
+      OUTPUT inserted.id
+      VALUES (
+        @fault_ref,
+        @client_id,
+        @client_custom,
+        @site_id,
+        @site_custom,
+        @manufacturer_id,
+        @manufacturer_custom,
+        @equipment_category_id,
+        @equipment_category_custom,
+        @equipment_subcategory_id,
+        @equipment_subcategory_custom,
+        @support_level,
+        @serial_number,
+        @manufacturer_ticket_id,
+        @fault_description,
+        @status,
+        @created_by
+      );
+    `;
+    const r = await execute(q, {
+      fault_ref: fault.fault_ref,
+      client_id: fault.client_id ?? null,
+      client_custom: fault.client_custom ?? null,
+      site_id: fault.site_id ?? null,
+      site_custom: fault.site_custom ?? null,
+      manufacturer_id: fault.manufacturer_id ?? null,
+      manufacturer_custom: fault.manufacturer_custom ?? null,
+      equipment_category_id: fault.equipment_category_id ?? null,
+      equipment_category_custom: fault.equipment_category_custom ?? null,
+      equipment_subcategory_id: fault.equipment_subcategory_id ?? null,
+      equipment_subcategory_custom: fault.equipment_subcategory_custom ?? null,
+      support_level: fault.support_level,
+      serial_number: fault.serial_number ?? null,
+      manufacturer_ticket_id: fault.manufacturer_ticket_id ?? null,
+      fault_description: fault.fault_description ?? null,
+      status: fault.status ?? 1,
+      created_by: fault.created_by,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async createFaultContact(row, execute = db.execute) {
+    const q = `
+      INSERT INTO dbo.[fault_contacts] (
+        fault_id,
+        contact_id,
+        contact_name,
+        contact_email,
+        contact_phone
+      )
+      OUTPUT inserted.id
+      VALUES (
+        @fault_id,
+        @contact_id,
+        @contact_name,
+        @contact_email,
+        @contact_phone
+      );
+    `;
+    const r = await execute(q, {
+      fault_id: row.fault_id,
+      contact_id: row.contact_id ?? null,
+      contact_name: row.contact_name,
+      contact_email: row.contact_email ?? null,
+      contact_phone: row.contact_phone ?? null,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async createFaultEvent(row, execute = db.execute) {
+    const q = `
+      INSERT INTO dbo.[fault_events] (
+        fault_id,
+        title,
+        details,
+        order_id,
+        created_by
+      )
+      OUTPUT inserted.id
+      VALUES (
+        @fault_id,
+        @title,
+        @details,
+        @order_id,
+        @created_by
+      );
+    `;
+    const r = await execute(q, {
+      fault_id: row.fault_id,
+      title: row.title,
+      details: row.details ?? null,
+      order_id: row.order_id ?? null,
+      created_by: row.created_by,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async listFaults(filters = {}) {
+    const q = `
+      SELECT
+        f.id,
+        f.fault_ref,
+        CONVERT(varchar(19), f.created_at, 120) AS created_at,
+        f.status,
+        f.support_level,
+        f.serial_number,
+        f.manufacturer_ticket_id,
+        f.fault_description,
+        COALESCE(c.name, f.client_custom) AS client_name,
+        COALESCE(s.name, f.site_custom) AS site_name,
+        COALESCE(m.name, f.manufacturer_custom) AS manufacturer_name,
+        COALESCE(cat.name, f.equipment_category_custom) AS equipment_category_name,
+        COALESCE(sub.name, f.equipment_subcategory_custom) AS equipment_subcategory_name,
+        e.first_name AS created_by_first_name,
+        e.last_name AS created_by_last_name
+      FROM dbo.[faults] f
+      LEFT JOIN dbo.[clients] c ON c.id = f.client_id
+      LEFT JOIN dbo.[client_sites] s ON s.id = f.site_id
+      LEFT JOIN dbo.[fault_manufacturers] m ON m.id = f.manufacturer_id
+      LEFT JOIN dbo.[fault_equipment_categories] cat ON cat.id = f.equipment_category_id
+      LEFT JOIN dbo.[fault_equipment_subcategories] sub ON sub.id = f.equipment_subcategory_id
+      INNER JOIN dbo.[employees] e ON e.id = f.created_by
+      WHERE (@status IS NULL OR f.status = @status)
+        AND (@client_id IS NULL OR f.client_id = @client_id)
+        AND (@manufacturer_id IS NULL OR f.manufacturer_id = @manufacturer_id)
+        AND (@support_level IS NULL OR f.support_level = @support_level)
+        AND (@date_from IS NULL OR CONVERT(date, f.created_at) >= @date_from)
+        AND (@date_to IS NULL OR CONVERT(date, f.created_at) <= @date_to)
+      ORDER BY f.created_at DESC, f.id DESC;
+    `;
+    const r = await db.execute(q, {
+      status: filters.status ?? null,
+      client_id: filters.client_id ?? null,
+      manufacturer_id: filters.manufacturer_id ?? null,
+      support_level: filters.support_level ?? null,
+      date_from: filters.date_from ?? null,
+      date_to: filters.date_to ?? null,
+    });
+    return r?.recordset || [];
+  }
+
+  async getFaultById(id) {
+    const q = `
+      SELECT
+        f.id,
+        f.fault_ref,
+        f.client_id,
+        f.client_custom,
+        f.site_id,
+        f.site_custom,
+        f.manufacturer_id,
+        f.manufacturer_custom,
+        f.equipment_category_id,
+        f.equipment_category_custom,
+        f.equipment_subcategory_id,
+        f.equipment_subcategory_custom,
+        f.support_level,
+        f.serial_number,
+        f.manufacturer_ticket_id,
+        f.fault_description,
+        f.status,
+        CONVERT(varchar(19), f.created_at, 120) AS created_at,
+        CONVERT(varchar(19), f.updated_at, 120) AS updated_at,
+        CONVERT(varchar(19), f.closed_at, 120) AS closed_at,
+        f.created_by,
+        COALESCE(c.name, f.client_custom) AS client_name,
+        COALESCE(s.name, f.site_custom) AS site_name,
+        COALESCE(m.name, f.manufacturer_custom) AS manufacturer_name,
+        COALESCE(cat.name, f.equipment_category_custom) AS equipment_category_name,
+        COALESCE(sub.name, f.equipment_subcategory_custom) AS equipment_subcategory_name,
+        creator.first_name AS created_by_first_name,
+        creator.last_name AS created_by_last_name
+      FROM dbo.[faults] f
+      LEFT JOIN dbo.[clients] c ON c.id = f.client_id
+      LEFT JOIN dbo.[client_sites] s ON s.id = f.site_id
+      LEFT JOIN dbo.[fault_manufacturers] m ON m.id = f.manufacturer_id
+      LEFT JOIN dbo.[fault_equipment_categories] cat ON cat.id = f.equipment_category_id
+      LEFT JOIN dbo.[fault_equipment_subcategories] sub ON sub.id = f.equipment_subcategory_id
+      INNER JOIN dbo.[employees] creator ON creator.id = f.created_by
+      WHERE f.id = @id;
+    `;
+    const r = await db.execute(q, { id });
+    return r?.recordset?.[0] || null;
+  }
+
+  async listFaultContactsByFaultId(faultId) {
+    const q = `
+      SELECT
+        fc.id,
+        fc.fault_id,
+        fc.contact_id,
+        fc.contact_name,
+        fc.contact_email,
+        fc.contact_phone
+      FROM dbo.[fault_contacts] fc
+      WHERE fc.fault_id = @fault_id
+      ORDER BY fc.id;
+    `;
+    const r = await db.execute(q, { fault_id: faultId });
+    return r?.recordset || [];
+  }
+
+  async listFaultEventsByFaultId(faultId) {
+    const q = `
+      SELECT
+        fe.id,
+        fe.fault_id,
+        fe.title,
+        fe.details,
+        fe.order_id,
+        CONVERT(varchar(19), fe.created_at, 120) AS created_at,
+        fe.created_by,
+        e.first_name AS created_by_first_name,
+        e.last_name AS created_by_last_name
+      FROM dbo.[fault_events] fe
+      INNER JOIN dbo.[employees] e ON e.id = fe.created_by
+      WHERE fe.fault_id = @fault_id
+      ORDER BY fe.created_at ASC, fe.id ASC;
+    `;
+    const r = await db.execute(q, { fault_id: faultId });
+    return r?.recordset || [];
+  }
+
+  async updateFault(id, patch) {
+    const allowed = [
+      "support_level",
+      "serial_number",
+      "manufacturer_ticket_id",
+      "fault_description",
+    ];
+    const setFields = allowed.filter((field) => Object.prototype.hasOwnProperty.call(patch, field));
+    if (setFields.length === 0) return 0;
+
+    const q = `
+      UPDATE dbo.[faults]
+      SET ${setFields.map((field) => `${field} = @${field}`).join(",\n          ")},
+          updated_at = SYSDATETIME()
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+
+    const values = { id };
+    for (const field of setFields) values[field] = patch[field];
+
+    const r = await db.execute(q, values);
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
+  async updateFaultStatus(id, status, execute = db.execute) {
+    const q = `
+      UPDATE dbo.[faults]
+      SET status = @status,
+          updated_at = SYSDATETIME(),
+          closed_at = CASE WHEN @status = 0 THEN SYSDATETIME() ELSE NULL END
+      WHERE id = @id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await execute(q, { id, status });
     return r?.recordset?.[0]?.affected ?? 0;
   }
 

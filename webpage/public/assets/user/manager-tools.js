@@ -40,7 +40,7 @@ export function renderManagerEmployees() {
 
   const table = document.createElement("table");
   table.className = "manager-workers-table";
-  table.innerHTML = "<thead><tr><th></th><th>שם עובד</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Worker name</th></tr></thead>";
   const tbody = document.createElement("tbody");
   for (const worker of managerEmployees) {
     tbody.appendChild(makeManagerWorkerRow(worker));
@@ -65,7 +65,7 @@ export async function saveContractorEntry() {
     service_cost: $id("contractor-cost").value,
   };
 
-  const r = await api("/my/manager/contractors", {
+  await api("/my/manager/contractors", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -75,7 +75,7 @@ export async function saveContractorEntry() {
   $id("contractor-start-time").value = "";
   $id("contractor-end-time").value = "";
   $id("contractor-cost").value = "";
-  $id("contractor-status").textContent = r.message ? "הקבלן נרשם." : "הקבלן נרשם.";
+  $id("contractor-status").textContent = "Contractor saved.";
 }
 
 export function enableManagerTools() {
@@ -85,10 +85,18 @@ export function enableManagerTools() {
 
 export function showManagerTool(which) {
   const isCars = which === "cars";
+  const isContractors = which === "contractors";
+  const isFaults = which === "faults";
+
   $id("manager-subtab-cars").classList.toggle("active", isCars);
-  $id("manager-subtab-contractors").classList.toggle("active", !isCars);
+  $id("manager-subtab-contractors").classList.toggle("active", isContractors);
+  $id("manager-subtab-faults").classList.toggle("active", isFaults);
+
   $id("manager-subtab-cars").setAttribute("aria-selected", isCars ? "true" : "false");
-  $id("manager-subtab-contractors").setAttribute("aria-selected", !isCars ? "true" : "false");
+  $id("manager-subtab-contractors").setAttribute("aria-selected", isContractors ? "true" : "false");
+  $id("manager-subtab-faults").setAttribute("aria-selected", isFaults ? "true" : "false");
+
   $id("manager-panel-cars").hidden = !isCars;
-  $id("manager-panel-contractors").hidden = isCars;
+  $id("manager-panel-contractors").hidden = !isContractors;
+  $id("manager-panel-faults").hidden = !isFaults;
 }

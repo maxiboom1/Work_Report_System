@@ -82,9 +82,9 @@ export async function listClientContacts(clientId) {
 export async function createClientContact(payload) {
     const clientId = toInt(payload?.client_id);
     const name = String(payload?.name || "").trim();
-    const email = String(payload?.email || "").trim();
+    const email = String(payload?.email || "").trim() || null;
     const phone = String(payload?.phone || "").trim() || null;
-    if (!clientId || !name || !email) return { ok: false, status: 400, message: "Missing client contact details" };
+    if (!clientId || !name) return { ok: false, status: 400, message: "Missing client contact details" };
 
     const client = await sqlService.getClientById(clientId);
     if (!client) return { ok: false, status: 400, message: "Invalid client" };
@@ -101,11 +101,10 @@ export async function updateClientContact(id, payload) {
 
     const patch = {};
     if (payload?.name !== undefined) patch.name = String(payload.name || "").trim();
-    if (payload?.email !== undefined) patch.email = String(payload.email || "").trim();
+    if (payload?.email !== undefined) patch.email = String(payload.email || "").trim() || null;
     if (payload?.phone !== undefined) patch.phone = String(payload.phone || "").trim() || null;
     if (payload?.is_active !== undefined) patch.is_active = payload.is_active ? 1 : 0;
     if (patch.name !== undefined && !patch.name) return { ok: false, status: 400, message: "Missing client contact name" };
-    if (patch.email !== undefined && !patch.email) return { ok: false, status: 400, message: "Missing client contact email" };
 
     const affected = await sqlService.updateClientContact(contactId, patch);
     if (!affected) return { ok: false, status: 404, message: "Client contact not found" };

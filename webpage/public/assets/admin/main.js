@@ -7,6 +7,7 @@ import { loadSettings, saveSettings } from "./settings.js";
 import { createEmployee, deleteEmployee, loadEmployees, renderEmployeeList, saveEmployee } from "./employees.js";
 import { createProject, deleteProject, loadProjects, renderProjectList, saveProject } from "./projects.js";
 import { closeClientEditModal, loadClients, openClientEditModal, renderClientContactList, renderClientList, renderClientSiteList, saveClientEditModal, selectedClient, selectedClientContact, selectedClientSite, toggleClientEditModal } from "./clients.js";
+import { clearFaultFilters, closeFaultDetailModal, initFaults, loadFaults, renderFaultFilterOptions } from "./faults.js";
 import { closeFaultEditModal, loadFaultManufacturers, openFaultEditModal, renderFaultCategoryList, renderFaultManufacturerList, renderFaultSubcategoryList, saveFaultEditModal, selectedFaultCategory, selectedFaultManufacturer, selectedFaultSubcategory, toggleFaultEditModal } from "./manufacturers.js";
 import { initMonthPickers, refreshStatsIfRendered, runStats, setStatsMode } from "./statistics.js";
 
@@ -23,6 +24,7 @@ async function init() {
   await loadSettings();
   initTabs();
   updateStaticText();
+  initFaults();
 
   $id("btn-logout").addEventListener("click", logout);
 
@@ -82,6 +84,9 @@ async function init() {
     if (event.key === "Escape" && !$id("fault-edit-modal")?.classList.contains("is-hidden")) {
       closeFaultEditModal();
     }
+    if (event.key === "Escape" && !$id("fault-detail-modal")?.classList.contains("is-hidden")) {
+      closeFaultDetailModal();
+    }
   });
 
   // Fault equipment hierarchy
@@ -105,6 +110,9 @@ async function init() {
   $id("fault-edit-modal").addEventListener("click", (event) => {
     if (event.target === $id("fault-edit-modal")) closeFaultEditModal();
   });
+
+  // Faults table
+  clearFaultFilters();
 
   // Settings
   $id("setting-language").addEventListener("change", () => {
@@ -130,6 +138,8 @@ async function init() {
   await loadProjects();
   await loadClients();
   await loadFaultManufacturers();
+  renderFaultFilterOptions();
+  await loadFaults();
 }
 
 init().catch((e) => {
