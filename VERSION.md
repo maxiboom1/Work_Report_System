@@ -1,3 +1,11 @@
+Version: v1.1.9
+Date: 2026-04-24
+Done:
+- Release bump for the approved admin hierarchy UI cleanup.
+- Clients and Manufacturers now use the same clearer pane layout with bottom Edit / Create actions and no refresh buttons.
+
+----------------------------------------
+
 Version: v1.1.8
 Date: 2026-04-23
 Done:

@@ -297,22 +297,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     grid-template-columns: repeat(3, minmax(260px, 1fr));
   }
 
-  .client-hierarchy .vlist{
-    flex: 0 0 240px;
-    min-height: 240px;
-  }
-
-  .client-hierarchy .hierarchy-editor{
+  .client-hierarchy .vlist,
+  .fault-hierarchy .vlist{
     flex: 1 1 auto;
     min-height: 0;
-    overflow: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
-  .client-hierarchy .hierarchy-editor::-webkit-scrollbar{
-    width: 0;
-    height: 0;
+  .client-hierarchy .pane-head,
+  .fault-hierarchy .pane-head{
+    min-height: 94px;
   }
 
   .modal-backdrop{
@@ -385,14 +378,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     padding:0 18px 16px;
   }
 
-  .hierarchy-editor{
+  .pane-actions{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
     margin-top:12px;
     padding-top:12px;
     border-top:1px solid rgba(255,255,255,0.08);
   }
 
-  .hierarchy-editor .btn{
-    min-width:82px;
+  .pane-actions .btn{
+    min-height:44px;
+    width:100%;
   }
 
   .assign-actions{

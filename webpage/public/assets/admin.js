@@ -65,8 +65,11 @@ const I18N = {
     selected: "Selected",
     none: "None",
     add: "Add",
+    createAction: "Create",
+    editAction: "Edit",
     save: "Save",
     delete: "Delete",
+    cancel: "Cancel",
     optional: "optional",
     keepEmpty: "leave empty to keep",
     projectTitle: "Projects",
@@ -148,10 +151,12 @@ const I18N = {
     noClients: "No clients yet",
     noSites: "No sites for this client yet",
     noContacts: "No contact managers for this client yet",
+    newClient: "New client",
+    newSite: "New site",
+    newContact: "New contact manager",
     editClient: "Edit client",
     editSite: "Edit site",
     editContact: "Edit contact manager",
-    cancel: "Cancel",
     clientCreated: "Client created",
     clientSaved: "Client updated",
     clientDisabled: "Client disabled",
@@ -193,6 +198,19 @@ const I18N = {
     subcategoryEnabled: "Component/area enabled",
     selectManufacturerFirst: "Select manufacturer first",
     selectCategoryFirst: "Select equipment/model first",
+    categoriesContextEmpty: "Select manufacturer first.",
+    subcategoriesContextEmpty: "Select equipment/model first.",
+    categoriesContext: "Equipment/model for",
+    subcategoriesContext: "Component/area for",
+    noManufacturers: "No manufacturers yet",
+    noCategories: "No equipment/model items yet",
+    noSubcategories: "No component/area items yet",
+    newManufacturer: "New manufacturer",
+    newCategory: "New equipment/model",
+    newSubcategory: "New component/area",
+    editManufacturer: "Edit manufacturer",
+    editCategory: "Edit equipment/model",
+    editSubcategory: "Edit component/area",
   },
   he: {
     appTitle: "דיווחי עבודה",
@@ -227,8 +245,11 @@ const I18N = {
     selected: "נבחר",
     none: "לא נבחר",
     add: "הוספה",
+    createAction: "יצירה",
+    editAction: "עריכה",
     save: "שמירה",
     delete: "מחיקה",
+    cancel: "ביטול",
     optional: "לא חובה",
     keepEmpty: "להשאיר ריק אם אין שינוי",
     projectTitle: "פרויקטים",
@@ -310,10 +331,12 @@ const I18N = {
     noClients: "\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05dc\u05e7\u05d5\u05d7\u05d5\u05ea",
     noSites: "\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d0\u05ea\u05e8\u05d9\u05dd \u05dc\u05dc\u05e7\u05d5\u05d7 \u05d4\u05d6\u05d4",
     noContacts: "\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05dc\u05dc\u05e7\u05d5\u05d7 \u05d4\u05d6\u05d4",
+    newClient: "\u05dc\u05e7\u05d5\u05d7 \u05d7\u05d3\u05e9",
+    newSite: "\u05d0\u05ea\u05e8 \u05d7\u05d3\u05e9",
+    newContact: "\u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8 \u05d7\u05d3\u05e9",
     editClient: "\u05e2\u05e8\u05d9\u05db\u05ea \u05dc\u05e7\u05d5\u05d7",
     editSite: "\u05e2\u05e8\u05d9\u05db\u05ea \u05d0\u05ea\u05e8",
     editContact: "\u05e2\u05e8\u05d9\u05db\u05ea \u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8",
-    cancel: "\u05d1\u05d9\u05d8\u05d5\u05dc",
     clientCreated: "\u05d4\u05dc\u05e7\u05d5\u05d7 \u05e0\u05d5\u05e1\u05e3",
     clientSaved: "\u05d4\u05dc\u05e7\u05d5\u05d7 \u05e0\u05e9\u05de\u05e8",
     clientDisabled: "\u05d4\u05dc\u05e7\u05d5\u05d7 \u05d4\u05d5\u05e9\u05d1\u05ea",
@@ -355,6 +378,19 @@ const I18N = {
     subcategoryEnabled: "הרכיב/אזור הופעל",
     selectManufacturerFirst: "יש לבחור יצרן קודם",
     selectCategoryFirst: "יש לבחור דגם/ציוד קודם",
+    categoriesContextEmpty: "יש לבחור יצרן קודם.",
+    subcategoriesContextEmpty: "יש לבחור דגם/ציוד קודם.",
+    categoriesContext: "דגם/ציוד עבור",
+    subcategoriesContext: "רכיב/אזור עבור",
+    noManufacturers: "עדיין אין יצרנים",
+    noCategories: "עדיין אין פריטי דגם/ציוד",
+    noSubcategories: "עדיין אין פריטי רכיב/אזור",
+    newManufacturer: "יצרן חדש",
+    newCategory: "דגם/ציוד חדש",
+    newSubcategory: "רכיב/אזור חדש",
+    editManufacturer: "עריכת יצרן",
+    editCategory: "עריכת דגם/ציוד",
+    editSubcategory: "עריכת רכיב/אזור",
   },
 };
 
@@ -455,20 +491,12 @@ function updateStaticText() {
   setText('[data-i18n-key="clientList"]', "clientList");
   setText('[data-i18n-key="clientSiteList"]', "clientSiteList");
   setText('[data-i18n-key="clientContactList"]', "clientContactList");
-  setLabel("client-add-name", "addClient");
-  setLabel("client-site-add-name", "addClientSite");
-  setLabel("client-contact-add-name", "clientContactName");
-  setLabel("client-contact-add-email", "clientContactEmail");
-  setLabel("client-contact-add-phone", "clientContactPhone");
-  setText("#btn-client-create", "add");
-  setText("#btn-client-reload", "refresh");
-  setText("#btn-client-site-create", "add");
-  setText("#btn-client-site-reload", "refresh");
-  setText("#btn-client-contact-create", "add");
-  setText("#btn-client-contact-reload", "refresh");
-  setText('.tab-panel[data-panel="clients"] [data-i18n-key="addClientSite"]', "addClientSite");
-  setText('.tab-panel[data-panel="clients"] [data-i18n-key="addContactManager"]', "addContactManager");
-  setLabel("client-edit-modal-name", "clientName");
+  setText("#btn-client-edit-open", "editAction");
+  setText("#btn-client-create-open", "createAction");
+  setText("#btn-client-site-edit-open", "editAction");
+  setText("#btn-client-site-create-open", "createAction");
+  setText("#btn-client-contact-edit-open", "editAction");
+  setText("#btn-client-contact-create-open", "createAction");
   setLabel("client-edit-modal-email", "clientContactEmail");
   setLabel("client-edit-modal-phone", "clientContactPhone");
   setLabel("client-edit-modal-active", "status");
@@ -480,24 +508,15 @@ function updateStaticText() {
   setText('[data-i18n-key="manufacturersTitle"]', "manufacturerList");
   setText('[data-i18n-key="equipmentCategoryTitle"]', "equipmentCategoryTitle");
   setText('[data-i18n-key="equipmentSubcategoryTitle"]', "equipmentSubcategoryTitle");
-  setLabel("fault-mfr-add-name", "addManufacturer");
-  setLabel("fault-mfr-edit-name", "manufacturerName");
-  setLabel("fault-mfr-edit-active", "status");
-  setLabel("fault-cat-add-name", "addEquipmentCategory");
-  setLabel("fault-cat-edit-name", "equipmentCategoryName");
-  setLabel("fault-cat-edit-active", "status");
-  setLabel("fault-sub-add-name", "addEquipmentSubcategory");
-  setLabel("fault-sub-edit-name", "equipmentSubcategoryName");
-  setLabel("fault-sub-edit-active", "status");
-  setText("#btn-fault-mfr-create", "add");
-  setText("#btn-fault-mfr-save", "save");
-  setText("#btn-fault-mfr-reload", "refresh");
-  setText("#btn-fault-cat-create", "add");
-  setText("#btn-fault-cat-save", "save");
-  setText("#btn-fault-cat-reload", "refresh");
-  setText("#btn-fault-sub-create", "add");
-  setText("#btn-fault-sub-save", "save");
-  setText("#btn-fault-sub-reload", "refresh");
+  setText("#btn-fault-mfr-edit-open", "editAction");
+  setText("#btn-fault-mfr-create-open", "createAction");
+  setText("#btn-fault-cat-edit-open", "editAction");
+  setText("#btn-fault-cat-create-open", "createAction");
+  setText("#btn-fault-sub-edit-open", "editAction");
+  setText("#btn-fault-sub-create-open", "createAction");
+  setLabel("fault-edit-modal-active", "status");
+  setText("#btn-fault-edit-save", "save");
+  setText("#btn-fault-edit-cancel", "cancel");
 
   setText('.tab-panel[data-panel="stats"] .page-header h1', "statsTitle");
   setText('.tab-panel[data-panel="stats"] .page-hint', "statsHint");
@@ -521,8 +540,6 @@ function updateStaticText() {
   setPlaceholder("client-search", "search");
   setPlaceholder("client-site-search", "search");
   setPlaceholder("client-contact-search", "search");
-  setPlaceholder("client-contact-add-phone", "optional");
-  setPlaceholder("client-contact-edit-phone", "optional");
   setPlaceholder("fault-mfr-search", "search");
   setPlaceholder("fault-cat-search", "search");
   setPlaceholder("fault-sub-search", "search");
@@ -552,9 +569,7 @@ function updateStaticText() {
   }
   [
     "client-edit-modal-active",
-    "fault-mfr-edit-active",
-    "fault-cat-edit-active",
-    "fault-sub-edit-active",
+    "fault-edit-modal-active",
   ].forEach((id) => {
     const select = $id(id);
     if (!select) return;
@@ -572,6 +587,7 @@ function updateStaticText() {
   fillFaultCategoryEdit(selectedFaultCategory);
   fillFaultSubcategoryEdit(selectedFaultSubcategory);
   fillClientEditModal();
+  fillFaultEditModal();
   if ($id("emp-list")) renderEmployeeList($id("emp-search")?.value || "");
   if ($id("prj-list")) renderProjectList($id("prj-search")?.value || "");
   if ($id("client-list")) renderClientList($id("client-search")?.value || "");
@@ -880,22 +896,29 @@ function currentClientEditItem() {
   return null;
 }
 
-function openClientEditModal(kind, id) {
+function openClientEditModal(kind, mode = "edit", id = null) {
   if (kind === "client") {
-    selectedClient = CLIENTS.find((item) => String(item.id) === String(id)) || null;
-    if (!selectedClient) return;
-    clientEditModalState = { kind };
+    if (mode === "edit") {
+      selectedClient = CLIENTS.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedClient) return;
   } else if (kind === "site") {
-    selectedClientSite = CLIENT_SITES.find((item) => String(item.id) === String(id)) || null;
-    if (!selectedClientSite) return;
-    clientEditModalState = { kind };
+    if (!selectedClient && mode === "create") return;
+    if (mode === "edit") {
+      selectedClientSite = CLIENT_SITES.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedClientSite) return;
   } else if (kind === "contact") {
-    selectedClientContact = CLIENT_CONTACTS.find((item) => String(item.id) === String(id)) || null;
-    if (!selectedClientContact) return;
-    clientEditModalState = { kind };
+    if (!selectedClient && mode === "create") return;
+    if (mode === "edit") {
+      selectedClientContact = CLIENT_CONTACTS.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedClientContact) return;
   } else {
     return;
   }
+
+  clientEditModalState = { kind, mode };
 
   fillClientEditModal();
   $id("client-edit-modal")?.classList.remove("is-hidden");
@@ -913,12 +936,18 @@ function closeClientEditModal() {
 function fillClientEditModal() {
   const item = currentClientEditItem();
   const kind = clientEditModalState?.kind;
+  const mode = clientEditModalState?.mode || "edit";
   const isContact = kind === "contact";
   const context = kind === "client"
-    ? item?.name || ""
-    : `${selectedClient?.name || ""}${item?.name ? ` • ${item.name}` : ""}`;
+    ? mode === "edit" ? item?.name || "" : ""
+    : `${selectedClient?.name || ""}${mode === "edit" && item?.name ? ` • ${item.name}` : ""}`;
 
-  setText("#client-edit-modal-title", kind === "client" ? "editClient" : kind === "site" ? "editSite" : kind === "contact" ? "editContact" : "editSelectedItem");
+  setText(
+    "#client-edit-modal-title",
+    mode === "create"
+      ? kind === "client" ? "newClient" : kind === "site" ? "newSite" : "newContact"
+      : kind === "client" ? "editClient" : kind === "site" ? "editSite" : kind === "contact" ? "editContact" : "editSelectedItem"
+  );
   setContext("client-edit-modal-context", context);
 
   if ($id("client-edit-modal-name-label")) {
@@ -927,13 +956,16 @@ function fillClientEditModal() {
     );
   }
 
-  if ($id("client-edit-modal-name")) $id("client-edit-modal-name").value = item?.name || "";
-  if ($id("client-edit-modal-email")) $id("client-edit-modal-email").value = isContact ? item?.email || "" : "";
-  if ($id("client-edit-modal-phone")) $id("client-edit-modal-phone").value = isContact ? item?.phone || "" : "";
-  if ($id("client-edit-modal-active")) $id("client-edit-modal-active").value = item?.is_active ? "1" : "0";
-  $id("btn-client-edit-toggle").textContent = item?.is_active ? t("disable") : t("enable");
+  if ($id("client-edit-modal-name")) $id("client-edit-modal-name").value = mode === "edit" ? item?.name || "" : "";
+  if ($id("client-edit-modal-email")) $id("client-edit-modal-email").value = isContact && mode === "edit" ? item?.email || "" : "";
+  if ($id("client-edit-modal-phone")) $id("client-edit-modal-phone").value = isContact && mode === "edit" ? item?.phone || "" : "";
+  if ($id("client-edit-modal-active")) $id("client-edit-modal-active").value = mode === "edit" && item?.is_active ? "1" : "1";
+  $id("btn-client-edit-toggle").textContent = mode === "edit" && item?.is_active ? t("disable") : t("enable");
   $id("client-edit-modal-email-row")?.classList.toggle("is-hidden", !isContact);
   $id("client-edit-modal-phone-row")?.classList.toggle("is-hidden", !isContact);
+  $id("client-edit-modal-active-row")?.classList.toggle("is-hidden", mode !== "edit");
+  $id("btn-client-edit-toggle")?.classList.toggle("is-hidden", mode !== "edit");
+  $id("client-edit-modal-note").textContent = "";
 }
 
 function renderClientList(filter = "") {
@@ -955,7 +987,6 @@ function renderClientList(filter = "") {
     btn.textContent = itemLabel(item);
     if (selectedClient?.id === item.id) btn.classList.add("active");
     btn.addEventListener("click", () => selectClient(item.id));
-    btn.addEventListener("dblclick", () => openClientEditModal("client", item.id));
     list.appendChild(btn);
   }
 }
@@ -963,6 +994,9 @@ function renderClientList(filter = "") {
 function fillClientEdit(item) {
   setContext("client-site-context", item ? `${t("clientSitesContext")} ${item.name}` : t("clientSitesContextEmpty"));
   setContext("client-contact-context", item ? `${t("clientContactsContext")} ${item.name}` : t("clientContactsContextEmpty"));
+  if ($id("btn-client-edit-open")) $id("btn-client-edit-open").disabled = !item;
+  if ($id("btn-client-site-create-open")) $id("btn-client-site-create-open").disabled = !item;
+  if ($id("btn-client-contact-create-open")) $id("btn-client-contact-create-open").disabled = !item;
 }
 
 async function selectClient(id) {
@@ -1040,13 +1074,12 @@ function renderClientSiteList(filter = "") {
     btn.textContent = itemLabel(item);
     if (selectedClientSite?.id === item.id) btn.classList.add("active");
     btn.addEventListener("click", () => selectClientSite(item.id));
-    btn.addEventListener("dblclick", () => openClientEditModal("site", item.id));
     list.appendChild(btn);
   }
 }
 
 function fillClientSiteEdit(item) {
-  $id("btn-client-site-create").disabled = !selectedClient;
+  if ($id("btn-client-site-edit-open")) $id("btn-client-site-edit-open").disabled = !item;
 }
 
 function selectClientSite(id) {
@@ -1136,13 +1169,12 @@ function renderClientContactList(filter = "") {
     btn.textContent = contactLabel(item);
     if (selectedClientContact?.id === item.id) btn.classList.add("active");
     btn.addEventListener("click", () => selectClientContact(item.id));
-    btn.addEventListener("dblclick", () => openClientEditModal("contact", item.id));
     list.appendChild(btn);
   }
 }
 
 function fillClientContactEdit(item) {
-  $id("btn-client-contact-create").disabled = !selectedClient;
+  if ($id("btn-client-contact-edit-open")) $id("btn-client-contact-edit-open").disabled = !item;
 }
 
 function selectClientContact(id) {
@@ -1219,9 +1251,17 @@ async function toggleClientContact() {
 async function saveClientEditModal() {
   const item = currentClientEditItem();
   const kind = clientEditModalState?.kind;
-  if (!item || !kind) return;
+  const mode = clientEditModalState?.mode || "edit";
+  if (!kind) return;
 
-  if (kind === "client") {
+  if (kind === "client" && mode === "create") {
+    const r = await api("/admin/clients", {
+      method: "POST",
+      body: JSON.stringify({ name: $id("client-edit-modal-name").value }),
+    });
+    $id("client-note").textContent = r.message ? t("clientCreated") : t("clientCreated");
+    await loadClients();
+  } else if (kind === "client" && item) {
     const r = await api(`/admin/clients/${item.id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -1231,7 +1271,17 @@ async function saveClientEditModal() {
     });
     $id("client-note").textContent = r.message ? t("clientSaved") : t("clientSaved");
     await loadClients();
-  } else if (kind === "site") {
+  } else if (kind === "site" && mode === "create") {
+    const r = await api("/admin/client-sites", {
+      method: "POST",
+      body: JSON.stringify({
+        client_id: selectedClient.id,
+        name: $id("client-edit-modal-name").value,
+      }),
+    });
+    $id("client-site-note").textContent = r.message ? t("clientSiteCreated") : t("clientSiteCreated");
+    await loadClientSites();
+  } else if (kind === "site" && item) {
     const r = await api(`/admin/client-sites/${item.id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -1241,7 +1291,19 @@ async function saveClientEditModal() {
     });
     $id("client-site-note").textContent = r.message ? t("clientSiteSaved") : t("clientSiteSaved");
     await loadClientSites();
-  } else if (kind === "contact") {
+  } else if (kind === "contact" && mode === "create") {
+    const r = await api("/admin/client-contacts", {
+      method: "POST",
+      body: JSON.stringify({
+        client_id: selectedClient.id,
+        name: $id("client-edit-modal-name").value,
+        email: $id("client-edit-modal-email").value,
+        phone: $id("client-edit-modal-phone").value,
+      }),
+    });
+    $id("client-contact-note").textContent = r.message ? t("clientContactCreated") : t("clientContactCreated");
+    await loadClientContacts();
+  } else if (kind === "contact" && item) {
     const r = await api(`/admin/client-contacts/${item.id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -1261,7 +1323,7 @@ async function saveClientEditModal() {
 async function toggleClientEditModal() {
   const item = currentClientEditItem();
   const kind = clientEditModalState?.kind;
-  if (!item || !kind) return;
+  if (!item || !kind || clientEditModalState?.mode !== "edit") return;
   const nextActive = !item.is_active;
 
   if (kind === "client") {
@@ -1300,6 +1362,7 @@ let FAULT_SUBCATEGORIES = [];
 let selectedFaultManufacturer = null;
 let selectedFaultCategory = null;
 let selectedFaultSubcategory = null;
+let faultEditModalState = null;
 
 function itemLabel(item) {
   if (!item) return "";
@@ -1313,12 +1376,89 @@ function setFaultControlsDisabled(prefix, disabled) {
   });
 }
 
+function currentFaultEditItem() {
+  if (!faultEditModalState) return null;
+  if (faultEditModalState.kind === "manufacturer") return selectedFaultManufacturer;
+  if (faultEditModalState.kind === "category") return selectedFaultCategory;
+  if (faultEditModalState.kind === "subcategory") return selectedFaultSubcategory;
+  return null;
+}
+
+function openFaultEditModal(kind, mode = "edit", id = null) {
+  if (kind === "manufacturer") {
+    if (mode === "edit") {
+      selectedFaultManufacturer = FAULT_MANUFACTURERS.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedFaultManufacturer) return;
+  } else if (kind === "category") {
+    if (!selectedFaultManufacturer && mode === "create") return;
+    if (mode === "edit") {
+      selectedFaultCategory = FAULT_CATEGORIES.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedFaultCategory) return;
+  } else if (kind === "subcategory") {
+    if (!selectedFaultCategory && mode === "create") return;
+    if (mode === "edit") {
+      selectedFaultSubcategory = FAULT_SUBCATEGORIES.find((item) => String(item.id) === String(id)) || null;
+    }
+    if (mode === "edit" && !selectedFaultSubcategory) return;
+  } else {
+    return;
+  }
+
+  faultEditModalState = { kind, mode };
+  fillFaultEditModal();
+  $id("fault-edit-modal")?.classList.remove("is-hidden");
+  $id("fault-edit-modal")?.setAttribute("aria-hidden", "false");
+  $id("fault-edit-modal-name")?.focus();
+}
+
+function closeFaultEditModal() {
+  faultEditModalState = null;
+  $id("fault-edit-modal-note").textContent = "";
+  $id("fault-edit-modal")?.classList.add("is-hidden");
+  $id("fault-edit-modal")?.setAttribute("aria-hidden", "true");
+}
+
+function fillFaultEditModal() {
+  const item = currentFaultEditItem();
+  const kind = faultEditModalState?.kind;
+  const mode = faultEditModalState?.mode || "edit";
+  const titleKey = mode === "create"
+    ? kind === "manufacturer" ? "newManufacturer" : kind === "category" ? "newCategory" : "newSubcategory"
+    : kind === "manufacturer" ? "editManufacturer" : kind === "category" ? "editCategory" : "editSubcategory";
+  const context = kind === "manufacturer"
+    ? mode === "edit" ? item?.name || "" : ""
+    : kind === "category"
+      ? `${selectedFaultManufacturer?.name || ""}${mode === "edit" && item?.name ? ` • ${item.name}` : ""}`
+      : `${selectedFaultManufacturer?.name || ""}${selectedFaultCategory?.name ? ` • ${selectedFaultCategory.name}` : ""}${mode === "edit" && item?.name ? ` • ${item.name}` : ""}`;
+
+  setText("#fault-edit-modal-title", titleKey);
+  setContext("fault-edit-modal-context", context);
+  if ($id("fault-edit-modal-name-label")) {
+    $id("fault-edit-modal-name-label").textContent = t(
+      kind === "manufacturer" ? "manufacturerName" : kind === "category" ? "equipmentCategoryName" : "equipmentSubcategoryName"
+    );
+  }
+  if ($id("fault-edit-modal-name")) $id("fault-edit-modal-name").value = mode === "edit" ? item?.name || "" : "";
+  if ($id("fault-edit-modal-active")) $id("fault-edit-modal-active").value = mode === "edit" && item?.is_active ? "1" : "1";
+  $id("fault-edit-modal-active-row")?.classList.toggle("is-hidden", mode !== "edit");
+  $id("btn-fault-edit-toggle")?.classList.toggle("is-hidden", mode !== "edit");
+  $id("btn-fault-edit-toggle").textContent = mode === "edit" && item?.is_active ? t("disable") : t("enable");
+  $id("fault-edit-modal-note").textContent = "";
+}
+
 function renderFaultManufacturerList(filter = "") {
   const list = $id("fault-mfr-list");
   if (!list) return;
   list.innerHTML = "";
   const f = filter.toLowerCase();
   const rows = FAULT_MANUFACTURERS.filter((item) => !f || String(item.name || "").toLowerCase().includes(f));
+
+  if (rows.length === 0) {
+    renderEmptyList(list, t("noManufacturers"));
+    return;
+  }
 
   for (const item of rows) {
     const btn = document.createElement("button");
@@ -1332,12 +1472,9 @@ function renderFaultManufacturerList(filter = "") {
 }
 
 function fillFaultManufacturerEdit(item) {
-  if (!$id("fault-mfr-selected")) return;
-  $id("fault-mfr-selected").textContent = item ? itemLabel(item) : t("none");
-  $id("fault-mfr-edit-name").value = item?.name || "";
-  $id("fault-mfr-edit-active").value = item?.is_active ? "1" : "0";
-  $id("btn-fault-mfr-toggle").textContent = item?.is_active ? t("disable") : t("enable");
-  setFaultControlsDisabled("mfr", !item);
+  setContext("fault-cat-context", item ? `${t("categoriesContext")} ${item.name}` : t("categoriesContextEmpty"));
+  if ($id("btn-fault-mfr-edit-open")) $id("btn-fault-mfr-edit-open").disabled = !item;
+  if ($id("btn-fault-cat-create-open")) $id("btn-fault-cat-create-open").disabled = !item;
 }
 
 async function selectFaultManufacturer(id) {
@@ -1399,6 +1536,11 @@ function renderFaultCategoryList(filter = "") {
   const f = filter.toLowerCase();
   const rows = FAULT_CATEGORIES.filter((item) => !f || String(item.name || "").toLowerCase().includes(f));
 
+  if (rows.length === 0) {
+    renderEmptyList(list, selectedFaultManufacturer ? t("noCategories") : t("categoriesContextEmpty"));
+    return;
+  }
+
   for (const item of rows) {
     const btn = document.createElement("button");
     btn.className = "vitem";
@@ -1411,13 +1553,9 @@ function renderFaultCategoryList(filter = "") {
 }
 
 function fillFaultCategoryEdit(item) {
-  if (!$id("fault-cat-selected")) return;
-  $id("fault-cat-selected").textContent = item ? itemLabel(item) : t("none");
-  $id("fault-cat-edit-name").value = item?.name || "";
-  $id("fault-cat-edit-active").value = item?.is_active ? "1" : "0";
-  $id("btn-fault-cat-toggle").textContent = item?.is_active ? t("disable") : t("enable");
-  setFaultControlsDisabled("cat", !item);
-  $id("btn-fault-cat-create").disabled = !selectedFaultManufacturer;
+  setContext("fault-sub-context", item ? `${t("subcategoriesContext")} ${item.name}` : t("subcategoriesContextEmpty"));
+  if ($id("btn-fault-cat-edit-open")) $id("btn-fault-cat-edit-open").disabled = !item;
+  if ($id("btn-fault-sub-create-open")) $id("btn-fault-sub-create-open").disabled = !item;
 }
 
 async function selectFaultCategory(id) {
@@ -1496,6 +1634,11 @@ function renderFaultSubcategoryList(filter = "") {
   const f = filter.toLowerCase();
   const rows = FAULT_SUBCATEGORIES.filter((item) => !f || String(item.name || "").toLowerCase().includes(f));
 
+  if (rows.length === 0) {
+    renderEmptyList(list, selectedFaultCategory ? t("noSubcategories") : t("subcategoriesContextEmpty"));
+    return;
+  }
+
   for (const item of rows) {
     const btn = document.createElement("button");
     btn.className = "vitem";
@@ -1508,13 +1651,7 @@ function renderFaultSubcategoryList(filter = "") {
 }
 
 function fillFaultSubcategoryEdit(item) {
-  if (!$id("fault-sub-selected")) return;
-  $id("fault-sub-selected").textContent = item ? itemLabel(item) : t("none");
-  $id("fault-sub-edit-name").value = item?.name || "";
-  $id("fault-sub-edit-active").value = item?.is_active ? "1" : "0";
-  $id("btn-fault-sub-toggle").textContent = item?.is_active ? t("disable") : t("enable");
-  setFaultControlsDisabled("sub", !item);
-  $id("btn-fault-sub-create").disabled = !selectedFaultCategory;
+  if ($id("btn-fault-sub-edit-open")) $id("btn-fault-sub-edit-open").disabled = !item;
 }
 
 function selectFaultSubcategory(id) {
@@ -1580,6 +1717,106 @@ async function toggleFaultSubcategory() {
   });
   $id("fault-sub-note").textContent = r.message ? (nextActive ? t("subcategoryEnabled") : t("subcategoryDisabled")) : "";
   await loadFaultSubcategories();
+}
+
+async function saveFaultEditModal() {
+  const item = currentFaultEditItem();
+  const kind = faultEditModalState?.kind;
+  const mode = faultEditModalState?.mode || "edit";
+  if (!kind) return;
+
+  if (kind === "manufacturer" && mode === "create") {
+    const r = await api("/admin/fault/manufacturers", {
+      method: "POST",
+      body: JSON.stringify({ name: $id("fault-edit-modal-name").value }),
+    });
+    $id("fault-mfr-note").textContent = r.message ? t("manufacturerCreated") : t("manufacturerCreated");
+    await loadFaultManufacturers();
+  } else if (kind === "manufacturer" && item) {
+    const r = await api(`/admin/fault/manufacturers/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: $id("fault-edit-modal-name").value,
+        is_active: $id("fault-edit-modal-active").value === "1",
+      }),
+    });
+    $id("fault-mfr-note").textContent = r.message ? t("manufacturerSaved") : t("manufacturerSaved");
+    await loadFaultManufacturers();
+  } else if (kind === "category" && mode === "create") {
+    const r = await api("/admin/fault/categories", {
+      method: "POST",
+      body: JSON.stringify({
+        manufacturer_id: selectedFaultManufacturer.id,
+        name: $id("fault-edit-modal-name").value,
+      }),
+    });
+    $id("fault-cat-note").textContent = r.message ? t("categoryCreated") : t("categoryCreated");
+    await loadFaultCategories();
+  } else if (kind === "category" && item) {
+    const r = await api(`/admin/fault/categories/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: $id("fault-edit-modal-name").value,
+        is_active: $id("fault-edit-modal-active").value === "1",
+      }),
+    });
+    $id("fault-cat-note").textContent = r.message ? t("categorySaved") : t("categorySaved");
+    await loadFaultCategories();
+  } else if (kind === "subcategory" && mode === "create") {
+    const r = await api("/admin/fault/subcategories", {
+      method: "POST",
+      body: JSON.stringify({
+        equipment_category_id: selectedFaultCategory.id,
+        name: $id("fault-edit-modal-name").value,
+      }),
+    });
+    $id("fault-sub-note").textContent = r.message ? t("subcategoryCreated") : t("subcategoryCreated");
+    await loadFaultSubcategories();
+  } else if (kind === "subcategory" && item) {
+    const r = await api(`/admin/fault/subcategories/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: $id("fault-edit-modal-name").value,
+        is_active: $id("fault-edit-modal-active").value === "1",
+      }),
+    });
+    $id("fault-sub-note").textContent = r.message ? t("subcategorySaved") : t("subcategorySaved");
+    await loadFaultSubcategories();
+  }
+
+  closeFaultEditModal();
+}
+
+async function toggleFaultEditModal() {
+  const item = currentFaultEditItem();
+  const kind = faultEditModalState?.kind;
+  if (!item || !kind || faultEditModalState?.mode !== "edit") return;
+  const nextActive = !item.is_active;
+
+  if (kind === "manufacturer") {
+    const r = await api(`/admin/fault/manufacturers/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({ is_active: nextActive }),
+    });
+    $id("fault-mfr-note").textContent = r.message ? (nextActive ? t("manufacturerEnabled") : t("manufacturerDisabled")) : "";
+    await loadFaultManufacturers();
+  } else if (kind === "category") {
+    const r = await api(`/admin/fault/categories/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({ is_active: nextActive }),
+    });
+    $id("fault-cat-note").textContent = r.message ? (nextActive ? t("categoryEnabled") : t("categoryDisabled")) : "";
+    await loadFaultCategories();
+  } else if (kind === "subcategory") {
+    const r = await api(`/admin/fault/subcategories/${item.id}`, {
+      method: "PUT",
+      body: JSON.stringify({ is_active: nextActive }),
+    });
+    $id("fault-sub-note").textContent = r.message ? (nextActive ? t("subcategoryEnabled") : t("subcategoryDisabled")) : "";
+    await loadFaultSubcategories();
+  }
+
+  closeFaultEditModal();
 }
 
 // =========================
@@ -2031,23 +2268,17 @@ async function init() {
   });
 
   // Clients hierarchy
-  $id("btn-client-reload").addEventListener("click", loadClients);
   $id("client-search").addEventListener("input", () => renderClientList($id("client-search").value));
-  $id("btn-client-create").addEventListener("click", async () => {
-    try { await createClient(); } catch (e) { $id("client-note").textContent = e.message; }
-  });
+  $id("btn-client-create-open").addEventListener("click", () => openClientEditModal("client", "create"));
+  $id("btn-client-edit-open").addEventListener("click", () => openClientEditModal("client", "edit", selectedClient?.id));
 
-  $id("btn-client-site-reload").addEventListener("click", loadClientSites);
   $id("client-site-search").addEventListener("input", () => renderClientSiteList($id("client-site-search").value));
-  $id("btn-client-site-create").addEventListener("click", async () => {
-    try { await createClientSite(); } catch (e) { $id("client-site-note").textContent = e.message; }
-  });
+  $id("btn-client-site-create-open").addEventListener("click", () => openClientEditModal("site", "create"));
+  $id("btn-client-site-edit-open").addEventListener("click", () => openClientEditModal("site", "edit", selectedClientSite?.id));
 
-  $id("btn-client-contact-reload").addEventListener("click", loadClientContacts);
   $id("client-contact-search").addEventListener("input", () => renderClientContactList($id("client-contact-search").value));
-  $id("btn-client-contact-create").addEventListener("click", async () => {
-    try { await createClientContact(); } catch (e) { $id("client-contact-note").textContent = e.message; }
-  });
+  $id("btn-client-contact-create-open").addEventListener("click", () => openClientEditModal("contact", "create"));
+  $id("btn-client-contact-edit-open").addEventListener("click", () => openClientEditModal("contact", "edit", selectedClientContact?.id));
   $id("btn-client-edit-close").addEventListener("click", closeClientEditModal);
   $id("btn-client-edit-cancel").addEventListener("click", closeClientEditModal);
   $id("btn-client-edit-save").addEventListener("click", async () => {
@@ -2063,43 +2294,31 @@ async function init() {
     if (event.key === "Escape" && !$id("client-edit-modal")?.classList.contains("is-hidden")) {
       closeClientEditModal();
     }
+    if (event.key === "Escape" && !$id("fault-edit-modal")?.classList.contains("is-hidden")) {
+      closeFaultEditModal();
+    }
   });
 
   // Fault equipment hierarchy
-  $id("btn-fault-mfr-reload").addEventListener("click", loadFaultManufacturers);
   $id("fault-mfr-search").addEventListener("input", () => renderFaultManufacturerList($id("fault-mfr-search").value));
-  $id("btn-fault-mfr-create").addEventListener("click", async () => {
-    try { await createFaultManufacturer(); } catch (e) { $id("fault-mfr-note").textContent = e.message; }
-  });
-  $id("btn-fault-mfr-save").addEventListener("click", async () => {
-    try { await saveFaultManufacturer(); } catch (e) { $id("fault-mfr-note").textContent = e.message; }
-  });
-  $id("btn-fault-mfr-toggle").addEventListener("click", async () => {
-    try { await toggleFaultManufacturer(); } catch (e) { $id("fault-mfr-note").textContent = e.message; }
-  });
-
-  $id("btn-fault-cat-reload").addEventListener("click", loadFaultCategories);
+  $id("btn-fault-mfr-create-open").addEventListener("click", () => openFaultEditModal("manufacturer", "create"));
+  $id("btn-fault-mfr-edit-open").addEventListener("click", () => openFaultEditModal("manufacturer", "edit", selectedFaultManufacturer?.id));
   $id("fault-cat-search").addEventListener("input", () => renderFaultCategoryList($id("fault-cat-search").value));
-  $id("btn-fault-cat-create").addEventListener("click", async () => {
-    try { await createFaultCategory(); } catch (e) { $id("fault-cat-note").textContent = e.message; }
-  });
-  $id("btn-fault-cat-save").addEventListener("click", async () => {
-    try { await saveFaultCategory(); } catch (e) { $id("fault-cat-note").textContent = e.message; }
-  });
-  $id("btn-fault-cat-toggle").addEventListener("click", async () => {
-    try { await toggleFaultCategory(); } catch (e) { $id("fault-cat-note").textContent = e.message; }
-  });
-
-  $id("btn-fault-sub-reload").addEventListener("click", loadFaultSubcategories);
+  $id("btn-fault-cat-create-open").addEventListener("click", () => openFaultEditModal("category", "create"));
+  $id("btn-fault-cat-edit-open").addEventListener("click", () => openFaultEditModal("category", "edit", selectedFaultCategory?.id));
   $id("fault-sub-search").addEventListener("input", () => renderFaultSubcategoryList($id("fault-sub-search").value));
-  $id("btn-fault-sub-create").addEventListener("click", async () => {
-    try { await createFaultSubcategory(); } catch (e) { $id("fault-sub-note").textContent = e.message; }
+  $id("btn-fault-sub-create-open").addEventListener("click", () => openFaultEditModal("subcategory", "create"));
+  $id("btn-fault-sub-edit-open").addEventListener("click", () => openFaultEditModal("subcategory", "edit", selectedFaultSubcategory?.id));
+  $id("btn-fault-edit-close").addEventListener("click", closeFaultEditModal);
+  $id("btn-fault-edit-cancel").addEventListener("click", closeFaultEditModal);
+  $id("btn-fault-edit-save").addEventListener("click", async () => {
+    try { await saveFaultEditModal(); } catch (e) { $id("fault-edit-modal-note").textContent = e.message; }
   });
-  $id("btn-fault-sub-save").addEventListener("click", async () => {
-    try { await saveFaultSubcategory(); } catch (e) { $id("fault-sub-note").textContent = e.message; }
+  $id("btn-fault-edit-toggle").addEventListener("click", async () => {
+    try { await toggleFaultEditModal(); } catch (e) { $id("fault-edit-modal-note").textContent = e.message; }
   });
-  $id("btn-fault-sub-toggle").addEventListener("click", async () => {
-    try { await toggleFaultSubcategory(); } catch (e) { $id("fault-sub-note").textContent = e.message; }
+  $id("fault-edit-modal").addEventListener("click", (event) => {
+    if (event.target === $id("fault-edit-modal")) closeFaultEditModal();
   });
 
   // Settings

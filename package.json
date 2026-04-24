@@ -1,6 +1,6 @@
 {
   "name": "employee_work_report_system",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "",
   "type": "module",
   "main": "app.js",
