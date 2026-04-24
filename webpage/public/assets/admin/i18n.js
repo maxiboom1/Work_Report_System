@@ -246,31 +246,33 @@ const I18N = {
     faultSummaryMany: "faults",
     faultNoResults: "No faults found for the current filters.",
     faultDetailTitle: "Fault detail",
-    faultDetailReference: "Reference",
-    faultDetailCreated: "Created",
-    faultDetailCreatedBy: "Created by",
-    faultDetailClient: "Client",
-    faultDetailSite: "Site",
-    faultDetailManufacturer: "Manufacturer",
-    faultDetailCategory: "Category / subcategory",
+    faultDetailOpenedBy: "Opened by",
+    faultDetailHardware: "Hardware",
+    faultDetailContactsInline: "Contacts:",
     faultDetailSupport: "Support level",
     faultDetailSerial: "Serial / unit ID",
     faultDetailTicket: "Manufacturer ticket ID",
     faultDetailDescription: "Fault description",
-    faultDetailContacts: "Contacts",
-    faultDetailTimeline: "Timeline",
+    faultDetailTimeline: "Treatment process",
+    faultProcessColStatus: "Status",
+    faultProcessColCreated: "Date creation",
+    faultProcessColName: "Name",
+    faultProcessColCreatedBy: "Created by",
+    faultProcessColDescription: "Description",
+    faultProcessColOrder: "Order ID / tracking",
+    faultProcessActive: "Active",
+    faultProcessDone: "Done",
     faultEventTitle: "Event title",
     faultEventOrder: "Order ID / tracking",
     faultEventDetails: "Event details",
+    faultEventModalTitle: "Add event",
+    faultEventSaveAction: "Save event",
     faultSaveAction: "Save fault",
     faultAddEventAction: "Add event",
     faultCloseAction: "Close fault",
     faultReopenAction: "Reopen fault",
     faultCloseModalAction: "Close",
-    faultNoContacts: "No contacts linked to this fault.",
-    faultNoContactDetails: "No email or phone",
     faultNoEvents: "No events yet.",
-    faultOrderLabel: "Order",
     faultSaved: "Fault saved.",
     faultMarkedClosed: "Fault marked as closed.",
     faultMarkedOpen: "Fault marked as open.",
@@ -487,31 +489,33 @@ const I18N = {
     faultSummaryMany: "\u05ea\u05e7\u05dc\u05d5\u05ea",
     faultNoResults: "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05ea\u05e7\u05dc\u05d5\u05ea \u05dc\u05e4\u05d9 \u05d4\u05e1\u05d9\u05e0\u05d5\u05df \u05d4\u05e0\u05d5\u05db\u05d7\u05d9.",
     faultDetailTitle: "\u05e4\u05e8\u05d8\u05d9 \u05ea\u05e7\u05dc\u05d4",
-    faultDetailReference: "\u05de\u05e1\u05e4\u05e8 \u05de\u05d6\u05d4\u05d4",
-    faultDetailCreated: "\u05e0\u05d5\u05e6\u05e8\u05d4",
-    faultDetailCreatedBy: "\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9",
-    faultDetailClient: "\u05dc\u05e7\u05d5\u05d7",
-    faultDetailSite: "\u05d0\u05ea\u05e8",
-    faultDetailManufacturer: "\u05d9\u05e6\u05e8\u05df",
-    faultDetailCategory: "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 / \u05ea\u05ea-\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4",
+    faultDetailOpenedBy: "\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9",
+    faultDetailHardware: "\u05d7\u05d5\u05de\u05e8\u05d4",
+    faultDetailContactsInline: "\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8:",
     faultDetailSupport: "\u05e8\u05de\u05ea \u05ea\u05de\u05d9\u05db\u05d4",
     faultDetailSerial: "\u05de\u05e1\u05e4\u05e8 \u05e1\u05d9\u05e8\u05d9\u05d0\u05dc\u05d9 / \u05d9\u05d7\u05d9\u05d3\u05d4",
     faultDetailTicket: "\u05de\u05e1\u05e4\u05e8 \u05e4\u05e0\u05d9\u05d9\u05d4 \u05d0\u05e6\u05dc \u05d4\u05d9\u05e6\u05e8\u05df",
     faultDetailDescription: "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05ea\u05e7\u05dc\u05d4",
-    faultDetailContacts: "\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8",
-    faultDetailTimeline: "\u05e6\u05d9\u05e8 \u05d6\u05de\u05df",
+    faultDetailTimeline: "\u05ea\u05d4\u05dc\u05d9\u05da \u05d4\u05d8\u05d9\u05e4\u05d5\u05dc",
+    faultProcessColStatus: "\u05e1\u05d8\u05d8\u05d5\u05e1",
+    faultProcessColCreated: "\u05ea\u05d0\u05e8\u05d9\u05da \u05d9\u05e6\u05d9\u05e8\u05d4",
+    faultProcessColName: "\u05e9\u05dd",
+    faultProcessColCreatedBy: "\u05e0\u05d5\u05e6\u05e8 \u05e2\u05dc \u05d9\u05d3\u05d9",
+    faultProcessColDescription: "\u05ea\u05d9\u05d0\u05d5\u05e8",
+    faultProcessColOrder: "\u05de\u05e1\u05e4\u05e8 \u05d4\u05d6\u05de\u05e0\u05d4 / \u05de\u05e2\u05e7\u05d1",
+    faultProcessActive: "Active",
+    faultProcessDone: "Done",
     faultEventTitle: "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05d0\u05d9\u05e8\u05d5\u05e2",
     faultEventOrder: "\u05de\u05e1\u05e4\u05e8 \u05d4\u05d6\u05de\u05e0\u05d4 / \u05de\u05e2\u05e7\u05d1",
     faultEventDetails: "\u05e4\u05e8\u05d8\u05d9 \u05d4\u05d0\u05d9\u05e8\u05d5\u05e2",
+    faultEventModalTitle: "\u05d4\u05d5\u05e1\u05e4\u05ea \u05d0\u05d9\u05e8\u05d5\u05e2",
+    faultEventSaveAction: "\u05e9\u05de\u05d9\u05e8\u05ea \u05d0\u05d9\u05e8\u05d5\u05e2",
     faultSaveAction: "\u05e9\u05de\u05d9\u05e8\u05ea \u05ea\u05e7\u05dc\u05d4",
     faultAddEventAction: "\u05d4\u05d5\u05e1\u05e4\u05ea \u05d0\u05d9\u05e8\u05d5\u05e2",
     faultCloseAction: "\u05e1\u05d2\u05d9\u05e8\u05ea \u05ea\u05e7\u05dc\u05d4",
     faultReopenAction: "\u05e4\u05ea\u05d9\u05d7\u05ea \u05ea\u05e7\u05dc\u05d4 \u05de\u05d7\u05d3\u05e9",
     faultCloseModalAction: "\u05e1\u05d2\u05d9\u05e8\u05d4",
-    faultNoContacts: "\u05d0\u05d9\u05df \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05de\u05e7\u05d5\u05e9\u05e8\u05d9\u05dd \u05dc\u05ea\u05e7\u05dc\u05d4 \u05d6\u05d5.",
-    faultNoContactDetails: "\u05d0\u05d9\u05df \u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d0\u05d5 \u05d8\u05dc\u05e4\u05d5\u05df",
     faultNoEvents: "\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd.",
-    faultOrderLabel: "\u05d4\u05d6\u05de\u05e0\u05d4",
     faultSaved: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e0\u05e9\u05de\u05e8\u05d4.",
     faultMarkedClosed: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e1\u05d5\u05de\u05e0\u05d4 \u05db\u05e1\u05d2\u05d5\u05e8\u05d4.",
     faultMarkedOpen: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e1\u05d5\u05de\u05e0\u05d4 \u05db\u05e4\u05ea\u05d5\u05d7\u05d4.",
@@ -658,6 +662,8 @@ export function updateStaticText() {
   setText("#btn-faults-clear", "clear");
 
   setText("#fault-detail-title", "faultDetailTitle");
+  setText("#fault-detail-opened-by-label", "faultDetailOpenedBy");
+  setText("#fault-detail-hardware-label", "faultDetailHardware");
   setText('label[for="fault-detail-support"]', "faultDetailSupport");
   setText('label[for="fault-detail-serial"]', "faultDetailSerial");
   setText('label[for="fault-detail-ticket"]', "faultDetailTicket");
@@ -665,25 +671,13 @@ export function updateStaticText() {
   setText('label[for="fault-event-title"]', "faultEventTitle");
   setText('label[for="fault-event-order-id"]', "faultEventOrder");
   setText('label[for="fault-event-details"]', "faultEventDetails");
-  setText("#fault-detail-contacts-label", "faultDetailContacts");
   setText("#fault-detail-timeline-label", "faultDetailTimeline");
+  setText("#fault-event-modal-title", "faultEventModalTitle");
   setText("#btn-fault-detail-save", "faultSaveAction");
   setText("#btn-fault-detail-add-event", "faultAddEventAction");
   setText("#btn-fault-detail-cancel", "faultCloseModalAction");
-
-  document.querySelectorAll("#fault-detail-modal .fault-detail-item .label").forEach((el, index) => {
-    const keys = [
-      "faultDetailReference",
-      "faultDetailCreated",
-      "faultFilterStatus",
-      "faultDetailCreatedBy",
-      "faultDetailClient",
-      "faultDetailSite",
-      "faultDetailManufacturer",
-      "faultDetailCategory",
-    ];
-    el.textContent = t(keys[index]);
-  });
+  setText("#btn-fault-event-save", "faultEventSaveAction");
+  setText("#btn-fault-event-cancel", "cancel");
 
   setText('.tab-panel[data-panel="stats"] .page-header h1', "statsTitle");
   setText('.tab-panel[data-panel="stats"] .page-hint', "statsHint");

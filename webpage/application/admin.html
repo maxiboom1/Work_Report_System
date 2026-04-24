@@ -652,49 +652,26 @@
             <div>
               <div id="fault-detail-title" class="modal-title">Fault detail</div>
               <div id="fault-detail-context" class="modal-context"></div>
+              <div id="fault-detail-contacts-line" class="modal-context fault-detail-contacts-line"></div>
             </div>
-            <button id="btn-fault-detail-close" class="btn btn-icon" type="button" aria-label="Close">×</button>
+            <button id="btn-fault-detail-close" class="btn btn-icon" type="button" aria-label="Close">&times;</button>
           </div>
 
           <div class="modal-body">
-            <div class="fault-detail-grid">
-              <div class="fault-detail-item">
-                <div class="label">Reference</div>
-                <div id="fault-detail-ref" class="fault-detail-value">-</div>
+            <div class="fault-detail-summary">
+              <div class="fault-detail-meta-line">
+                <span id="fault-detail-opened-by-label" class="fault-detail-meta-label">Opened by</span>
+                <span id="fault-detail-created-by" class="fault-detail-meta-value">-</span>
               </div>
-              <div class="fault-detail-item">
-                <div class="label">Created</div>
-                <div id="fault-detail-created" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Status</div>
-                <div id="fault-detail-status" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Created by</div>
-                <div id="fault-detail-created-by" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Client</div>
-                <div id="fault-detail-client" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Site</div>
-                <div id="fault-detail-site" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Manufacturer</div>
-                <div id="fault-detail-manufacturer" class="fault-detail-value">-</div>
-              </div>
-              <div class="fault-detail-item">
-                <div class="label">Category / subcategory</div>
-                <div id="fault-detail-category" class="fault-detail-value">-</div>
+              <div class="fault-detail-meta-line">
+                <span id="fault-detail-hardware-label" class="fault-detail-meta-label">Hardware</span>
+                <span id="fault-detail-hardware" class="fault-detail-meta-value">-</span>
               </div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="form-grid-2">
+            <div class="fault-detail-operational-grid">
               <div class="form-field">
                 <label class="label" for="fault-detail-support">Support level</label>
                 <select id="fault-detail-support" class="select">
@@ -707,9 +684,6 @@
                 <label class="label" for="fault-detail-serial">Serial / unit ID</label>
                 <input id="fault-detail-serial" class="input" type="text" />
               </div>
-            </div>
-
-            <div class="form-grid-2">
               <div class="form-field">
                 <label class="label" for="fault-detail-ticket">Manufacturer ticket ID</label>
                 <input id="fault-detail-ticket" class="input" type="text" />
@@ -718,23 +692,39 @@
 
             <div class="form-row">
               <label class="label" for="fault-detail-description">Fault description</label>
-              <textarea id="fault-detail-description" class="input fault-textarea" rows="4"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div id="fault-detail-contacts-label" class="label">Contacts</div>
-              <div id="fault-detail-contacts" class="fault-detail-stack"></div>
+              <textarea id="fault-detail-description" class="input fault-textarea fault-detail-description-input" rows="4"></textarea>
             </div>
 
             <div class="divider"></div>
 
             <div class="form-row">
               <div id="fault-detail-timeline-label" class="label">Timeline</div>
-              <div id="fault-detail-events" class="fault-detail-stack"></div>
+              <div id="fault-detail-events" class="fault-detail-table-wrap"></div>
             </div>
 
-            <div class="divider"></div>
+            <div id="fault-detail-note" class="hint"></div>
+          </div>
 
+          <div class="modal-actions">
+            <button id="btn-fault-detail-save" class="btn" type="button">Save fault</button>
+            <button id="btn-fault-detail-add-event" class="btn" type="button">Add event</button>
+            <button id="btn-fault-detail-toggle-status" class="btn danger" type="button">Close fault</button>
+            <button id="btn-fault-detail-cancel" class="btn" type="button">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="fault-event-modal" class="modal-backdrop is-hidden" aria-hidden="true">
+        <div class="modal-card fault-event-modal-card" role="dialog" aria-modal="true" aria-labelledby="fault-event-modal-title">
+          <div class="modal-head">
+            <div>
+              <div id="fault-event-modal-title" class="modal-title">Add event</div>
+              <div id="fault-event-modal-context" class="modal-context"></div>
+            </div>
+            <button id="btn-fault-event-close" class="btn btn-icon" type="button" aria-label="Close">&times;</button>
+          </div>
+
+          <div class="modal-body">
             <div class="form-grid-2">
               <div class="form-field">
                 <label class="label" for="fault-event-title">Event title</label>
@@ -748,17 +738,15 @@
 
             <div class="form-row">
               <label class="label" for="fault-event-details">Event details</label>
-              <textarea id="fault-event-details" class="input fault-textarea" rows="3"></textarea>
+              <textarea id="fault-event-details" class="input fault-textarea" rows="4"></textarea>
             </div>
 
-            <div id="fault-detail-note" class="hint"></div>
+            <div id="fault-event-note" class="hint"></div>
           </div>
 
           <div class="modal-actions">
-            <button id="btn-fault-detail-save" class="btn" type="button">Save fault</button>
-            <button id="btn-fault-detail-add-event" class="btn" type="button">Add event</button>
-            <button id="btn-fault-detail-toggle-status" class="btn danger" type="button">Close fault</button>
-            <button id="btn-fault-detail-cancel" class="btn" type="button">Close</button>
+            <button id="btn-fault-event-save" class="btn" type="button">Save event</button>
+            <button id="btn-fault-event-cancel" class="btn" type="button">Cancel</button>
           </div>
         </div>
       </div>

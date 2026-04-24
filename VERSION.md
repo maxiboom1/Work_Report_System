@@ -1,3 +1,13 @@
+Version: v1.1.13
+Date: 2026-04-24
+Done:
+- Redesigned the admin fault detail modal into a simpler text-first layout with fault context and contact names in the header.
+- Removed the top fault summary cards and regrouped editable support, serial, and manufacturer ticket fields into one row.
+- Replaced timeline event cards with a treatment-process table including status, creation date, name, created by, description, and order/tracking.
+- Moved new fault event creation into a separate modal launched from the main fault detail modal.
+
+----------------------------------------
+
 Version: v1.1.12
 Date: 2026-04-24
 Done:

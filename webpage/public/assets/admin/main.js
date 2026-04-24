@@ -7,7 +7,7 @@ import { loadSettings, saveSettings } from "./settings.js";
 import { createEmployee, deleteEmployee, loadEmployees, renderEmployeeList, saveEmployee } from "./employees.js";
 import { createProject, deleteProject, loadProjects, renderProjectList, saveProject } from "./projects.js";
 import { closeClientEditModal, loadClients, openClientEditModal, renderClientContactList, renderClientList, renderClientSiteList, saveClientEditModal, selectedClient, selectedClientContact, selectedClientSite, toggleClientEditModal } from "./clients.js";
-import { clearFaultFilters, closeFaultDetailModal, initFaults, loadFaults, refreshFaultsText, renderFaultFilterOptions } from "./faults.js";
+import { clearFaultFilters, closeFaultDetailModal, closeFaultEventModal, initFaults, loadFaults, refreshFaultsText, renderFaultFilterOptions } from "./faults.js";
 import { closeFaultEditModal, loadFaultManufacturers, openFaultEditModal, renderFaultCategoryList, renderFaultManufacturerList, renderFaultSubcategoryList, saveFaultEditModal, selectedFaultCategory, selectedFaultManufacturer, selectedFaultSubcategory, toggleFaultEditModal } from "./manufacturers.js";
 import { initMonthPickers, refreshStatsIfRendered, runStats, setStatsMode } from "./statistics.js";
 
@@ -83,6 +83,10 @@ async function init() {
     }
     if (event.key === "Escape" && !$id("fault-edit-modal")?.classList.contains("is-hidden")) {
       closeFaultEditModal();
+    }
+    if (event.key === "Escape" && !$id("fault-event-modal")?.classList.contains("is-hidden")) {
+      closeFaultEventModal();
+      return;
     }
     if (event.key === "Escape" && !$id("fault-detail-modal")?.classList.contains("is-hidden")) {
       closeFaultDetailModal();

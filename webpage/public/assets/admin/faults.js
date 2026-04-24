@@ -167,74 +167,87 @@ function setText(id, value) {
   if (el) el.textContent = value || "-";
 }
 
-function renderFaultContacts(contacts) {
-  const holder = $id("fault-detail-contacts");
-  if (!holder) return;
-  holder.innerHTML = "";
-
-  if (!contacts.length) {
-    holder.innerHTML = `<div class="fault-detail-card">${t("faultNoContacts")}</div>`;
-    return;
-  }
-
-  for (const contact of contacts) {
-    const card = document.createElement("div");
-    card.className = "fault-detail-card";
-
-    const title = document.createElement("div");
-    title.className = "fault-detail-card-title";
-    title.textContent = contact.contact_name || "-";
-
-    const meta = document.createElement("div");
-    meta.className = "fault-detail-card-meta";
-    const parts = [];
-    if (contact.contact_email) parts.push(contact.contact_email);
-    if (contact.contact_phone) parts.push(contact.contact_phone);
-    meta.textContent = parts.join(" | ") || t("faultNoContactDetails");
-
-    card.append(title, meta);
-    holder.appendChild(card);
-  }
+function contactNamesLabel(contacts) {
+  const names = (contacts || [])
+    .map((contact) => String(contact?.contact_name || "").trim())
+    .filter(Boolean);
+  return `${t("faultDetailContactsInline")} ${names.join(", ") || "-"}`;
 }
 
-function renderFaultEvents(events) {
+function faultHardwareLabel(fault) {
+  const pieces = [
+    fault?.manufacturer_name,
+    fault?.equipment_category_name,
+    fault?.equipment_subcategory_name,
+  ].filter(Boolean);
+  return pieces.join(" / ") || "-";
+}
+
+function faultEventDescription(event, fault) {
+  const details = String(event?.details || "").trim();
+  if (details) return details;
+
+  if (String(event?.title || "").trim() === "Fault opened") {
+    const description = String(fault?.fault_description || "").trim();
+    return description || "-";
+  }
+
+  return "-";
+}
+
+function faultEventAuthor(event) {
+  return `${event?.created_by_first_name || ""} ${event?.created_by_last_name || ""}`.trim() || "-";
+}
+
+function makeProcessBadge(isActive) {
+  const badge = document.createElement("span");
+  badge.className = `fault-process-badge ${isActive ? "is-active" : "is-done"}`;
+  badge.textContent = isActive ? t("faultProcessActive") : t("faultProcessDone");
+  return badge;
+}
+
+function makeProcessDescriptionCell(text) {
+  const wrap = document.createElement("div");
+  wrap.className = "fault-process-description";
+  wrap.textContent = text;
+  return wrap;
+}
+
+function renderFaultEvents(events, fault) {
   const holder = $id("fault-detail-events");
   if (!holder) return;
   holder.innerHTML = "";
 
   if (!events.length) {
-    holder.innerHTML = `<div class="fault-detail-card">${t("faultNoEvents")}</div>`;
+    holder.innerHTML = `<div class="vitem-empty">${t("faultNoEvents")}</div>`;
     return;
   }
 
-  for (const event of events) {
-    const card = document.createElement("div");
-    card.className = "fault-detail-card";
+  const latestIndex = events.length - 1;
+  const rows = events.map((event, index) => ({
+    cells: [
+      makeProcessBadge(index === latestIndex),
+      formatDateTime(event.created_at),
+      event.title || "-",
+      faultEventAuthor(event),
+      makeProcessDescriptionCell(faultEventDescription(event, fault)),
+      event.order_id || "-",
+    ],
+  }));
 
-    const title = document.createElement("div");
-    title.className = "fault-detail-card-title";
-    title.textContent = event.title || "-";
+  const table = renderTable(
+    [
+      t("faultProcessColStatus"),
+      t("faultProcessColCreated"),
+      t("faultProcessColName"),
+      t("faultProcessColCreatedBy"),
+      t("faultProcessColDescription"),
+      t("faultProcessColOrder"),
+    ],
+    rows
+  );
 
-    const meta = document.createElement("div");
-    meta.className = "fault-detail-card-meta";
-    const metaParts = [];
-    const author = `${event.created_by_first_name || ""} ${event.created_by_last_name || ""}`.trim();
-    if (author) metaParts.push(author);
-    if (event.created_at) metaParts.push(formatDateTime(event.created_at));
-    if (event.order_id) metaParts.push(`${t("faultOrderLabel")}: ${event.order_id}`);
-    meta.textContent = metaParts.join(" | ");
-
-    card.append(title, meta);
-
-    if (event.details) {
-      const body = document.createElement("div");
-      body.className = "fault-detail-card-body";
-      body.textContent = event.details;
-      card.appendChild(body);
-    }
-
-    holder.appendChild(card);
-  }
+  holder.appendChild(table);
 }
 
 function showFaultDetailModal() {
@@ -242,12 +255,35 @@ function showFaultDetailModal() {
   $id("fault-detail-modal")?.setAttribute("aria-hidden", "false");
 }
 
-export function closeFaultDetailModal() {
-  currentFaultDetail = null;
-  $id("fault-detail-note").textContent = "";
+function clearFaultEventForm() {
   $id("fault-event-title").value = "";
   $id("fault-event-order-id").value = "";
   $id("fault-event-details").value = "";
+  $id("fault-event-note").textContent = "";
+}
+
+function showFaultEventModal() {
+  $id("fault-event-modal")?.classList.remove("is-hidden");
+  $id("fault-event-modal")?.setAttribute("aria-hidden", "false");
+}
+
+export function closeFaultEventModal() {
+  clearFaultEventForm();
+  $id("fault-event-modal")?.classList.add("is-hidden");
+  $id("fault-event-modal")?.setAttribute("aria-hidden", "true");
+}
+
+function openFaultEventModal() {
+  if (!currentFaultDetail?.fault?.id) return;
+  clearFaultEventForm();
+  setText("fault-event-modal-context", currentFaultDetail.fault.fault_ref || "-");
+  showFaultEventModal();
+}
+
+export function closeFaultDetailModal() {
+  closeFaultEventModal();
+  currentFaultDetail = null;
+  $id("fault-detail-note").textContent = "";
   $id("fault-detail-modal")?.classList.add("is-hidden");
   $id("fault-detail-modal")?.setAttribute("aria-hidden", "true");
 }
@@ -255,22 +291,17 @@ export function closeFaultDetailModal() {
 function renderFaultDetail(response) {
   currentFaultDetail = response;
   const fault = response.fault;
+  const contacts = response.contacts || [];
 
   $id("fault-detail-note").textContent = "";
-  setText("fault-detail-context", `${fault.fault_ref} | ${fault.client_name || "-"} | ${fault.site_name || "-"}`);
-  setText("fault-detail-ref", fault.fault_ref);
-  setText("fault-detail-created", formatDateTime(fault.created_at));
+  setText(
+    "fault-detail-context",
+    `${fault.fault_ref} | ${fault.client_name || "-"} | ${fault.site_name || "-"} | ${formatDateTime(fault.created_at)}`
+  );
+  setText("fault-detail-contacts-line", contactNamesLabel(contacts));
   setText("fault-detail-created-by", `${fault.created_by_first_name || ""} ${fault.created_by_last_name || ""}`.trim());
-  setText("fault-detail-client", fault.client_name);
-  setText("fault-detail-site", fault.site_name);
-  setText("fault-detail-manufacturer", fault.manufacturer_name);
-  setText("fault-detail-category", faultCategoryLabel(fault));
-
-  const statusHolder = $id("fault-detail-status");
-  if (statusHolder) {
-    statusHolder.innerHTML = "";
-    statusHolder.appendChild(makeStatusBadge(fault.status));
-  }
+  setText("fault-detail-hardware", faultHardwareLabel(fault));
+  setText("fault-event-modal-context", fault.fault_ref || "-");
 
   $id("fault-detail-support").value = fault.support_level || "layer2_support";
   $id("fault-detail-serial").value = fault.serial_number || "";
@@ -280,8 +311,7 @@ function renderFaultDetail(response) {
     fault.status === "closed" ? t("faultReopenAction") : t("faultCloseAction");
   $id("btn-fault-detail-toggle-status").classList.toggle("danger", fault.status !== "closed");
 
-  renderFaultContacts(response.contacts || []);
-  renderFaultEvents(response.events || []);
+  renderFaultEvents(response.events || [], fault);
 }
 
 async function fillFaultDetailModal(faultId) {
@@ -339,9 +369,7 @@ export async function addFaultDetailEvent() {
     }),
   });
 
-  $id("fault-event-title").value = "";
-  $id("fault-event-order-id").value = "";
-  $id("fault-event-details").value = "";
+  closeFaultEventModal();
   await fillFaultDetailModal(currentFaultDetail.fault.id);
   await loadFaults();
   $id("fault-detail-note").textContent = t("faultEventAdded");
@@ -391,11 +419,19 @@ export function initFaults() {
     });
   });
   $id("btn-fault-detail-add-event")?.addEventListener("click", () => {
+    openFaultEventModal();
+  });
+  $id("btn-fault-event-close")?.addEventListener("click", closeFaultEventModal);
+  $id("btn-fault-event-cancel")?.addEventListener("click", closeFaultEventModal);
+  $id("btn-fault-event-save")?.addEventListener("click", () => {
     addFaultDetailEvent().catch((e) => {
-      $id("fault-detail-note").textContent = e.message;
+      $id("fault-event-note").textContent = e.message;
     });
   });
   $id("fault-detail-modal")?.addEventListener("click", (event) => {
     if (event.target === $id("fault-detail-modal")) closeFaultDetailModal();
+  });
+  $id("fault-event-modal")?.addEventListener("click", (event) => {
+    if (event.target === $id("fault-event-modal")) closeFaultEventModal();
   });
 }
