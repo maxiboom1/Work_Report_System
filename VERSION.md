@@ -1,3 +1,13 @@
+Version: v1.1.12
+Date: 2026-04-24
+Done:
+- Added Hebrew admin translations and live language-switch wiring for the Faults tab, including the detail modal.
+- Removed the Ref column from the admin Faults table.
+- Added a created-date column and a separate latest-action description column to the Faults table.
+- Faults with only the initial open event now show the original fault description in that description column.
+
+----------------------------------------
+
 Version: v1.1.11
 Date: 2026-04-24
 Done:

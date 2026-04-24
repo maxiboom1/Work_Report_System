@@ -1,6 +1,7 @@
 import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
 import { CLIENTS } from "./clients.js";
+import { currentLang, t } from "./i18n.js";
 import { FAULT_MANUFACTURERS } from "./manufacturers.js";
 import { renderTable } from "./table.js";
 
@@ -8,39 +9,25 @@ let faults = [];
 let currentFaultDetail = null;
 
 function supportLevelLabel(value) {
-  if (value === "layer2_support") return "Under Layer-2 Support";
-  if (value === "under_support") return "Under Support";
-  if (value === "no_support") return "Not Under Support";
+  if (value === "layer2_support") return t("faultSupportLayer2");
+  if (value === "under_support") return t("faultSupportUnder");
+  if (value === "no_support") return t("faultSupportNone");
   return value || "-";
 }
 
 function makeStatusBadge(status) {
   const badge = document.createElement("span");
   badge.className = `fault-badge ${status === "closed" ? "is-closed" : "is-open"}`;
-  badge.textContent = status === "closed" ? "Closed" : "Open";
+  badge.textContent = status === "closed" ? t("faultStatusClosed") : t("faultStatusOpen");
   return badge;
-}
-
-function makeStack(primary, secondary = "") {
-  const wrap = document.createElement("div");
-  wrap.className = "fault-stack";
-
-  const main = document.createElement("div");
-  main.textContent = primary || "-";
-  wrap.appendChild(main);
-
-  if (secondary) {
-    const meta = document.createElement("div");
-    meta.className = "fault-muted";
-    meta.textContent = secondary;
-    wrap.appendChild(meta);
-  }
-
-  return wrap;
 }
 
 function formatDateTime(value) {
   return value ? String(value).replace("T", " ") : "-";
+}
+
+function formatDateOnly(value) {
+  return value ? String(value).split(" ")[0] : "-";
 }
 
 function faultCategoryLabel(fault) {
@@ -48,27 +35,57 @@ function faultCategoryLabel(fault) {
   return pieces.join(" / ") || "-";
 }
 
+function faultSummaryLabel(count) {
+  if (currentLang() === "he") {
+    return `${count} ${count === 1 ? t("faultSummaryOne") : t("faultSummaryMany")}`;
+  }
+  return `${count} ${count === 1 ? t("faultSummaryOne") : t("faultSummaryMany")}`;
+}
+
+function lastActionDescription(fault) {
+  const details = String(fault.last_event_details || "").trim();
+  if (details) return details;
+
+  if (String(fault.last_event_title || "").trim() === "Fault opened") {
+    const initialDescription = String(fault.fault_description || "").trim();
+    return initialDescription || "-";
+  }
+
+  return "-";
+}
+
+function makeDescriptionCell(fault) {
+  const wrap = document.createElement("div");
+  wrap.className = "fault-description-cell";
+  wrap.textContent = lastActionDescription(fault);
+  return wrap;
+}
+
 export function renderFaultFilterOptions() {
   const clientSelect = $id("fault-filter-client");
   if (clientSelect) {
-    clientSelect.innerHTML = '<option value="">All</option>';
+    const selected = clientSelect.value;
+    clientSelect.innerHTML = `<option value="">${t("all")}</option>`;
     for (const client of CLIENTS) {
       const opt = document.createElement("option");
       opt.value = String(client.id);
       opt.textContent = client.name;
       clientSelect.appendChild(opt);
     }
+    clientSelect.value = selected;
   }
 
   const manufacturerSelect = $id("fault-filter-manufacturer");
   if (manufacturerSelect) {
-    manufacturerSelect.innerHTML = '<option value="">All</option>';
+    const selected = manufacturerSelect.value;
+    manufacturerSelect.innerHTML = `<option value="">${t("all")}</option>`;
     for (const manufacturer of FAULT_MANUFACTURERS) {
       const opt = document.createElement("option");
       opt.value = String(manufacturer.id);
       opt.textContent = manufacturer.name;
       manufacturerSelect.appendChild(opt);
     }
+    manufacturerSelect.value = selected;
   }
 }
 
@@ -79,26 +96,35 @@ function renderFaultTable() {
   holder.innerHTML = "";
 
   if (!faults.length) {
-    holder.innerHTML = '<div class="vitem-empty">No faults found for the current filters.</div>';
-    summary.textContent = "0 faults";
+    holder.innerHTML = `<div class="vitem-empty">${t("faultNoResults")}</div>`;
+    summary.textContent = faultSummaryLabel(0);
     return;
   }
 
   const rows = faults.map((fault) => ({
     cells: [
-      makeStack(fault.fault_ref, formatDateTime(fault.created_at)),
+      formatDateOnly(fault.created_at),
       fault.client_name || "-",
       fault.site_name || "-",
       fault.manufacturer_name || "-",
       faultCategoryLabel(fault),
       supportLevelLabel(fault.support_level),
-      fault.manufacturer_ticket_id || "-",
       makeStatusBadge(fault.status),
+      makeDescriptionCell(fault),
     ],
   }));
 
   const table = renderTable(
-    ["Ref", "Client", "Site", "Manufacturer", "Category / subcategory", "Support", "Ticket ID", "Status"],
+    [
+      t("faultColCreated"),
+      t("faultColClient"),
+      t("faultColSite"),
+      t("faultColManufacturer"),
+      t("faultColCategory"),
+      t("faultColSupport"),
+      t("faultColStatus"),
+      t("faultColDescription"),
+    ],
     rows,
     { rowClassName: () => "fault-row" }
   );
@@ -108,7 +134,7 @@ function renderFaultTable() {
   });
 
   holder.appendChild(table);
-  summary.textContent = `${faults.length} fault${faults.length === 1 ? "" : "s"}`;
+  summary.textContent = faultSummaryLabel(faults.length);
 }
 
 function currentFilters() {
@@ -147,7 +173,7 @@ function renderFaultContacts(contacts) {
   holder.innerHTML = "";
 
   if (!contacts.length) {
-    holder.innerHTML = '<div class="fault-detail-card">No contacts linked to this fault.</div>';
+    holder.innerHTML = `<div class="fault-detail-card">${t("faultNoContacts")}</div>`;
     return;
   }
 
@@ -164,7 +190,7 @@ function renderFaultContacts(contacts) {
     const parts = [];
     if (contact.contact_email) parts.push(contact.contact_email);
     if (contact.contact_phone) parts.push(contact.contact_phone);
-    meta.textContent = parts.join(" | ") || "No email or phone";
+    meta.textContent = parts.join(" | ") || t("faultNoContactDetails");
 
     card.append(title, meta);
     holder.appendChild(card);
@@ -177,7 +203,7 @@ function renderFaultEvents(events) {
   holder.innerHTML = "";
 
   if (!events.length) {
-    holder.innerHTML = '<div class="fault-detail-card">No events yet.</div>';
+    holder.innerHTML = `<div class="fault-detail-card">${t("faultNoEvents")}</div>`;
     return;
   }
 
@@ -195,7 +221,7 @@ function renderFaultEvents(events) {
     const author = `${event.created_by_first_name || ""} ${event.created_by_last_name || ""}`.trim();
     if (author) metaParts.push(author);
     if (event.created_at) metaParts.push(formatDateTime(event.created_at));
-    if (event.order_id) metaParts.push(`Order: ${event.order_id}`);
+    if (event.order_id) metaParts.push(`${t("faultOrderLabel")}: ${event.order_id}`);
     meta.textContent = metaParts.join(" | ");
 
     card.append(title, meta);
@@ -226,8 +252,7 @@ export function closeFaultDetailModal() {
   $id("fault-detail-modal")?.setAttribute("aria-hidden", "true");
 }
 
-async function fillFaultDetailModal(faultId) {
-  const response = await api(`/admin/faults/${faultId}`);
+function renderFaultDetail(response) {
   currentFaultDetail = response;
   const fault = response.fault;
 
@@ -251,11 +276,17 @@ async function fillFaultDetailModal(faultId) {
   $id("fault-detail-serial").value = fault.serial_number || "";
   $id("fault-detail-ticket").value = fault.manufacturer_ticket_id || "";
   $id("fault-detail-description").value = fault.fault_description || "";
-  $id("btn-fault-detail-toggle-status").textContent = fault.status === "closed" ? "Reopen fault" : "Close fault";
+  $id("btn-fault-detail-toggle-status").textContent =
+    fault.status === "closed" ? t("faultReopenAction") : t("faultCloseAction");
   $id("btn-fault-detail-toggle-status").classList.toggle("danger", fault.status !== "closed");
 
   renderFaultContacts(response.contacts || []);
   renderFaultEvents(response.events || []);
+}
+
+async function fillFaultDetailModal(faultId) {
+  const response = await api(`/admin/faults/${faultId}`);
+  renderFaultDetail(response);
 }
 
 export async function openFaultDetail(faultId) {
@@ -278,7 +309,7 @@ export async function saveFaultDetail() {
 
   await fillFaultDetailModal(currentFaultDetail.fault.id);
   await loadFaults();
-  $id("fault-detail-note").textContent = "Fault saved.";
+  $id("fault-detail-note").textContent = t("faultSaved");
 }
 
 export async function toggleFaultDetailStatus() {
@@ -292,7 +323,8 @@ export async function toggleFaultDetailStatus() {
 
   await fillFaultDetailModal(currentFaultDetail.fault.id);
   await loadFaults();
-  $id("fault-detail-note").textContent = `Fault marked as ${nextStatus}.`;
+  $id("fault-detail-note").textContent =
+    nextStatus === "closed" ? t("faultMarkedClosed") : t("faultMarkedOpen");
 }
 
 export async function addFaultDetailEvent() {
@@ -312,7 +344,7 @@ export async function addFaultDetailEvent() {
   $id("fault-event-details").value = "";
   await fillFaultDetailModal(currentFaultDetail.fault.id);
   await loadFaults();
-  $id("fault-detail-note").textContent = "Event added.";
+  $id("fault-detail-note").textContent = t("faultEventAdded");
 }
 
 export function clearFaultFilters() {
@@ -322,6 +354,14 @@ export function clearFaultFilters() {
   $id("fault-filter-support").value = "";
   $id("fault-filter-date-from").value = "";
   $id("fault-filter-date-to").value = "";
+}
+
+export function refreshFaultsText() {
+  renderFaultFilterOptions();
+  renderFaultTable();
+  if (currentFaultDetail?.fault) {
+    renderFaultDetail(currentFaultDetail);
+  }
 }
 
 export function initFaults() {

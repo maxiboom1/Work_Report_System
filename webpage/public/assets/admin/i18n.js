@@ -50,6 +50,7 @@ const I18N = {
     employeeList: "Employee list",
     search: "Search...",
     refresh: "Refresh",
+    clear: "Clear",
     addEmployee: "Add employee",
     editSelected: "Edit selected",
     editSelectedItem: "Edit selected",
@@ -214,6 +215,66 @@ const I18N = {
     editManufacturer: "Edit manufacturer",
     editCategory: "Edit equipment/model",
     editSubcategory: "Edit component/area",
+    all: "All",
+    faults: "Faults",
+    faultsTitle: "Faults",
+    faultsHint: "Track manager-submitted fault cases and continue the handling timeline.",
+    faultList: "Fault list",
+    faultsTableHint: "The table stays flat. Double-click a fault row to open its detail view.",
+    faultFilterStatus: "Status",
+    faultFilterClient: "Client",
+    faultFilterManufacturer: "Manufacturer",
+    faultFilterSupport: "Support level",
+    faultFilterFrom: "From",
+    faultFilterTo: "To",
+    faultRunAction: "Run",
+    faultColCreated: "Created",
+    faultColClient: "Client",
+    faultColSite: "Site",
+    faultColManufacturer: "Manufacturer",
+    faultColCategory: "Category / subcategory",
+    faultColSupport: "Support",
+    faultColLastEvent: "Last event",
+    faultColStatus: "Status",
+    faultColDescription: "Description",
+    faultStatusOpen: "Open",
+    faultStatusClosed: "Closed",
+    faultSupportLayer2: "Under Layer-2 Support",
+    faultSupportUnder: "Under Support",
+    faultSupportNone: "Not Under Support",
+    faultSummaryOne: "fault",
+    faultSummaryMany: "faults",
+    faultNoResults: "No faults found for the current filters.",
+    faultDetailTitle: "Fault detail",
+    faultDetailReference: "Reference",
+    faultDetailCreated: "Created",
+    faultDetailCreatedBy: "Created by",
+    faultDetailClient: "Client",
+    faultDetailSite: "Site",
+    faultDetailManufacturer: "Manufacturer",
+    faultDetailCategory: "Category / subcategory",
+    faultDetailSupport: "Support level",
+    faultDetailSerial: "Serial / unit ID",
+    faultDetailTicket: "Manufacturer ticket ID",
+    faultDetailDescription: "Fault description",
+    faultDetailContacts: "Contacts",
+    faultDetailTimeline: "Timeline",
+    faultEventTitle: "Event title",
+    faultEventOrder: "Order ID / tracking",
+    faultEventDetails: "Event details",
+    faultSaveAction: "Save fault",
+    faultAddEventAction: "Add event",
+    faultCloseAction: "Close fault",
+    faultReopenAction: "Reopen fault",
+    faultCloseModalAction: "Close",
+    faultNoContacts: "No contacts linked to this fault.",
+    faultNoContactDetails: "No email or phone",
+    faultNoEvents: "No events yet.",
+    faultOrderLabel: "Order",
+    faultSaved: "Fault saved.",
+    faultMarkedClosed: "Fault marked as closed.",
+    faultMarkedOpen: "Fault marked as open.",
+    faultEventAdded: "Event added.",
   },
   he: {
     appTitle: "דיווחי עבודה",
@@ -230,6 +291,7 @@ const I18N = {
     employeeList: "רשימת עובדים",
     search: "חיפוש...",
     refresh: "רענון",
+    clear: "ניקוי",
     addEmployee: "עובד חדש",
     editSelected: "עריכה",
     editSelectedItem: "עריכת נבחר",
@@ -394,6 +456,66 @@ const I18N = {
     editManufacturer: "עריכת יצרן",
     editCategory: "עריכת דגם/ציוד",
     editSubcategory: "עריכת רכיב/אזור",
+    all: "\u05d4\u05db\u05dc",
+    faults: "\u05ea\u05e7\u05dc\u05d5\u05ea",
+    faultsTitle: "\u05ea\u05e7\u05dc\u05d5\u05ea",
+    faultsHint: "\u05de\u05e2\u05e7\u05d1 \u05d0\u05d7\u05e8 \u05ea\u05e7\u05dc\u05d5\u05ea \u05e9\u05e0\u05e4\u05ea\u05d7\u05d5 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05de\u05e0\u05d4\u05dc\u05d9\u05dd \u05d5\u05d4\u05de\u05e9\u05da \u05d4\u05d8\u05d9\u05e4\u05d5\u05dc \u05d1\u05e6\u05d9\u05e8 \u05d4\u05d6\u05de\u05df.",
+    faultList: "\u05e8\u05e9\u05d9\u05de\u05ea \u05ea\u05e7\u05dc\u05d5\u05ea",
+    faultsTableHint: "\u05d4\u05d8\u05d1\u05dc\u05d4 \u05e0\u05e9\u05d0\u05e8\u05ea \u05e9\u05d8\u05d5\u05d7\u05d4. \u05dc\u05d7\u05d9\u05e6\u05d4 \u05db\u05e4\u05d5\u05dc\u05d4 \u05e2\u05dc \u05e9\u05d5\u05e8\u05ea \u05ea\u05e7\u05dc\u05d4 \u05ea\u05e4\u05ea\u05d7 \u05d0\u05ea \u05ea\u05e6\u05d5\u05d2\u05ea \u05d4\u05e4\u05e8\u05d8\u05d9\u05dd.",
+    faultFilterStatus: "\u05e1\u05d8\u05d8\u05d5\u05e1",
+    faultFilterClient: "\u05dc\u05e7\u05d5\u05d7",
+    faultFilterManufacturer: "\u05d9\u05e6\u05e8\u05df",
+    faultFilterSupport: "\u05e8\u05de\u05ea \u05ea\u05de\u05d9\u05db\u05d4",
+    faultFilterFrom: "\u05de\u05ea\u05d0\u05e8\u05d9\u05da",
+    faultFilterTo: "\u05e2\u05d3 \u05ea\u05d0\u05e8\u05d9\u05da",
+    faultRunAction: "\u05d4\u05e6\u05d2",
+    faultColCreated: "\u05ea\u05d0\u05e8\u05d9\u05da \u05e4\u05ea\u05d9\u05d7\u05d4",
+    faultColClient: "\u05dc\u05e7\u05d5\u05d7",
+    faultColSite: "\u05d0\u05ea\u05e8",
+    faultColManufacturer: "\u05d9\u05e6\u05e8\u05df",
+    faultColCategory: "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 / \u05ea\u05ea-\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4",
+    faultColSupport: "\u05ea\u05de\u05d9\u05db\u05d4",
+    faultColLastEvent: "\u05d0\u05d9\u05e8\u05d5\u05e2 \u05d0\u05d7\u05e8\u05d5\u05df",
+    faultColStatus: "\u05e1\u05d8\u05d8\u05d5\u05e1",
+    faultColDescription: "\u05ea\u05d9\u05d0\u05d5\u05e8",
+    faultStatusOpen: "\u05e4\u05ea\u05d5\u05d7\u05d4",
+    faultStatusClosed: "\u05e1\u05d2\u05d5\u05e8\u05d4",
+    faultSupportLayer2: "\u05d1\u05ea\u05de\u05d9\u05db\u05ea L2",
+    faultSupportUnder: "\u05d1\u05ea\u05de\u05d9\u05db\u05d4",
+    faultSupportNone: "\u05dc\u05dc\u05d0 \u05ea\u05de\u05d9\u05db\u05d4",
+    faultSummaryOne: "\u05ea\u05e7\u05dc\u05d4",
+    faultSummaryMany: "\u05ea\u05e7\u05dc\u05d5\u05ea",
+    faultNoResults: "\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05ea\u05e7\u05dc\u05d5\u05ea \u05dc\u05e4\u05d9 \u05d4\u05e1\u05d9\u05e0\u05d5\u05df \u05d4\u05e0\u05d5\u05db\u05d7\u05d9.",
+    faultDetailTitle: "\u05e4\u05e8\u05d8\u05d9 \u05ea\u05e7\u05dc\u05d4",
+    faultDetailReference: "\u05de\u05e1\u05e4\u05e8 \u05de\u05d6\u05d4\u05d4",
+    faultDetailCreated: "\u05e0\u05d5\u05e6\u05e8\u05d4",
+    faultDetailCreatedBy: "\u05e0\u05e4\u05ea\u05d7\u05d4 \u05e2\u05dc \u05d9\u05d3\u05d9",
+    faultDetailClient: "\u05dc\u05e7\u05d5\u05d7",
+    faultDetailSite: "\u05d0\u05ea\u05e8",
+    faultDetailManufacturer: "\u05d9\u05e6\u05e8\u05df",
+    faultDetailCategory: "\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 / \u05ea\u05ea-\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4",
+    faultDetailSupport: "\u05e8\u05de\u05ea \u05ea\u05de\u05d9\u05db\u05d4",
+    faultDetailSerial: "\u05de\u05e1\u05e4\u05e8 \u05e1\u05d9\u05e8\u05d9\u05d0\u05dc\u05d9 / \u05d9\u05d7\u05d9\u05d3\u05d4",
+    faultDetailTicket: "\u05de\u05e1\u05e4\u05e8 \u05e4\u05e0\u05d9\u05d9\u05d4 \u05d0\u05e6\u05dc \u05d4\u05d9\u05e6\u05e8\u05df",
+    faultDetailDescription: "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05ea\u05e7\u05dc\u05d4",
+    faultDetailContacts: "\u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8",
+    faultDetailTimeline: "\u05e6\u05d9\u05e8 \u05d6\u05de\u05df",
+    faultEventTitle: "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05d0\u05d9\u05e8\u05d5\u05e2",
+    faultEventOrder: "\u05de\u05e1\u05e4\u05e8 \u05d4\u05d6\u05de\u05e0\u05d4 / \u05de\u05e2\u05e7\u05d1",
+    faultEventDetails: "\u05e4\u05e8\u05d8\u05d9 \u05d4\u05d0\u05d9\u05e8\u05d5\u05e2",
+    faultSaveAction: "\u05e9\u05de\u05d9\u05e8\u05ea \u05ea\u05e7\u05dc\u05d4",
+    faultAddEventAction: "\u05d4\u05d5\u05e1\u05e4\u05ea \u05d0\u05d9\u05e8\u05d5\u05e2",
+    faultCloseAction: "\u05e1\u05d2\u05d9\u05e8\u05ea \u05ea\u05e7\u05dc\u05d4",
+    faultReopenAction: "\u05e4\u05ea\u05d9\u05d7\u05ea \u05ea\u05e7\u05dc\u05d4 \u05de\u05d7\u05d3\u05e9",
+    faultCloseModalAction: "\u05e1\u05d2\u05d9\u05e8\u05d4",
+    faultNoContacts: "\u05d0\u05d9\u05df \u05d0\u05e0\u05e9\u05d9 \u05e7\u05e9\u05e8 \u05de\u05e7\u05d5\u05e9\u05e8\u05d9\u05dd \u05dc\u05ea\u05e7\u05dc\u05d4 \u05d6\u05d5.",
+    faultNoContactDetails: "\u05d0\u05d9\u05df \u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d0\u05d5 \u05d8\u05dc\u05e4\u05d5\u05df",
+    faultNoEvents: "\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d0\u05d9\u05e8\u05d5\u05e2\u05d9\u05dd.",
+    faultOrderLabel: "\u05d4\u05d6\u05de\u05e0\u05d4",
+    faultSaved: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e0\u05e9\u05de\u05e8\u05d4.",
+    faultMarkedClosed: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e1\u05d5\u05de\u05e0\u05d4 \u05db\u05e1\u05d2\u05d5\u05e8\u05d4.",
+    faultMarkedOpen: "\u05d4\u05ea\u05e7\u05dc\u05d4 \u05e1\u05d5\u05de\u05e0\u05d4 \u05db\u05e4\u05ea\u05d5\u05d7\u05d4.",
+    faultEventAdded: "\u05d4\u05d0\u05d9\u05e8\u05d5\u05e2 \u05e0\u05d5\u05e1\u05e3.",
   },
 };
 
@@ -434,6 +556,7 @@ export function updateStaticText() {
   setText('.nav-tab[data-tab="projects"]', "projects");
   setText('.nav-tab[data-tab="clients"]', "clients");
   setText('.nav-tab[data-tab="manufacturers"]', "manufacturers");
+  setText('.nav-tab[data-tab="faults"]', "faults");
   setText('.nav-tab[data-tab="stats"]', "stats");
   setText('.nav-tab[data-tab="settings"]', "settings");
   setText("#btn-logout", "logout");
@@ -521,6 +644,47 @@ export function updateStaticText() {
   setText("#btn-fault-edit-save", "save");
   setText("#btn-fault-edit-cancel", "cancel");
 
+  setText('.tab-panel[data-panel="faults"] .page-header h1', "faultsTitle");
+  setText('.tab-panel[data-panel="faults"] .page-hint', "faultsHint");
+  setText('.tab-panel[data-panel="faults"] .pane-title', "faultList");
+  setText('.tab-panel[data-panel="faults"] .pane-context', "faultsTableHint");
+  setLabel("fault-filter-status", "faultFilterStatus");
+  setLabel("fault-filter-client", "faultFilterClient");
+  setLabel("fault-filter-manufacturer", "faultFilterManufacturer");
+  setLabel("fault-filter-support", "faultFilterSupport");
+  setLabel("fault-filter-date-from", "faultFilterFrom");
+  setLabel("fault-filter-date-to", "faultFilterTo");
+  setText("#btn-faults-run", "faultRunAction");
+  setText("#btn-faults-clear", "clear");
+
+  setText("#fault-detail-title", "faultDetailTitle");
+  setText('label[for="fault-detail-support"]', "faultDetailSupport");
+  setText('label[for="fault-detail-serial"]', "faultDetailSerial");
+  setText('label[for="fault-detail-ticket"]', "faultDetailTicket");
+  setText('label[for="fault-detail-description"]', "faultDetailDescription");
+  setText('label[for="fault-event-title"]', "faultEventTitle");
+  setText('label[for="fault-event-order-id"]', "faultEventOrder");
+  setText('label[for="fault-event-details"]', "faultEventDetails");
+  setText("#fault-detail-contacts-label", "faultDetailContacts");
+  setText("#fault-detail-timeline-label", "faultDetailTimeline");
+  setText("#btn-fault-detail-save", "faultSaveAction");
+  setText("#btn-fault-detail-add-event", "faultAddEventAction");
+  setText("#btn-fault-detail-cancel", "faultCloseModalAction");
+
+  document.querySelectorAll("#fault-detail-modal .fault-detail-item .label").forEach((el, index) => {
+    const keys = [
+      "faultDetailReference",
+      "faultDetailCreated",
+      "faultFilterStatus",
+      "faultDetailCreatedBy",
+      "faultDetailClient",
+      "faultDetailSite",
+      "faultDetailManufacturer",
+      "faultDetailCategory",
+    ];
+    el.textContent = t(keys[index]);
+  });
+
   setText('.tab-panel[data-panel="stats"] .page-header h1', "statsTitle");
   setText('.tab-panel[data-panel="stats"] .page-hint', "statsHint");
   setText('.tab-panel[data-panel="stats"] .pane-title', "report");
@@ -579,6 +743,28 @@ export function updateStaticText() {
     select.querySelector('option[value="1"]').textContent = t("activeValue");
     select.querySelector('option[value="0"]').textContent = t("disabledValue");
   });
+
+  const faultStatusFilter = $id("fault-filter-status");
+  if (faultStatusFilter) {
+    faultStatusFilter.querySelector('option[value=""]').textContent = t("all");
+    faultStatusFilter.querySelector('option[value="open"]').textContent = t("faultStatusOpen");
+    faultStatusFilter.querySelector('option[value="closed"]').textContent = t("faultStatusClosed");
+  }
+
+  const faultSupportFilter = $id("fault-filter-support");
+  if (faultSupportFilter) {
+    faultSupportFilter.querySelector('option[value=""]').textContent = t("all");
+    faultSupportFilter.querySelector('option[value="layer2_support"]').textContent = t("faultSupportLayer2");
+    faultSupportFilter.querySelector('option[value="under_support"]').textContent = t("faultSupportUnder");
+    faultSupportFilter.querySelector('option[value="no_support"]').textContent = t("faultSupportNone");
+  }
+
+  const faultDetailSupport = $id("fault-detail-support");
+  if (faultDetailSupport) {
+    faultDetailSupport.querySelector('option[value="layer2_support"]').textContent = t("faultSupportLayer2");
+    faultDetailSupport.querySelector('option[value="under_support"]').textContent = t("faultSupportUnder");
+    faultDetailSupport.querySelector('option[value="no_support"]').textContent = t("faultSupportNone");
+  }
 
   fillStatsPickers();
   fillEmployeeEdit(selectedEmployee);

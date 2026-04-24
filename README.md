@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.11
+**Version:** v1.1.12
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -44,6 +44,12 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.12 improvements:
+- Added full admin Hebrew copy coverage for the Faults tab, including filters, table labels, and the detail modal.
+- Faults table no longer shows the `Ref` column in the list view.
+- Faults table now starts with the fault creation date and keeps the latest action description in its own column.
+- When a fault still has only the initial open event, the list shows the original fault description in that description column.
 
 v1.1.11 improvements:
 - Added manager-only Fault Registration Form creation from the worker/manager app.
@@ -255,7 +261,8 @@ npm install
 
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
-- For an existing database upgrade to v1.1.11, run: `database/update_employee_work_report_to_v1.1.11_frf.sql`
+- No database migration is required for v1.1.12.
+- If your database is older than v1.1.11 and does not yet include the FRF fault tables, run: `database/update_employee_work_report_to_v1.1.11_frf.sql`
 
 4) Start
 ```bash

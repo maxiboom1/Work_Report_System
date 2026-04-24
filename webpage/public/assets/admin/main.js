@@ -7,7 +7,7 @@ import { loadSettings, saveSettings } from "./settings.js";
 import { createEmployee, deleteEmployee, loadEmployees, renderEmployeeList, saveEmployee } from "./employees.js";
 import { createProject, deleteProject, loadProjects, renderProjectList, saveProject } from "./projects.js";
 import { closeClientEditModal, loadClients, openClientEditModal, renderClientContactList, renderClientList, renderClientSiteList, saveClientEditModal, selectedClient, selectedClientContact, selectedClientSite, toggleClientEditModal } from "./clients.js";
-import { clearFaultFilters, closeFaultDetailModal, initFaults, loadFaults, renderFaultFilterOptions } from "./faults.js";
+import { clearFaultFilters, closeFaultDetailModal, initFaults, loadFaults, refreshFaultsText, renderFaultFilterOptions } from "./faults.js";
 import { closeFaultEditModal, loadFaultManufacturers, openFaultEditModal, renderFaultCategoryList, renderFaultManufacturerList, renderFaultSubcategoryList, saveFaultEditModal, selectedFaultCategory, selectedFaultManufacturer, selectedFaultSubcategory, toggleFaultEditModal } from "./manufacturers.js";
 import { initMonthPickers, refreshStatsIfRendered, runStats, setStatsMode } from "./statistics.js";
 
@@ -118,6 +118,7 @@ async function init() {
   $id("setting-language").addEventListener("change", () => {
     updateAdminLanguage($id("setting-language").value);
     updateStaticText();
+    refreshFaultsText();
     refreshStatsIfRendered();
   });
   $id("btn-settings-save").addEventListener("click", async () => {

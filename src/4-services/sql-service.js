@@ -762,6 +762,10 @@ class SqlService {
         COALESCE(m.name, f.manufacturer_custom) AS manufacturer_name,
         COALESCE(cat.name, f.equipment_category_custom) AS equipment_category_name,
         COALESCE(sub.name, f.equipment_subcategory_custom) AS equipment_subcategory_name,
+        last_event.last_event_title,
+        last_event.last_event_details,
+        last_event.last_event_created_at,
+        last_event.event_count AS last_event_count,
         e.first_name AS created_by_first_name,
         e.last_name AS created_by_last_name
       FROM dbo.[faults] f
@@ -770,6 +774,16 @@ class SqlService {
       LEFT JOIN dbo.[fault_manufacturers] m ON m.id = f.manufacturer_id
       LEFT JOIN dbo.[fault_equipment_categories] cat ON cat.id = f.equipment_category_id
       LEFT JOIN dbo.[fault_equipment_subcategories] sub ON sub.id = f.equipment_subcategory_id
+      OUTER APPLY (
+        SELECT TOP 1
+          fe.title AS last_event_title,
+          fe.details AS last_event_details,
+          CONVERT(varchar(19), fe.created_at, 120) AS last_event_created_at,
+          COUNT(*) OVER () AS event_count
+        FROM dbo.[fault_events] fe
+        WHERE fe.fault_id = f.id
+        ORDER BY fe.created_at DESC, fe.id DESC
+      ) last_event
       INNER JOIN dbo.[employees] e ON e.id = f.created_by
       WHERE (@status IS NULL OR f.status = @status)
         AND (@client_id IS NULL OR f.client_id = @client_id)
