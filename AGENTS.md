@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.1.13`.
+- App version: `1.1.14`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -26,6 +26,7 @@ Employee Work Report System is a working Node.js/Express application backed by M
 - Every version bump must also update `README.md` and  with the relevant user-facing changes.
 - Database structure changes are owned by Codex. Do not ask the user to manually patch schema unless direct database access is unavailable.
 - Schema changes must be reflected in SQL scripts and in the DAL/service code that depends on them.
+- Every database structure change must update `database/create_employee_work_report_db.sql` so a fresh database matches the current live app schema.
 - Keep secrets and local runtime files out of git. `.codex/`, `config.json`, `logs/`, `dist/`, `build/`, and `node_modules/` should stay ignored.
 
 ## Frontend Work

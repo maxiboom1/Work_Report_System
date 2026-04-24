@@ -1,3 +1,12 @@
+Version: v1.1.14
+Date: 2026-04-24
+Done:
+- Synced the checked-in database create script with the live application schema, including the current employees and work entries columns.
+- Consolidated the database folder to a fresh-create script plus one stable full-data import snapshot file.
+- Added a project rule requiring the create script to be updated whenever the database structure changes.
+
+----------------------------------------
+
 Version: v1.1.13
 Date: 2026-04-24
 Done:

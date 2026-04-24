@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.13
+   Version: v1.1.14
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -63,7 +63,8 @@ CREATE TABLE dbo.[employees] (
   [role]         NVARCHAR(20)  NOT NULL CONSTRAINT DF_employees_role DEFAULT('employee'),
   [is_manager]   BIT           NOT NULL CONSTRAINT DF_employees_is_manager DEFAULT(0),
   [is_active]    BIT           NOT NULL CONSTRAINT DF_employees_is_active DEFAULT(1),
-  [created_at]   DATETIME2(0)  NOT NULL CONSTRAINT DF_employees_created_at DEFAULT (SYSDATETIME())
+  [created_at]   DATETIME2(0)  NOT NULL CONSTRAINT DF_employees_created_at DEFAULT (SYSDATETIME()),
+  [updated_at]   DATETIME2(0)  NULL
 );
 GO
 
@@ -156,6 +157,7 @@ CREATE TABLE dbo.[work_entries] (
   [start_time]  TIME(0) NOT NULL,
   [end_time]    TIME(0) NOT NULL,
   [notes]       NVARCHAR(400) NULL,
+  [admin_notes] NVARCHAR(400) NULL,
   [created_at]  DATETIME2(0) NOT NULL CONSTRAINT DF_work_entries_created_at DEFAULT (SYSDATETIME()),
   [updated_at]  DATETIME2(0) NULL
 );
