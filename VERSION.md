@@ -1,3 +1,12 @@
+Version: v1.1.10
+Date: 2026-04-24
+Done:
+- Refactored the frontend into smaller admin, worker, and shared JavaScript modules without changing user workflows.
+- Split backend routes and services by project domain while preserving the existing API contract.
+- Removed stale unlinked frontend tab code from older endpoint models.
+
+----------------------------------------
+
 Version: v1.1.9
 Date: 2026-04-24
 Done:
