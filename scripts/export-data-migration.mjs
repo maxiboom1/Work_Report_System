@@ -280,7 +280,7 @@ async function main() {
 
   const script = `/* =========================================================
    Employee Work Report System - data import snapshot
-   Source version: v1.2.00
+   Source version: 1.2.1
    Exported at: ${exportMeta.display}
 
    Run this AFTER:

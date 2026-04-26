@@ -40,7 +40,23 @@ function populateTimeSelect(id, selectedValue, options = {}) {
   select.value = selectedValue || "";
 }
 
+function preventAppZoom() {
+  let lastTouchEnd = 0;
+  document.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("gesturechange", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("gestureend", (event) => event.preventDefault(), { passive: false });
+  document.addEventListener("wheel", (event) => {
+    if (event.ctrlKey) event.preventDefault();
+  }, { passive: false });
+  document.addEventListener("touchend", (event) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 350) event.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+}
+
 async function init() {
+  preventAppZoom();
   $id("rep-month").value = todayMonth();
   populateTimeSelect("contractor-start-time", "", { allowEmpty: true });
   populateTimeSelect("contractor-end-time", "", { allowEmpty: true });

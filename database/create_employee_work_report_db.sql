@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.2.00
+   Version: 1.2.1
 
    DEV NOTE:
    - This script is for development / local installs.

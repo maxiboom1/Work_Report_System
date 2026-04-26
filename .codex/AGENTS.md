@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.2.0` (documented to users as `v1.2.00`).
+- App version: `1.2.1`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -99,6 +99,7 @@ Repository files are the source of truth.
 - v1.1.18 adds worker stale-session recovery and worker i18n infrastructure.
 - v1.1.19 keeps the worker app Hebrew-only by default, hides the language toggle until settings are added, redirects expired API sessions to login, removes default clock status noise, allows zero-duration placeholder entries, and adds the opener login spinner/password polish.
 - v1.2.00 adds localized worker-surface frontend validation, blocks overlapping same-day worker reports across all projects, and limits worker Start times to the next available time after completed same-day entries.
+- 1.2.1 polishes worker UI navigation, report entry action menus, and manager car-list row selection/alignment.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
 - The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:

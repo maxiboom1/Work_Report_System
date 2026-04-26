@@ -311,6 +311,41 @@ function closeEditModal() {
   editingEntry = null;
 }
 
+function closeEntryActionMenus(exceptMenu = null) {
+  document.querySelectorAll(".entry-actions-menu").forEach((menu) => {
+    if (menu !== exceptMenu) {
+      menu.hidden = true;
+      menu.style.removeProperty("visibility");
+      menu.style.removeProperty("--entry-menu-top");
+      menu.style.removeProperty("--entry-menu-left");
+    }
+  });
+  document.querySelectorAll(".entry-menu-button").forEach((button) => {
+    const ownsMenu = exceptMenu && button.parentElement?.contains(exceptMenu);
+    button.setAttribute("aria-expanded", ownsMenu && !exceptMenu.hidden ? "true" : "false");
+  });
+}
+
+function positionEntryActionMenu(button, menu) {
+  const gap = 6;
+  const margin = 8;
+  const buttonRect = button.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  let left = buttonRect.right - menuRect.width;
+  let top = buttonRect.bottom + gap;
+
+  if (left < margin) left = margin;
+  if (left + menuRect.width > window.innerWidth - margin) {
+    left = Math.max(margin, window.innerWidth - menuRect.width - margin);
+  }
+  if (top + menuRect.height > window.innerHeight - margin) {
+    top = Math.max(margin, buttonRect.top - menuRect.height - gap);
+  }
+
+  menu.style.setProperty("--entry-menu-left", `${Math.round(left)}px`);
+  menu.style.setProperty("--entry-menu-top", `${Math.round(top)}px`);
+}
+
 async function openSessionModal(mode) {
   await refreshActiveSession();
   const isStop = mode === "stop";
@@ -480,28 +515,63 @@ function makeEntryCard(e) {
   const actions = document.createElement("div");
   actions.className = "entry-actions";
 
+  const menuButton = document.createElement("button");
+  menuButton.className = "entry-menu-button";
+  menuButton.type = "button";
+  menuButton.setAttribute("aria-label", `${t("edit")} / ${t("delete")}`);
+  menuButton.setAttribute("aria-haspopup", "menu");
+  menuButton.setAttribute("aria-expanded", "false");
+
+  const menu = document.createElement("div");
+  menu.className = "entry-actions-menu";
+  menu.setAttribute("role", "menu");
+  menu.hidden = true;
+
   const btnEdit = document.createElement("button");
-  btnEdit.className = "btn";
+  btnEdit.className = "entry-menu-item";
   btnEdit.type = "button";
+  btnEdit.setAttribute("role", "menuitem");
   btnEdit.textContent = t("edit");
   btnEdit.addEventListener("click", () => {
+    closeEntryActionMenus();
     refreshActiveSession()
       .catch(() => {})
       .finally(() => openEditModal(e));
   });
 
   const btnDel = document.createElement("button");
-  btnDel.className = "btn";
+  btnDel.className = "entry-menu-item entry-menu-item-danger";
   btnDel.type = "button";
+  btnDel.setAttribute("role", "menuitem");
   btnDel.textContent = t("delete");
   btnDel.addEventListener("click", async () => {
+    closeEntryActionMenus();
     if (!confirm(t("deleteEntryConfirm"))) return;
     await api(`/my/work-entries/${e.id}`, { method: "DELETE" });
     await loadEntries();
   });
 
-  actions.appendChild(btnEdit);
-  actions.appendChild(btnDel);
+  menuButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const willOpen = menu.hidden;
+    closeEntryActionMenus();
+    menuButton.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if (willOpen) {
+      menu.style.visibility = "hidden";
+      menu.hidden = false;
+      window.requestAnimationFrame(() => {
+        positionEntryActionMenu(menuButton, menu);
+        menu.style.removeProperty("visibility");
+      });
+    } else {
+      menu.hidden = true;
+      menu.style.removeProperty("visibility");
+    }
+  });
+  menu.addEventListener("click", (event) => event.stopPropagation());
+
+  menu.append(btnEdit, btnDel);
+  actions.append(menuButton, menu);
   card.appendChild(meta);
   card.appendChild(actions);
   return card;
@@ -631,6 +701,12 @@ export async function initWorkReporting() {
   $id("work-entry-edit-modal").addEventListener("click", (e) => {
     if (e.target?.hasAttribute("data-close-work-entry")) closeEditModal();
   });
+  document.addEventListener("click", () => closeEntryActionMenus());
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeEntryActionMenus();
+  });
+  document.addEventListener("scroll", () => closeEntryActionMenus(), true);
+  window.addEventListener("resize", () => closeEntryActionMenus());
   $id("edit-work-date").addEventListener("change", refreshEditTimeOptions);
   $id("btn-stale-close").addEventListener("click", recoverCloseSession);
   $id("btn-stale-discard").addEventListener("click", discardStaleSession);

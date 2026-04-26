@@ -1,3 +1,16 @@
+Version: 1.2.1
+Package version: 1.2.1
+Date: 2026-04-26
+Done:
+- Forced the worker tab order to Clock, Reports, then Manager tools while preserving Hebrew content direction.
+- Replaced report entry Edit/Delete buttons with a compact three-dot action menu.
+- Removed car-list selection checkboxes; worker rows now toggle selection directly with clearer dividers.
+- Right-aligned Hebrew car-list worker names and headers.
+- Changed the generated car-list passport column label to ID / ת.ז.
+- No database migration required.
+
+----------------------------------------
+
 Version: v1.2.00
 Package version: 1.2.0
 Date: 2026-04-26

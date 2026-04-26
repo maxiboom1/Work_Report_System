@@ -1,7 +1,7 @@
 import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
 import { t } from "./i18n.js";
-import { managerEmployees, setManagerEmployees } from "./state.js";
+import { isManagerWorkerSelected, managerEmployees, setManagerEmployees, toggleManagerWorkerSelection } from "./state.js";
 
 function timeToMinutes(time) {
   const [hour, minute] = String(time || "00:00").split(":").map(Number);
@@ -39,27 +39,31 @@ function validateContractorPayload(payload) {
 function makeManagerWorkerRow(worker) {
   const tr = document.createElement("tr");
   tr.className = "manager-worker-row";
-
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.value = String(worker.id);
-
-  const checkCell = document.createElement("td");
-  checkCell.className = "manager-check-cell";
-  checkCell.appendChild(checkbox);
+  tr.tabIndex = 0;
+  tr.setAttribute("role", "checkbox");
 
   const nameCell = document.createElement("td");
   nameCell.className = "manager-name-cell";
   nameCell.textContent = `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || "-";
 
-  tr.append(checkCell, nameCell);
-  tr.addEventListener("click", (event) => {
-    if (event.target !== checkbox) checkbox.checked = !checkbox.checked;
-    tr.classList.toggle("is-selected", checkbox.checked);
+  function syncSelectedState() {
+    const selected = isManagerWorkerSelected(worker.id);
+    tr.classList.toggle("is-selected", selected);
+    tr.setAttribute("aria-checked", selected ? "true" : "false");
+  }
+
+  tr.append(nameCell);
+  tr.addEventListener("click", () => {
+    toggleManagerWorkerSelection(worker.id);
+    syncSelectedState();
   });
-  checkbox.addEventListener("change", () => {
-    tr.classList.toggle("is-selected", checkbox.checked);
+  tr.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    toggleManagerWorkerSelection(worker.id);
+    syncSelectedState();
   });
+  syncSelectedState();
   return tr;
 }
 
@@ -74,7 +78,7 @@ export function renderManagerEmployees() {
 
   const table = document.createElement("table");
   table.className = "manager-workers-table";
-  table.innerHTML = `<thead><tr><th></th><th>${t("workerName")}</th></tr></thead>`;
+  table.innerHTML = `<thead><tr><th>${t("workerName")}</th></tr></thead>`;
   const tbody = document.createElement("tbody");
   for (const worker of managerEmployees) {
     tbody.appendChild(makeManagerWorkerRow(worker));

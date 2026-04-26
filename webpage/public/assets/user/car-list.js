@@ -1,11 +1,9 @@
 import { $id } from "../shared/dom.js";
 import { t, workerLanguage } from "./i18n.js";
-import { currentCarList, managerEmployees, setCurrentCarList } from "./state.js";
+import { currentCarList, selectedManagerWorkers, setCurrentCarList } from "./state.js";
 
 export function showCarList() {
-  const selectedIds = Array.from(document.querySelectorAll('#manager-workers input[type="checkbox"]:checked'))
-    .map((input) => Number(input.value));
-  const selected = managerEmployees.filter((worker) => selectedIds.includes(Number(worker.id)));
+  const selected = selectedManagerWorkers();
   setCurrentCarList(selected);
   const output = $id("car-list-output");
   output.innerHTML = "";
@@ -29,7 +27,7 @@ export function showCarList() {
   const table = document.createElement("table");
   table.className = "car-list-table";
   const thead = document.createElement("thead");
-  thead.innerHTML = `<tr><th>${t("name")}</th><th>${t("passport")}</th><th>${t("car")}</th></tr>`;
+  thead.innerHTML = `<tr><th>${t("name")}</th><th>${t("idNumber")}</th><th>${t("car")}</th></tr>`;
   const tbody = document.createElement("tbody");
 
   for (const worker of selected) {
