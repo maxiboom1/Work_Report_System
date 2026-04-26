@@ -7,6 +7,7 @@ import { initFaultRegistration, loadFaultFormLookups, refreshFaultRegistrationLa
 import { initWorkReporting, loadEntries, loadMe, loadProjects, setStatus, updateWorkReportingText } from "./work-entries.js";
 import { enableManagerTools, loadManagerEmployees, renderManagerEmployees, saveContractorEntry, showManagerTool } from "./manager-tools.js";
 import { closeCarList, shareCarList, showCarList } from "./car-list.js";
+import { initUserSettings, refreshUserSettingsText } from "./profile.js";
 
 async function logout() {
   try { await api("/auth/logout", { method: "POST" }); } catch {}
@@ -66,6 +67,14 @@ async function init() {
     renderManagerEmployees();
     refreshFaultRegistrationLanguage();
     updateStaticText();
+    refreshUserSettingsText();
+  });
+  initUserSettings(logout, () => {
+    updateWorkReportingText();
+    renderManagerEmployees();
+    refreshFaultRegistrationLanguage();
+    updateStaticText();
+    refreshUserSettingsText();
   });
 
   const tabReg = $id("tab-register");
@@ -89,7 +98,7 @@ async function init() {
     panelRep.hidden = !isReports;
     panelManager.hidden = !isManager;
     setStatus("");
-    if (isManager && currentUser?.isManager && managerEmployees.length === 0) {
+    if (isManager && currentUser?.capabilities?.managerTools && managerEmployees.length === 0) {
       loadManagerEmployees().catch((e) => {
         $id("manager-status").textContent = e.message;
       });
@@ -130,10 +139,8 @@ async function init() {
       $id("manager-status").textContent = e.message;
     });
   });
-  $id("btn-logout").addEventListener("click", logout);
-
   const u = await loadMe();
-  if (u?.isManager) {
+  if (u?.capabilities?.managerTools) {
     enableManagerTools();
     await loadFaultFormLookups();
   }

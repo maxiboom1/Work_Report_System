@@ -5,6 +5,25 @@ const STRINGS = {
   en: {
     appTitle: "Work Reports",
     logout: "Logout",
+    settings: "Settings",
+    personal: "Personal details",
+    language: "Language",
+    switchLanguage: "Hebrew version",
+    signedIn: "Signed in",
+    loading: "Loading...",
+    personalSettings: "Personal settings",
+    passportId: "Passport ID",
+    carId: "Car ID",
+    cardId: "Card ID",
+    currentPassword: "Current password",
+    newPassword: "New password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    personalSaved: "Personal details saved.",
+    personalLoadFailed: "Could not load personal details.",
+    personalPasswordFieldsRequired: "Current password and new password are required.",
+    personalCurrentPasswordInvalid: "Current password is incorrect.",
+    validationEmailInvalid: "Email address is invalid.",
     workClock: "Work clock",
     viewReports: "View reports",
     managerTools: "Manager tools",
@@ -151,6 +170,25 @@ const STRINGS = {
   he: {
     appTitle: "דיווח עבודה",
     logout: "יציאה",
+    settings: "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea",
+    personal: "\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05d0\u05d9\u05e9\u05d9\u05d9\u05dd",
+    language: "\u05e9\u05e4\u05d4",
+    switchLanguage: "\u05d2\u05e8\u05e1\u05d4 \u05d0\u05e0\u05d2\u05dc\u05d9\u05ea",
+    signedIn: "\u05de\u05d7\u05d5\u05d1\u05e8",
+    loading: "\u05d8\u05d5\u05e2\u05df...",
+    personalSettings: "\u05d4\u05d2\u05d3\u05e8\u05d5\u05ea \u05d0\u05d9\u05e9\u05d9\u05d5\u05ea",
+    passportId: "\u05ea.\u05d6",
+    carId: "\u05de\u05e1\u05e4\u05e8 \u05e8\u05db\u05d1",
+    cardId: "\u05de\u05e1\u05e4\u05e8 \u05db\u05e8\u05d8\u05d9\u05e1",
+    currentPassword: "\u05e1\u05d9\u05e1\u05de\u05d4 \u05e0\u05d5\u05db\u05d7\u05d9\u05ea",
+    newPassword: "\u05e1\u05d9\u05e1\u05de\u05d4 \u05d7\u05d3\u05e9\u05d4",
+    showPassword: "\u05d4\u05e6\u05d2 \u05e1\u05d9\u05e1\u05de\u05d4",
+    hidePassword: "\u05d4\u05e1\u05ea\u05e8 \u05e1\u05d9\u05e1\u05de\u05d4",
+    personalSaved: "\u05d4\u05e4\u05e8\u05d8\u05d9\u05dd \u05d4\u05d0\u05d9\u05e9\u05d9\u05d9\u05dd \u05e0\u05e9\u05de\u05e8\u05d5.",
+    personalLoadFailed: "\u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05d8\u05e2\u05d5\u05df \u05e4\u05e8\u05d8\u05d9\u05dd \u05d0\u05d9\u05e9\u05d9\u05d9\u05dd.",
+    personalPasswordFieldsRequired: "\u05d9\u05e9 \u05dc\u05de\u05dc\u05d0 \u05e1\u05d9\u05e1\u05de\u05d4 \u05e0\u05d5\u05db\u05d7\u05d9\u05ea \u05d5\u05e1\u05d9\u05e1\u05de\u05d4 \u05d7\u05d3\u05e9\u05d4.",
+    personalCurrentPasswordInvalid: "\u05d4\u05e1\u05d9\u05e1\u05de\u05d4 \u05d4\u05e0\u05d5\u05db\u05d7\u05d9\u05ea \u05e9\u05d2\u05d5\u05d9\u05d4.",
+    validationEmailInvalid: "\u05db\u05ea\u05d5\u05d1\u05ea \u05d4\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05dc\u05d0 \u05ea\u05e7\u05d9\u05e0\u05d4.",
     workClock: "שעון עבודה",
     viewReports: "דוחות",
     managerTools: "כלי מנהל",
@@ -201,7 +239,7 @@ const STRINGS = {
     carList: "רשימת רכבים",
     contractors: "קבלנים",
     faultRegistration: "פתיחת תקלה",
-    carListHint: "בחר עובדים והכן רשימת שמות, דרכונים ורכבים לשיתוף עם הלקוח.",
+    carListHint: "בחר עובדים והכן רשימת שמות, ת.ז ורכבים לשיתוף עם הלקוח.",
     showCarList: "הצג רשימה",
     selectWorkers: "בחר עובד אחד או יותר.",
     noWorkers: "לא נמצאו עובדים.",
@@ -271,7 +309,7 @@ const STRINGS = {
     workersSelected: "עובדים נבחרו.",
     carListTitle: "רשימת רכבים",
     workers: "עובדים",
-    passport: "דרכון",
+    passport: "ת.ז",
     car: "רכב",
     idNumber: "ת.ז",
     carNumber: "מס. רכב",
@@ -335,7 +373,8 @@ export function updateStaticText(root = document) {
 }
 
 export function initWorkerI18n(onChange) {
-  workerLanguage = CURRENT_LANGUAGE;
+  const savedLanguage = localStorage.getItem(STORAGE_KEY);
+  workerLanguage = savedLanguage === "en" ? "en" : CURRENT_LANGUAGE;
   localStorage.setItem(STORAGE_KEY, workerLanguage);
   applyDocumentLanguage();
   document.querySelectorAll("[data-worker-lang]").forEach((button) => {

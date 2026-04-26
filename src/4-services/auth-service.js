@@ -116,6 +116,16 @@ async function getMe(req) {
         const decoded = verifyToken(token);
         const user = await sqlService.getEmployeeById(decoded.uid);
         if (!user) return { ok: false, status: 401 };
+        if (String(user.role || "").toLowerCase() === "employee") {
+            return {
+                ok: true,
+                user: {
+                    capabilities: {
+                        managerTools: Boolean(user.is_manager),
+                    },
+                },
+            };
+        }
         return {
             ok: true,
             user: {

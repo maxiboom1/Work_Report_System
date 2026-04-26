@@ -1,3 +1,18 @@
+Version: 1.2.2
+Package version: 1.2.2
+Date: 2026-04-26
+Done:
+- Added a worker navbar gear menu with Personal settings, language toggle, and logout.
+- Removed the standalone worker Logout button.
+- Added employee self-service personal settings for passport ID, car ID, card ID, phone, email, and password.
+- Required the current password before employees can change their own password.
+- Sanitized employee-facing identity responses so worker APIs do not expose login, role, daily rate, or raw manager flags.
+- Personal settings shows the employee first and last name as read-only context.
+- Restored persistent worker English/Hebrew language selection from user settings.
+- No database migration required.
+
+----------------------------------------
+
 Version: 1.2.1
 Package version: 1.2.1
 Date: 2026-04-26

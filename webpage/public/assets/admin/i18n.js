@@ -299,7 +299,7 @@ const I18N = {
     editSelectedItem: "עריכת נבחר",
     firstName: "שם פרטי",
     lastName: "שם משפחה",
-    passport: "מספר דרכון",
+    passport: "ת.ז",
     car: "מספר רכב",
     card: "מספר כרטיס",
     phone: "טלפון",

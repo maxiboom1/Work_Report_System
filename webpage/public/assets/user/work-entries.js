@@ -664,7 +664,9 @@ export async function loadMe() {
   const r = await api("/auth/me");
   const u = r.user;
   setCurrentUser(u);
-  $id("crumb").textContent = `${u.firstName || ""} ${u.lastName || ""}`.trim() || u.username;
+  const crumb = $id("crumb");
+  crumb.dataset.i18n = "signedIn";
+  crumb.textContent = t("signedIn");
   return u;
 }
 

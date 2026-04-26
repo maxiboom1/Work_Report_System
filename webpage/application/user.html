@@ -14,11 +14,19 @@
     </div>
 
     <div class="actions">
-      <div class="lang-toggle" role="group" aria-label="Language" hidden>
-        <button class="lang-btn active" data-worker-lang="en" type="button" aria-pressed="true">Eng</button>
-        <button class="lang-btn" data-worker-lang="he" type="button" aria-pressed="false">Heb</button>
+      <div class="settings-wrap">
+        <button id="btn-user-settings" class="settings-button" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Settings" title="Settings" data-i18n-aria-label="settings" data-i18n-title="settings">
+          <svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"></path>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2a2 2 0 0 1-4 0V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 0 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H2.8a2 2 0 0 1 0-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7A2 2 0 0 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2a2 2 0 0 1 4 0V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2a2 2 0 0 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"></path>
+          </svg>
+        </button>
+        <div id="user-settings-menu" class="settings-menu" role="menu" hidden>
+          <button id="btn-open-personal" class="settings-menu-item" type="button" role="menuitem" data-i18n="personal">Personal</button>
+          <button id="btn-switch-language" class="settings-menu-item" type="button" role="menuitem" data-i18n="switchLanguage">Hebrew version</button>
+          <button id="btn-settings-logout" class="settings-menu-item settings-menu-danger" type="button" role="menuitem" data-i18n="logout">Logout</button>
+        </div>
       </div>
-      <button id="btn-logout" class="btn" data-i18n="logout">Logout</button>
     </div>
   </header>
 
@@ -229,6 +237,92 @@
 
     </section>
   </main>
+
+  <section id="personal-modal" class="work-modal personal-modal" role="dialog" aria-modal="true" aria-labelledby="personal-title" hidden>
+    <div class="work-modal-backdrop" data-close-personal></div>
+    <div class="work-modal-card">
+      <div class="work-modal-head">
+        <div>
+          <div id="personal-title" class="work-modal-title" data-i18n="personalSettings">Personal settings</div>
+          <div id="personal-name" class="personal-name"></div>
+        </div>
+        <button id="btn-personal-close" class="btn btn-icon" type="button" aria-label="Close" data-i18n-aria-label="close">x</button>
+      </div>
+
+      <div class="work-modal-body">
+        <div class="form-grid">
+          <div class="field">
+            <div class="field-label" data-i18n="passportId">Passport ID</div>
+            <input id="personal-passport" class="select select-md" type="text" autocomplete="off" />
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="carId">Car ID</div>
+            <input id="personal-car" class="select select-md" type="text" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="form-grid mt-10">
+          <div class="field">
+            <div class="field-label" data-i18n="cardId">Card ID</div>
+            <input id="personal-card" class="select select-md" type="text" autocomplete="off" />
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="phone">Phone</div>
+            <input id="personal-phone" class="select select-md" type="tel" autocomplete="tel" />
+          </div>
+        </div>
+
+        <div class="field mt-10">
+          <div class="field-label" data-i18n="email">Email</div>
+          <input id="personal-email" class="select select-md" type="email" autocomplete="email" />
+        </div>
+
+        <div class="form-grid mt-10">
+          <div class="field">
+            <div class="field-label" data-i18n="currentPassword">Current password</div>
+            <div class="personal-password-control">
+              <input id="personal-current-password" class="select select-md personal-password-input" type="password" autocomplete="current-password" />
+              <button class="personal-password-toggle" type="button" data-toggle-password="personal-current-password" aria-label="Show password" title="Show password" data-i18n-aria-label="showPassword" data-i18n-title="showPassword">
+                <svg class="eye-icon eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2.2 12s3.6-6 9.8-6 9.8 6 9.8 6-3.6 6-9.8 6-9.8-6-9.8-6Z"></path>
+                  <circle cx="12" cy="12" r="2.6"></circle>
+                </svg>
+                <svg class="eye-icon eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 3l18 18"></path>
+                  <path d="M9.7 5.4A10 10 0 0 1 12 5.1c6.2 0 9.8 6 9.8 6a17.4 17.4 0 0 1-3.1 3.7"></path>
+                  <path d="M14.1 14.1A3 3 0 0 1 9.9 9.9"></path>
+                  <path d="M6.4 6.9A17.4 17.4 0 0 0 2.2 11.1s3.6 6 9.8 6a9.8 9.8 0 0 0 4.2-.9"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="newPassword">New password</div>
+            <div class="personal-password-control">
+              <input id="personal-new-password" class="select select-md personal-password-input" type="password" autocomplete="new-password" />
+              <button class="personal-password-toggle" type="button" data-toggle-password="personal-new-password" aria-label="Show password" title="Show password" data-i18n-aria-label="showPassword" data-i18n-title="showPassword">
+                <svg class="eye-icon eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2.2 12s3.6-6 9.8-6 9.8 6 9.8 6-3.6 6-9.8 6-9.8-6-9.8-6Z"></path>
+                  <circle cx="12" cy="12" r="2.6"></circle>
+                </svg>
+                <svg class="eye-icon eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 3l18 18"></path>
+                  <path d="M9.7 5.4A10 10 0 0 1 12 5.1c6.2 0 9.8 6 9.8 6a17.4 17.4 0 0 1-3.1 3.7"></path>
+                  <path d="M14.1 14.1A3 3 0 0 1 9.9 9.9"></path>
+                  <path d="M6.4 6.9A17.4 17.4 0 0 0 2.2 11.1s3.6 6 9.8 6a9.8 9.8 0 0 0 4.2-.9"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-modal-actions">
+        <button id="btn-personal-save" class="btn btn-open" type="button" data-i18n="saveChanges">Save changes</button>
+        <div id="personal-status" class="crumb"></div>
+      </div>
+    </div>
+  </section>
 
   <section id="work-session-modal" class="work-modal" role="dialog" aria-modal="true" aria-labelledby="work-session-title" hidden>
     <div class="work-modal-backdrop" data-close-work-session></div>

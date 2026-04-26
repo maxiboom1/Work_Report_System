@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** 1.2.1
+**Version:** 1.2.2
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -19,7 +19,9 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 - Mobile-friendly worker UI with 2 tabs:
   - Work clock (start / stop active work)
   - View reports (monthly entries)
-- Worker UI is currently Hebrew-only by default; language selection will move into settings later.
+- Worker UI defaults to Hebrew, with English/Hebrew selection available from user settings.
+- Open user settings from the navbar gear menu to update personal contact identifiers, switch language, or log out.
+- Change their own password from personal settings after entering the current password.
 - Worker screens must remain responsive because employees mostly enter reports from mobile phones.
 - Employees marked as managers can open manager-only tools:
   - Generate selected workers' name/passport/car details for client parking access.
@@ -28,6 +30,7 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 
 ### Admin
 - CRUD Employees
+- Set or reset employee passwords without seeing existing passwords.
 - CRUD Projects
 - CRUD fault client data:
   - Clients
@@ -47,6 +50,16 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+1.2.2 improvements:
+- Added a worker navbar gear menu with Personal settings, language toggle, and logout.
+- Removed the standalone worker Logout button.
+- Added employee self-service personal settings for passport ID, car ID, card ID, phone, email, and password.
+- Required the current password before an employee can change their own password.
+- Sanitized employee-facing identity responses so worker APIs do not expose login, role, daily rate, or raw manager flags.
+- Personal settings now shows the employee first and last name as read-only context.
+- Restored persistent worker English/Hebrew language selection from the settings menu.
+- No database migration required.
 
 1.2.1 improvements:
 - Polished worker tab ordering so Clock, Reports, and Manager tools stay left-to-right.
@@ -330,7 +343,7 @@ npm install
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
 - Existing databases must run `database/migrate_1_1_17_active_work_sessions.sql`.
-- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, or 1.2.1.
+- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, 1.2.1, or 1.2.2.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start
