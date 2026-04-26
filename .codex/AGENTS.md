@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.1.19`.
+- App version: `1.2.0` (documented to users as `v1.2.00`).
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -29,6 +29,66 @@ Employee Work Report System is a working Node.js/Express application backed by M
 - Every database structure change must update `database/create_employee_work_report_db.sql` so a fresh database matches the current live app schema.
 - Keep secrets and local runtime files out of git. `.codex/` may track Markdown project docs only; non-Markdown `.codex` files, `config.json`, `logs/`, `dist/`, `build/`, and `node_modules/` should stay ignored.
 
+## Context Cleanup / Compression Protocol
+
+When chat context approaches compression, or when the user says:
+
+`context cleanup`
+
+Codex must pause implementation work and perform the protocol below.
+
+### Step 1 — Pre-Compression Handoff
+
+Before compression, produce a compact handoff summary containing:
+
+- Current implementation state  
+- Current version and milestone  
+- Files changed or expected to change  
+- Open design decisions  
+- Unresolved risks or suspected bugs  
+- Immediate next implementation step  
+- Validation already completed  
+- Validation still required  
+
+Treat these as governing sources of truth:
+
+- `.codex/AGENTS.md`
+- `README.md`
+- `.codex/VERSION.md`
+- Active ExecPlan (if one exists)
+
+During this step:
+
+- Do not begin new implementation work  
+- Do not expand scope  
+- Only prepare resumable handoff context
+
+If compressed chat memory conflicts with repository documents, repository documents win.
+
+---
+
+### Step 2 — Post-Compression Re-Anchor
+
+After compression (or after any resumed compressed context), before coding:
+
+1. Re-read `.codex/AGENTS.md`
+2. Re-read `.codex/VERSION.md`
+3. Re-read relevant `README.md` sections
+4. Re-read active ExecPlan, if present
+5. Restate:
+   - current task
+   - immediate next step
+   - risks to watch
+
+Only then continue implementation.
+
+Do not rely solely on compressed chat memory for project state.
+
+Repository files are the source of truth.
+
+---
+
+
 ## Frontend Work
 
 - Main near-term focus is frontend polish.
@@ -38,6 +98,7 @@ Employee Work Report System is a working Node.js/Express application backed by M
 - Worker reporting uses the punch-clock flow: a durable active session starts first, then stopping creates the completed work entry.
 - v1.1.18 adds worker stale-session recovery and worker i18n infrastructure.
 - v1.1.19 keeps the worker app Hebrew-only by default, hides the language toggle until settings are added, redirects expired API sessions to login, removes default clock status noise, allows zero-duration placeholder entries, and adds the opener login spinner/password polish.
+- v1.2.00 adds localized worker-surface frontend validation, blocks overlapping same-day worker reports across all projects, and limits worker Start times to the next available time after completed same-day entries.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
 - The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:

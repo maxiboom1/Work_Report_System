@@ -1,3 +1,16 @@
+Version: v1.2.00
+Package version: 1.2.0
+Date: 2026-04-26
+Done:
+- Added localized frontend validation for worker-surface forms, with English and Hebrew messages.
+- Added structured API errors so the worker UI can show localized messages instead of raw backend text.
+- Blocked overlapping same-day worker reports across all projects.
+- Blocked active session starts inside an existing same-day report so workers cannot get stuck with an unclosable overlap.
+- Limited the worker Start time picker to the next available time after existing completed entries for the day.
+- Kept zero-duration placeholder entries valid and non-overlapping.
+
+----------------------------------------
+
 Version: v1.1.19
 Date: 2026-04-26
 Done:

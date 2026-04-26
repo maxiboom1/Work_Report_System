@@ -330,6 +330,7 @@ function buildPayload() {
   if (payload.manufacturer_mode === "other" && !payload.manufacturer_name) throw new Error(t("otherManufacturerRequired"));
   if (payload.equipment_category_mode === "other" && !payload.equipment_category_name) throw new Error(t("otherCategoryRequired"));
   if (payload.equipment_subcategory_mode === "other" && !payload.equipment_subcategory_name) throw new Error(t("otherSubcategoryRequired"));
+  if (!payload.fault_description) throw new Error(t("validationFaultDescriptionRequired"));
 
   return payload;
 }

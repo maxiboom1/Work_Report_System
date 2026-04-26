@@ -1005,6 +1005,34 @@ class SqlService {
       const session = activeResult?.recordset?.[0] || null;
       if (!session) return null;
 
+      if (String(session.start_time).slice(0, 5) !== String(endTime).slice(0, 5)) {
+        const overlapQuery = `
+          SELECT TOP (1)
+            we.id,
+            CONVERT(varchar(10), we.work_date, 23) AS work_date,
+            CONVERT(varchar(8), we.start_time, 108) AS start_time,
+            CONVERT(varchar(8), we.end_time, 108) AS end_time,
+            we.project_id,
+            p.name AS project_name
+          FROM dbo.[work_entries] we WITH (UPDLOCK, HOLDLOCK)
+          INNER JOIN dbo.[projects] p ON p.id = we.project_id
+          WHERE we.employee_id = @employee_id
+            AND we.work_date = @work_date
+            AND we.start_time <> we.end_time
+            AND we.start_time < @end_time
+            AND we.end_time > @start_time
+          ORDER BY we.start_time;
+        `;
+        const overlapResult = await tx(overlapQuery, {
+          employee_id: session.employee_id,
+          work_date: session.work_date,
+          start_time: session.start_time,
+          end_time: endTime,
+        });
+        const overlap = overlapResult?.recordset?.[0] || null;
+        if (overlap) return { overlap, session };
+      }
+
       const insertQuery = `
         INSERT INTO dbo.[work_entries]
           (employee_id, project_id, work_date, start_time, end_time, notes)
@@ -1029,6 +1057,84 @@ class SqlService {
 
       return { entryId, session };
     });
+  }
+
+  async findOverlappingWorkEntry(employeeId, workDate, startTime, endTime, excludeEntryId = null) {
+    const q = `
+      SELECT TOP (1)
+        we.id,
+        CONVERT(varchar(10), we.work_date, 23) AS work_date,
+        CONVERT(varchar(8), we.start_time, 108) AS start_time,
+        CONVERT(varchar(8), we.end_time, 108) AS end_time,
+        we.project_id,
+        p.name AS project_name
+      FROM dbo.[work_entries] we
+      INNER JOIN dbo.[projects] p ON p.id = we.project_id
+      WHERE we.employee_id = @employee_id
+        AND we.work_date = @work_date
+        AND we.id <> @exclude_entry_id
+        AND we.start_time <> we.end_time
+        AND we.start_time < @end_time
+        AND we.end_time > @start_time
+      ORDER BY we.start_time;
+    `;
+    const r = await db.execute(q, {
+      employee_id: employeeId,
+      work_date: workDate,
+      start_time: startTime,
+      end_time: endTime,
+      exclude_entry_id: excludeEntryId ?? 0,
+    });
+    return r?.recordset?.[0] || null;
+  }
+
+  async findWorkEntryContainingTime(employeeId, workDate, time) {
+    const q = `
+      SELECT TOP (1)
+        we.id,
+        CONVERT(varchar(10), we.work_date, 23) AS work_date,
+        CONVERT(varchar(8), we.start_time, 108) AS start_time,
+        CONVERT(varchar(8), we.end_time, 108) AS end_time,
+        we.project_id,
+        p.name AS project_name
+      FROM dbo.[work_entries] we
+      INNER JOIN dbo.[projects] p ON p.id = we.project_id
+      WHERE we.employee_id = @employee_id
+        AND we.work_date = @work_date
+        AND we.start_time <> we.end_time
+        AND we.start_time <= @time
+        AND we.end_time > @time
+      ORDER BY we.start_time;
+    `;
+    const r = await db.execute(q, {
+      employee_id: employeeId,
+      work_date: workDate,
+      time,
+    });
+    return r?.recordset?.[0] || null;
+  }
+
+  async findLatestNonZeroWorkEntryForDate(employeeId, workDate) {
+    const q = `
+      SELECT TOP (1)
+        we.id,
+        CONVERT(varchar(10), we.work_date, 23) AS work_date,
+        CONVERT(varchar(8), we.start_time, 108) AS start_time,
+        CONVERT(varchar(8), we.end_time, 108) AS end_time,
+        we.project_id,
+        p.name AS project_name
+      FROM dbo.[work_entries] we
+      INNER JOIN dbo.[projects] p ON p.id = we.project_id
+      WHERE we.employee_id = @employee_id
+        AND we.work_date = @work_date
+        AND we.start_time <> we.end_time
+      ORDER BY we.end_time DESC, we.start_time DESC;
+    `;
+    const r = await db.execute(q, {
+      employee_id: employeeId,
+      work_date: workDate,
+    });
+    return r?.recordset?.[0] || null;
   }
 
   async deleteActiveWorkSessionForEmployee(employeeId) {

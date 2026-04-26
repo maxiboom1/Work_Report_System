@@ -36,6 +36,52 @@ function publicSession(session, now = new Date()) {
     };
 }
 
+function publicConflict(entry) {
+    if (!entry) return null;
+    return {
+      id: entry.id,
+      project_name: entry.project_name,
+      work_date: entry.work_date,
+      start_time: String(entry.start_time || "").slice(0, 5),
+      end_time: String(entry.end_time || "").slice(0, 5),
+    };
+}
+
+function overlapResult(conflict) {
+    return {
+      ok: false,
+      status: 409,
+      code: "WORK_ENTRY_OVERLAP",
+      message: "Work entry overlaps an existing entry",
+      conflict: publicConflict(conflict),
+    };
+}
+
+function startUnavailableResult(conflict) {
+    const publicEntry = publicConflict(conflict);
+    return {
+      ok: false,
+      status: 409,
+      code: "WORK_ENTRY_START_UNAVAILABLE",
+      message: "Start time is before the next available time",
+      minimum_start_time: publicEntry?.end_time || null,
+      conflict: publicEntry,
+    };
+}
+
+async function findOverlap(employeeId, workDate, startTime, endTime, excludeEntryId = null) {
+    if (minutesBetween(String(startTime), String(endTime)) === 0) return null;
+    return sqlService.findOverlappingWorkEntry(employeeId, workDate, startTime, endTime, excludeEntryId);
+}
+
+async function findStartOverlap(employeeId, workDate, startTime) {
+    return sqlService.findWorkEntryContainingTime(employeeId, workDate, startTime);
+}
+
+async function findLatestCompletedEntry(employeeId, workDate) {
+    return sqlService.findLatestNonZeroWorkEntryForDate(employeeId, workDate);
+}
+
 export async function listMyEntries(user, month) {
     const range = monthRange(month);
     if (!range) return { ok: false, status: 400, message: "Invalid month (expected YYYY-MM)" };
@@ -76,6 +122,14 @@ export async function startSession(user, payload) {
     if (!project) return { ok: false, status: 400, message: "Invalid project" };
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
 
+    const latestEntry = await findLatestCompletedEntry(user.uid, work_date);
+    if (latestEntry && minutesBetween(String(start_time), String(latestEntry.end_time)) > 0) {
+      return startUnavailableResult(latestEntry);
+    }
+
+    const overlap = await findStartOverlap(user.uid, work_date, start_time);
+    if (overlap) return overlapResult(overlap);
+
     const id = await sqlService.createActiveWorkSession({
       employee_id: user.uid,
       project_id,
@@ -112,6 +166,7 @@ export async function stopSession(user, payload) {
     if (mins < 0) return { ok: false, status: 400, message: "End time cannot be before start time" };
 
     const result = await sqlService.completeActiveWorkSession(user.uid, end_time, notes);
+    if (result?.overlap) return overlapResult(result.overlap);
     if (!result?.entryId) return { ok: false, status: 500, message: "Failed to stop work session" };
     return { ok: true, id: result.entryId, server_now: serverClock(now), message: "Work session stopped" };
 }
@@ -136,6 +191,7 @@ export async function recoverCloseSession(user, payload) {
     if (mins < 0) return { ok: false, status: 400, message: "End time cannot be before start time" };
 
     const result = await sqlService.completeActiveWorkSession(user.uid, end_time, notes);
+    if (result?.overlap) return overlapResult(result.overlap);
     if (!result?.entryId) return { ok: false, status: 500, message: "Failed to recover work session" };
     return { ok: true, id: result.entryId, server_now: serverClock(now), message: "Work session recovered" };
 }
@@ -177,6 +233,9 @@ export async function createMyEntry(user, payload) {
     const project = await sqlService.getProjectById(project_id);
     if (!project) return { ok: false, status: 400, message: "Invalid project" };
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
+
+    const overlap = await findOverlap(user.uid, work_date, start_time, end_time);
+    if (overlap) return overlapResult(overlap);
 
     const id = await sqlService.createWorkEntry({
       employee_id: user.uid,
@@ -230,6 +289,9 @@ export async function updateMyEntry(user, entryId, payload) {
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
     const mins = minutesBetween(String(st), String(et));
     if (mins < 0) return { ok: false, status: 400, message: "end_time cannot be before start_time" };
+
+    const overlap = await findOverlap(user.uid, finalDate, String(st), String(et), id);
+    if (overlap) return overlapResult(overlap);
 
     const affected = await sqlService.updateWorkEntry(id, patch);
     if (!affected) return { ok: false, status: 404, message: "Entry not found" };

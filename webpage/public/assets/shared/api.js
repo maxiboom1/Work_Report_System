@@ -16,7 +16,11 @@ export async function api(path, options = {}) {
       await new Promise(() => {});
     }
     const message = body?.message || `Request failed (${res.status})`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = res.status;
+    error.code = body?.code || null;
+    error.body = body;
+    throw error;
   }
   return body;
 }

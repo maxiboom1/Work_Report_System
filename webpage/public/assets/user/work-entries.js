@@ -10,6 +10,7 @@ let serverNow = null;
 let serverOffsetMs = 0;
 let counterTimer = null;
 let editingEntry = null;
+let loadedEntries = [];
 
 export function setStatus(msg) {
   const el = $id("status");
@@ -55,6 +56,132 @@ function currentMaxTime() {
   return String(serverNow?.rounded_time || floorNowToFive()).slice(0, 5);
 }
 
+function monthFromDate(date) {
+  return String(date || "").slice(0, 7);
+}
+
+function isFutureDateTime(workDate, time) {
+  const today = serverNow?.date || localToday();
+  if (!workDate || !time) return true;
+  if (workDate > today) return true;
+  if (workDate < today) return false;
+  return timeToMinutes(time) > timeToMinutes(currentMaxTime());
+}
+
+function formatConflict(conflict) {
+  if (!conflict) return t("validationUnknown");
+  const start = String(conflict.start_time || "").slice(0, 5);
+  const end = String(conflict.end_time || "").slice(0, 5);
+  const project = conflict.project_name ? `, ${conflict.project_name}` : "";
+  return `${t("validationOverlapPrefix")} ${start}-${end}${project}`;
+}
+
+function formatStartUnavailable(minimumStartTime) {
+  const time = String(minimumStartTime || "").slice(0, 5);
+  if (!time) return t("validationUnknown");
+  return `${t("validationStartUnavailablePrefix")} ${time}${t("validationStartUnavailableSuffix")}`;
+}
+
+function localizeApiError(error) {
+  if (error?.code === "WORK_ENTRY_OVERLAP") return formatConflict(error.body?.conflict);
+  if (error?.code === "WORK_ENTRY_START_UNAVAILABLE") {
+    return formatStartUnavailable(error.body?.minimum_start_time || error.body?.conflict?.end_time);
+  }
+
+  const message = String(error?.message || "");
+  const known = new Map([
+    ["Missing/invalid fields", "validationUnknown"],
+    ["Missing/invalid end time", "validationEndTimeRequired"],
+    ["Invalid project", "validationProjectRequired"],
+    ["Project is disabled", "validationProjectRequired"],
+    ["Time must use 5-minute steps", "validationTimeRequired"],
+    ["Start time cannot be in the future", "validationFutureTime"],
+    ["End time cannot be in the future", "validationFutureTime"],
+    ["Work entry cannot use future date/time", "validationFutureTime"],
+    ["End time cannot be before start time", "validationEndBeforeStart"],
+    ["end_time cannot be before start_time", "validationEndBeforeStart"],
+  ]);
+  const key = known.get(message);
+  return key ? t(key) : (message || t("validationUnknown"));
+}
+
+async function getEntriesForDate(workDate) {
+  const month = monthFromDate(workDate);
+  if (!month) return [];
+  if ($id("rep-month")?.value === month) return loadedEntries;
+  const r = await api(`/my/work-entries?month=${encodeURIComponent(month)}`);
+  return r.entries || [];
+}
+
+function findLocalOverlap(entries, { workDate, startTime, endTime, excludeId = null }) {
+  const start = timeToMinutes(startTime);
+  const end = timeToMinutes(endTime);
+  if (start === end) return null;
+  return (entries || []).find((entry) => {
+    if (excludeId && String(entry.id) === String(excludeId)) return false;
+    if (entry.work_date !== workDate) return false;
+    const entryStart = timeToMinutes(entry.start_time);
+    const entryEnd = timeToMinutes(entry.end_time);
+    if (entryStart === entryEnd) return false;
+    return entryStart < end && entryEnd > start;
+  }) || null;
+}
+
+function findLocalStartOverlap(entries, { workDate, startTime }) {
+  const start = timeToMinutes(startTime);
+  return (entries || []).find((entry) => {
+    if (entry.work_date !== workDate) return false;
+    const entryStart = timeToMinutes(entry.start_time);
+    const entryEnd = timeToMinutes(entry.end_time);
+    if (entryStart === entryEnd) return false;
+    return entryStart <= start && entryEnd > start;
+  }) || null;
+}
+
+function nextAvailableStartTime(entries, workDate) {
+  let latestEnd = -1;
+  let latestEndTime = "";
+
+  for (const entry of entries || []) {
+    if (entry.work_date !== workDate) continue;
+    const entryStart = timeToMinutes(entry.start_time);
+    const entryEnd = timeToMinutes(entry.end_time);
+    if (entryStart === entryEnd) continue;
+    if (entryEnd > latestEnd) {
+      latestEnd = entryEnd;
+      latestEndTime = String(entry.end_time || "").slice(0, 5);
+    }
+  }
+
+  return latestEndTime || "00:00";
+}
+
+async function validateSessionStart({ projectId, workDate, startTime }) {
+  if (!projectId) return t("validationProjectRequired");
+  if (!workDate) return t("validationDateRequired");
+  if (!startTime) return t("validationStartTimeRequired");
+  if (isFutureDateTime(workDate, startTime)) return t("validationFutureTime");
+
+  const entries = await getEntriesForDate(workDate);
+  const minimumStart = nextAvailableStartTime(entries, workDate);
+  if (timeToMinutes(startTime) < timeToMinutes(minimumStart)) return formatStartUnavailable(minimumStart);
+
+  const conflict = findLocalStartOverlap(entries, { workDate, startTime });
+  return conflict ? formatConflict(conflict) : "";
+}
+
+async function validateEntryInterval({ workDate, startTime, endTime, excludeId = null }) {
+  if (!workDate) return t("validationDateRequired");
+  if (!startTime) return t("validationStartTimeRequired");
+  if (!endTime) return t("validationEndTimeRequired");
+  if (isFutureDateTime(workDate, startTime) || isFutureDateTime(workDate, endTime)) return t("validationFutureTime");
+  if (timeToMinutes(endTime) < timeToMinutes(startTime)) return t("validationEndBeforeStart");
+
+  const entries = await getEntriesForDate(workDate);
+  const conflict = findLocalOverlap(entries, { workDate, startTime, endTime, excludeId });
+  return conflict ? formatConflict(conflict) : "";
+}
+
 function fillProjectSelect(select, options = {}) {
   if (!select) return;
   const { placeholder = false } = options;
@@ -76,7 +203,7 @@ function fillProjectSelect(select, options = {}) {
 
 function populateTimeSelect(select, selectedValue, options = {}) {
   if (!select) return;
-  const { minTime = "00:00", maxTime = "23:55" } = options;
+  const { minTime = "00:00", maxTime = "23:55", includeSelected = true } = options;
   const selected = String(selectedValue || "").slice(0, 5);
   const minMinutes = timeToMinutes(minTime);
   const maxMinutes = timeToMinutes(maxTime);
@@ -91,7 +218,7 @@ function populateTimeSelect(select, selectedValue, options = {}) {
     select.appendChild(opt);
   }
 
-  if (selected && !Array.from(select.options).some((opt) => opt.value === selected)) {
+  if (includeSelected && selected && !Array.from(select.options).some((opt) => opt.value === selected)) {
     const opt = document.createElement("option");
     opt.value = selected;
     opt.textContent = selected;
@@ -206,6 +333,8 @@ async function openSessionModal(mode) {
   projectRow.hidden = isStop;
   notesRow.hidden = !isStop;
   saveBtn.textContent = isStop ? t("stop") : t("start");
+  saveBtn.disabled = false;
+  timeSelect.disabled = false;
 
   dateInput.value = isStop ? activeSession?.work_date : (serverNow?.date || localToday());
   dateInput.max = serverNow?.date || localToday();
@@ -213,8 +342,19 @@ async function openSessionModal(mode) {
   projectSelect.value = "";
 
   const maxTime = currentMaxTime();
-  const minTime = isStop ? String(activeSession?.start_time || "").slice(0, 5) : "00:00";
-  populateTimeSelect(timeSelect, maxTime, { minTime, maxTime });
+  let minTime = isStop ? String(activeSession?.start_time || "").slice(0, 5) : "00:00";
+  let selectedTime = maxTime;
+  if (!isStop) {
+    const entries = await getEntriesForDate(dateInput.value);
+    minTime = nextAvailableStartTime(entries, dateInput.value);
+    selectedTime = timeToMinutes(maxTime) >= timeToMinutes(minTime) ? maxTime : "";
+  }
+  populateTimeSelect(timeSelect, selectedTime, { minTime, maxTime, includeSelected: isStop });
+  if (!isStop && timeSelect.options.length === 0) {
+    timeSelect.disabled = true;
+    saveBtn.disabled = true;
+    setSessionModalStatus(formatStartUnavailable(minTime));
+  }
   if (notesInput) notesInput.value = "";
   modal.hidden = false;
 }
@@ -228,6 +368,14 @@ async function saveSessionModal() {
   const notes = $id("work-session-notes").value;
 
   try {
+    const validationMessage = mode === "stop"
+      ? await validateEntryInterval({ workDate: activeSession?.work_date, startTime: activeSession?.start_time, endTime: time })
+      : await validateSessionStart({ projectId, workDate, startTime: time });
+    if (validationMessage) {
+      setSessionModalStatus(validationMessage);
+      return;
+    }
+
     saveBtn.disabled = true;
     setSessionModalStatus(mode === "stop" ? t("stopping") : t("starting"));
     if (mode === "stop") {
@@ -247,7 +395,7 @@ async function saveSessionModal() {
     await refreshActiveSession();
     await loadEntries();
   } catch (e) {
-    setSessionModalStatus(e.message);
+    setSessionModalStatus(localizeApiError(e));
   } finally {
     saveBtn.disabled = false;
   }
@@ -256,6 +404,16 @@ async function saveSessionModal() {
 async function recoverCloseSession() {
   const saveBtn = $id("btn-stale-close");
   try {
+    const validationMessage = await validateEntryInterval({
+      workDate: activeSession?.work_date,
+      startTime: activeSession?.start_time,
+      endTime: $id("stale-end-time").value,
+    });
+    if (validationMessage) {
+      $id("stale-session-status").textContent = validationMessage;
+      return;
+    }
+
     saveBtn.disabled = true;
     $id("stale-session-status").textContent = t("recovering");
     await api("/my/work-session/recover-close", {
@@ -270,7 +428,7 @@ async function recoverCloseSession() {
     await refreshActiveSession();
     await loadEntries();
   } catch (e) {
-    $id("stale-session-status").textContent = e.message;
+    $id("stale-session-status").textContent = localizeApiError(e);
   } finally {
     saveBtn.disabled = false;
   }
@@ -288,7 +446,7 @@ async function discardStaleSession() {
     await refreshActiveSession();
     await loadEntries();
   } catch (e) {
-    $id("stale-session-status").textContent = e.message;
+    $id("stale-session-status").textContent = localizeApiError(e);
   } finally {
     discardBtn.disabled = false;
   }
@@ -384,6 +542,19 @@ async function saveEditModal() {
   };
 
   try {
+    const validationMessage = !payload.project_id
+      ? t("validationProjectRequired")
+      : await validateEntryInterval({
+        workDate: payload.work_date,
+        startTime: payload.start_time,
+        endTime: payload.end_time,
+        excludeId: editingEntry.id,
+      });
+    if (validationMessage) {
+      setEditStatus(validationMessage);
+      return;
+    }
+
     saveBtn.disabled = true;
     setEditStatus(t("saving"));
     await api(`/my/work-entries/${editingEntry.id}`, {
@@ -394,7 +565,7 @@ async function saveEditModal() {
     await loadEntries();
     setStatus(t("entryUpdated"));
   } catch (e) {
-    setEditStatus(e.message);
+    setEditStatus(localizeApiError(e));
   } finally {
     saveBtn.disabled = false;
   }
@@ -431,6 +602,7 @@ export async function loadEntries() {
   const month = $id("rep-month")?.value || todayMonth();
   const r = await api(`/my/work-entries?month=${encodeURIComponent(month)}`);
   const entries = r.entries || [];
+  loadedEntries = entries;
 
   const holder = $id("rep-entries");
   holder.innerHTML = "";

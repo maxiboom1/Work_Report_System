@@ -3,6 +3,39 @@ import { $id } from "../shared/dom.js";
 import { t } from "./i18n.js";
 import { managerEmployees, setManagerEmployees } from "./state.js";
 
+function timeToMinutes(time) {
+  const [hour, minute] = String(time || "00:00").split(":").map(Number);
+  return (hour * 60) + minute;
+}
+
+function localizeApiError(error) {
+  const message = String(error?.message || "");
+  const known = new Map([
+    ["Missing contractor details", "validationUnknown"],
+    ["Invalid service cost", "validationContractorCostInvalid"],
+    ["Invalid contractor time", "validationTimeRequired"],
+    ["Start and end time must be filled together", "validationContractorTimesPair"],
+    ["end_time must be after start_time", "validationEndBeforeStart"],
+    ["Invalid project", "validationProjectRequired"],
+    ["Project is disabled", "validationProjectRequired"],
+  ]);
+  const key = known.get(message);
+  return key ? t(key) : (message || t("validationUnknown"));
+}
+
+function validateContractorPayload(payload) {
+  if (!payload.project_id) return t("validationProjectRequired");
+  if (!String(payload.contractor_name || "").trim()) return t("validationContractorNameRequired");
+  if (!String(payload.service_description || "").trim()) return t("validationContractorDescriptionRequired");
+  if ((payload.start_time && !payload.end_time) || (!payload.start_time && payload.end_time)) return t("validationContractorTimesPair");
+  if (payload.start_time && payload.end_time && timeToMinutes(payload.end_time) <= timeToMinutes(payload.start_time)) return t("validationEndBeforeStart");
+  if (String(payload.service_cost || "").trim()) {
+    const cost = Number(payload.service_cost);
+    if (!Number.isFinite(cost) || cost < 0) return t("validationContractorCostInvalid");
+  }
+  return "";
+}
+
 function makeManagerWorkerRow(worker) {
   const tr = document.createElement("tr");
   tr.className = "manager-worker-row";
@@ -66,10 +99,21 @@ export async function saveContractorEntry() {
     service_cost: $id("contractor-cost").value,
   };
 
-  await api("/my/manager/contractors", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  const validationMessage = validateContractorPayload(payload);
+  if (validationMessage) {
+    $id("contractor-status").textContent = validationMessage;
+    return;
+  }
+
+  try {
+    await api("/my/manager/contractors", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    $id("contractor-status").textContent = localizeApiError(error);
+    return;
+  }
 
   $id("contractor-name").value = "";
   $id("contractor-description").value = "";
