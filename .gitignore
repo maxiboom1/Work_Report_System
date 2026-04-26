@@ -5,5 +5,8 @@ logs/
 dist/
 build/
 config.json
-.codex/
+.codex/*
+!.codex/
+!.codex/*.md
+!.codex/**/*.md
 tmp/

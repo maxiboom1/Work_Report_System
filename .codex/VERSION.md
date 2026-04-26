@@ -169,7 +169,7 @@ Done:
 Version: v1.1.0
 Date: 2026-04-23
 Done:
-- Added Codex project guidance in AGENTS.md, including version bump, database ownership, and frontend workflow rules.
+- Added Codex project guidance in .codex/AGENTS.md, including version bump, database ownership, and frontend workflow rules.
 - Added Playwright UI inspection scripts for browser screenshots and frontend polish.
 - Added company logo branding to the login screen.
 - Simplified the login screen by removing technical copy and making the primary login action full width.

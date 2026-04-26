@@ -20,14 +20,14 @@ Employee Work Report System is a working Node.js/Express application backed by M
   - `package-lock.json`
   - `src/3-utilities/app-config.js`
   - `README.md`
-  - `VERSION.md`
-  - `AGENTS.md`
+  - `.codex/VERSION.md`
+  - `.codex/AGENTS.md`
   - database scripts or comments that mention the release version
-- Every version bump must also update `README.md` and  with the relevant user-facing changes.
+- Every version bump must also update `README.md` and `.codex/VERSION.md` with the relevant user-facing changes.
 - Database structure changes are owned by Codex. Do not ask the user to manually patch schema unless direct database access is unavailable.
 - Schema changes must be reflected in SQL scripts and in the DAL/service code that depends on them.
 - Every database structure change must update `database/create_employee_work_report_db.sql` so a fresh database matches the current live app schema.
-- Keep secrets and local runtime files out of git. `.codex/`, `config.json`, `logs/`, `dist/`, `build/`, and `node_modules/` should stay ignored.
+- Keep secrets and local runtime files out of git. `.codex/` may track Markdown project docs only; non-Markdown `.codex` files, `config.json`, `logs/`, `dist/`, `build/`, and `node_modules/` should stay ignored.
 
 ## Frontend Work
 
