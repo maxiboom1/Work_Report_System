@@ -35,7 +35,6 @@ form.addEventListener("submit", async (e) => {
       btn.disabled = false;
       return;
     }
-    console.log(res)
     setStatus("Success. Redirecting...");
     window.location.href = "/"; // server will serve admin/user after auth (next step)
   } catch (err) {

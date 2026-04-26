@@ -1,3 +1,12 @@
+Version: v1.1.16
+Date: 2026-04-26
+Done:
+- Polished the opener/login screen with a cleaner logo-first layout, updated color palette, focused form styling, and restrained entrance motion.
+- Added a left-to-right company logo reveal with reduced-motion support.
+- Planned the new opener style language for wider frontend application, including color schemes, spacing, and control styling.
+
+----------------------------------------
+
 Version: v1.1.15
 Date: 2026-04-24
 Done:

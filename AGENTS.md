@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.1.15`.
+- App version: `1.1.16`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -36,6 +36,7 @@ Employee Work Report System is a working Node.js/Express application backed by M
 - Admin UI is a desktop/workstation surface. Do not spend effort adapting the admin experience to mobile unless explicitly requested.
 - Worker/user UI must be responsive and comfortable on mobile because workers mostly enter reports from phones.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
+- The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:
   - `npm run inspect:ui` captures screenshots into `tmp/ui-snapshots`.
   - `npm run inspect:ui:headed` opens a visible Chrome/Edge browser for interactive inspection.

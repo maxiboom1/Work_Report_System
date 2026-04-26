@@ -72,6 +72,7 @@ try {
 
   const page = await browser.newPage();
   await page.goto(`${baseUrl}/login.html`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(1100);
   await capturePage(page, "login", 1440, 900);
   await capturePage(page, "login", 390, 844);
 

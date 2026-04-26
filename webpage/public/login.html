@@ -10,17 +10,16 @@
   <main class="login-shell">
     <section class="login-panel">
       <img class="company-logo" src="/assets/company-logo.jpg" alt="I/O Systems" />
-      <h1>שעון נוכחות</h1>
 
       <form id="login-form" autocomplete="on">
         <div class="field">
           <label class="label" for="username">Username</label>
-          <input id="username" class="input" type="text" required />
+          <input id="username" class="input" type="text" autocomplete="username" required />
         </div>
 
         <div class="field">
           <label class="label" for="password">Password</label>
-          <input id="password" class="input" type="password" required />
+          <input id="password" class="input" type="password" autocomplete="current-password" required />
         </div>
 
         <div class="actions">
