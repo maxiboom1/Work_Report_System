@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.2.2`.
+- App version: `1.2.21`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -23,6 +23,7 @@ Employee Work Report System is a working Node.js/Express application backed by M
   - `.codex/VERSION.md`
   - `.codex/AGENTS.md`
   - database scripts or comments that mention the release version
+- Before applying any user-requested version bump, compare it against the current app version as semantic numeric components. The new version must be greater than the current version; if it is equal or lower, stop and clarify instead of downgrading or reusing an older version.
 - Every version bump must also update `README.md` and `.codex/VERSION.md` with the relevant user-facing changes.
 - Database structure changes are owned by Codex. Do not ask the user to manually patch schema unless direct database access is unavailable.
 - Schema changes must be reflected in SQL scripts and in the DAL/service code that depends on them.
@@ -102,6 +103,7 @@ Repository files are the source of truth.
 - v1.2.00 adds localized worker-surface frontend validation, blocks overlapping same-day worker reports across all projects, and limits worker Start times to the next available time after completed same-day entries.
 - 1.2.1 polishes worker UI navigation, report entry action menus, and manager car-list row selection/alignment.
 - 1.2.2 adds worker user settings, self-service password change, persistent worker language selection, and stricter employee-facing privacy.
+- 1.2.21 removes Card ID from worker personal settings and separates the password-change fields with a labeled divider.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
 - The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:

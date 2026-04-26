@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** 1.2.2
+**Version:** 1.2.21
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -51,10 +51,15 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
 
+1.2.21 improvements:
+- Removed Card ID from worker Personal settings.
+- Added a centered password-change label and thin divider between personal details and password fields.
+- No database migration required.
+
 1.2.2 improvements:
 - Added a worker navbar gear menu with Personal settings, language toggle, and logout.
 - Removed the standalone worker Logout button.
-- Added employee self-service personal settings for passport ID, car ID, card ID, phone, email, and password.
+- Added employee self-service personal settings for ID, car ID, phone, email, and password.
 - Required the current password before an employee can change their own password.
 - Sanitized employee-facing identity responses so worker APIs do not expose login, role, daily rate, or raw manager flags.
 - Personal settings now shows the employee first and last name as read-only context.
@@ -343,7 +348,7 @@ npm install
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
 - Existing databases must run `database/migrate_1_1_17_active_work_sessions.sql`.
-- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, 1.2.1, or 1.2.2.
+- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, 1.2.1, 1.2.2, or 1.2.21.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start

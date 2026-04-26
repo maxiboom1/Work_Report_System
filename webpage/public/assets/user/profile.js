@@ -5,7 +5,6 @@ import { setWorkerLanguage, t, updateStaticText, workerLanguage } from "./i18n.j
 const fieldMap = {
   passport_id: "personal-passport",
   car_id: "personal-car",
-  card_id: "personal-card",
   phone: "personal-phone",
   email: "personal-email",
 };

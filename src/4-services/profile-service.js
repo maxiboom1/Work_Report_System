@@ -11,7 +11,6 @@ function toProfile(employee) {
     last_name: employee?.last_name ?? "",
     passport_id: employee?.passport_id ?? null,
     car_id: employee?.car_id ?? null,
-    card_id: employee?.card_id ?? null,
     phone: employee?.phone ?? null,
     email: employee?.email ?? null,
   };
@@ -41,7 +40,7 @@ export async function updateMyProfile(authUser, payload) {
   if (!employee || !isEmployee(employee)) return { ok: false, status: 404, message: "Profile not found" };
 
   const patch = {};
-  for (const field of ["passport_id", "car_id", "card_id", "phone", "email"]) {
+  for (const field of ["passport_id", "car_id", "phone", "email"]) {
     if (Object.prototype.hasOwnProperty.call(payload || {}, field)) {
       patch[field] = String(payload[field] || "").trim() || null;
     }

@@ -1,10 +1,20 @@
+Version: 1.2.21
+Package version: 1.2.21
+Date: 2026-04-26
+Done:
+- Removed Card ID from worker Personal settings.
+- Added a centered password-change label and thin divider between personal details and password fields.
+- No database migration required.
+
+----------------------------------------
+
 Version: 1.2.2
 Package version: 1.2.2
 Date: 2026-04-26
 Done:
 - Added a worker navbar gear menu with Personal settings, language toggle, and logout.
 - Removed the standalone worker Logout button.
-- Added employee self-service personal settings for passport ID, car ID, card ID, phone, email, and password.
+- Added employee self-service personal settings for ID, car ID, phone, email, and password.
 - Required the current password before employees can change their own password.
 - Sanitized employee-facing identity responses so worker APIs do not expose login, role, daily rate, or raw manager flags.
 - Personal settings shows the employee first and last name as read-only context.

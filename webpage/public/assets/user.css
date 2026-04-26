@@ -1291,6 +1291,26 @@ body::before{
   line-height:1.35;
 }
 
+.personal-password-section-title{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  margin-top:18px;
+  color:var(--worker-ink);
+  font-size:14px;
+  font-weight:900;
+  text-align:center;
+}
+
+.personal-password-section-title::before,
+.personal-password-section-title::after{
+  content:"";
+  height:1px;
+  flex:1 1 0;
+  background:var(--worker-line);
+}
+
 .work-modal-subtitle{
   margin-top:4px;
   color:var(--worker-muted);
