@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** 1.2.21
+**Version:** 1.2.23
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -50,6 +50,16 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+1.2.23 improvements:
+- Car-list worker selection now uses explicit checkboxes instead of row touch selection.
+- Checkbox column stays fixed and appears before worker names in both English LTR and Hebrew RTL layouts.
+- No database migration required.
+
+1.2.22 improvements:
+- Worker navbar now greets the signed-in employee as `שלום, First Last` instead of showing the generic connected text.
+- Employee `/api/auth/me` exposes only a display name plus capability flags; it still does not expose login, role, daily rate, or raw manager flags.
+- No database migration required.
 
 1.2.21 improvements:
 - Removed Card ID from worker Personal settings.
@@ -346,9 +356,9 @@ npm install
 2) Create / edit `config.json` (auto-generated on first run)
 
 3) Create DB
-- Run: `database/create_employee_work_report_db.sql`
+- Run: `database/create_employee_work_report_db_1.2.23.sql`
 - Existing databases must run `database/migrate_1_1_17_active_work_sessions.sql`.
-- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, 1.2.1, 1.2.2, or 1.2.21.
+- No additional database migration is required for v1.1.18, v1.1.19, v1.2.00, 1.2.1, 1.2.2, 1.2.21, 1.2.22, or 1.2.23.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start

@@ -117,9 +117,14 @@ async function getMe(req) {
         const user = await sqlService.getEmployeeById(decoded.uid);
         if (!user) return { ok: false, status: 401 };
         if (String(user.role || "").toLowerCase() === "employee") {
+            const displayName = [user.first_name, user.last_name]
+                .map((part) => String(part || "").trim())
+                .filter(Boolean)
+                .join(" ");
             return {
                 ok: true,
                 user: {
+                    displayName,
                     capabilities: {
                         managerTools: Boolean(user.is_manager),
                     },

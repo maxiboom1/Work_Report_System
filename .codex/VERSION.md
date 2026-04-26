@@ -1,3 +1,23 @@
+Version: 1.2.23
+Package version: 1.2.23
+Date: 2026-04-26
+Done:
+- Car-list worker selection now uses explicit checkboxes instead of row touch selection.
+- Checkbox column stays fixed and appears before worker names in both English LTR and Hebrew RTL layouts.
+- No database migration required.
+
+----------------------------------------
+
+Version: 1.2.22
+Package version: 1.2.22
+Date: 2026-04-26
+Done:
+- Worker navbar now greets the signed-in employee as `שלום, First Last` instead of showing generic connected text.
+- Employee `/api/auth/me` exposes only a display name plus capability flags; it still does not expose login, role, daily rate, or raw manager flags.
+- No database migration required.
+
+----------------------------------------
+
 Version: 1.2.21
 Package version: 1.2.21
 Date: 2026-04-26

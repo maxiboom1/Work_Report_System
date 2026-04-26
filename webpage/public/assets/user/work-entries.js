@@ -665,8 +665,9 @@ export async function loadMe() {
   const u = r.user;
   setCurrentUser(u);
   const crumb = $id("crumb");
-  crumb.dataset.i18n = "signedIn";
-  crumb.textContent = t("signedIn");
+  const displayName = String(u?.displayName || "").trim();
+  crumb.removeAttribute("data-i18n");
+  crumb.textContent = displayName ? `שלום, ${displayName}` : t("signedIn");
   return u;
 }
 

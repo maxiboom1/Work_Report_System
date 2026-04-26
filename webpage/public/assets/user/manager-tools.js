@@ -39,8 +39,15 @@ function validateContractorPayload(payload) {
 function makeManagerWorkerRow(worker) {
   const tr = document.createElement("tr");
   tr.className = "manager-worker-row";
-  tr.tabIndex = 0;
-  tr.setAttribute("role", "checkbox");
+  tr.setAttribute("aria-selected", "false");
+
+  const checkCell = document.createElement("td");
+  checkCell.className = "manager-check-cell";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.setAttribute("aria-label", `${t("selectWorkers")} ${worker.first_name || ""} ${worker.last_name || ""}`.trim());
+  checkCell.appendChild(checkbox);
 
   const nameCell = document.createElement("td");
   nameCell.className = "manager-name-cell";
@@ -49,19 +56,18 @@ function makeManagerWorkerRow(worker) {
   function syncSelectedState() {
     const selected = isManagerWorkerSelected(worker.id);
     tr.classList.toggle("is-selected", selected);
-    tr.setAttribute("aria-checked", selected ? "true" : "false");
+    tr.setAttribute("aria-selected", selected ? "true" : "false");
+    checkbox.checked = selected;
   }
 
-  tr.append(nameCell);
-  tr.addEventListener("click", () => {
+  function toggleSelectedState() {
     toggleManagerWorkerSelection(worker.id);
     syncSelectedState();
-  });
-  tr.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    toggleManagerWorkerSelection(worker.id);
-    syncSelectedState();
+  }
+
+  tr.append(checkCell, nameCell);
+  checkbox.addEventListener("change", () => {
+    toggleSelectedState();
   });
   syncSelectedState();
   return tr;
@@ -78,7 +84,7 @@ export function renderManagerEmployees() {
 
   const table = document.createElement("table");
   table.className = "manager-workers-table";
-  table.innerHTML = `<thead><tr><th>${t("workerName")}</th></tr></thead>`;
+  table.innerHTML = `<thead><tr><th class="manager-check-cell"></th><th>${t("workerName")}</th></tr></thead>`;
   const tbody = document.createElement("tbody");
   for (const worker of managerEmployees) {
     tbody.appendChild(makeManagerWorkerRow(worker));

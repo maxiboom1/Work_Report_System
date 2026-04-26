@@ -56,10 +56,18 @@ body{
   cursor:pointer;
 }
 .brand-title:hover{opacity:.92; text-decoration:underline}
+.brand{
+  min-width:0;
+  flex:1 1 auto;
+}
 .crumb{
   margin-top:4px;
   font-size:13px;
   color:var(--muted);
+  max-width:min(60vw, 520px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .actions{display:flex; gap:10px; align-items:center}
@@ -356,16 +364,9 @@ body[data-worker-language="he"] .settings-menu{
 }
 
 .manager-worker-row{
-  cursor:pointer;
   transition:background .12s ease, box-shadow .12s ease;
 }
 
-.manager-worker-row:focus-visible{
-  outline:3px solid rgba(242,100,82,.25);
-  outline-offset:-3px;
-}
-
-.manager-worker-row:hover,
 .manager-worker-row.is-selected{
   background:rgba(29,125,255,.10);
 }
@@ -376,14 +377,20 @@ body[data-worker-language="he"] .settings-menu{
 
 .manager-check-cell{
   width:52px;
+  min-width:52px;
+  max-width:52px;
+  text-align:center;
+  padding-inline:10px;
 }
 
 .manager-check-cell input{
-  width:18px;
-  height:18px;
+  width:20px;
+  height:20px;
   display:block;
   margin:0 auto;
   accent-color:var(--accent);
+  cursor:pointer;
+  touch-action:manipulation;
 }
 
 .manager-name-cell{

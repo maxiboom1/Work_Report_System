@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.2.21`.
+- App version: `1.2.23`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -27,7 +27,7 @@ Employee Work Report System is a working Node.js/Express application backed by M
 - Every version bump must also update `README.md` and `.codex/VERSION.md` with the relevant user-facing changes.
 - Database structure changes are owned by Codex. Do not ask the user to manually patch schema unless direct database access is unavailable.
 - Schema changes must be reflected in SQL scripts and in the DAL/service code that depends on them.
-- Every database structure change must update `database/create_employee_work_report_db.sql` so a fresh database matches the current live app schema.
+- Every database structure change must update the current `database/create_employee_work_report_db_<version>.sql` script so a fresh database matches the current live app schema.
 - Keep secrets and local runtime files out of git. `.codex/` may track Markdown project docs only; non-Markdown `.codex` files, `config.json`, `logs/`, `dist/`, `build/`, and `node_modules/` should stay ignored.
 
 ## Context Cleanup / Compression Protocol
@@ -104,6 +104,8 @@ Repository files are the source of truth.
 - 1.2.1 polishes worker UI navigation, report entry action menus, and manager car-list row selection/alignment.
 - 1.2.2 adds worker user settings, self-service password change, persistent worker language selection, and stricter employee-facing privacy.
 - 1.2.21 removes Card ID from worker personal settings and separates the password-change fields with a labeled divider.
+- 1.2.22 shows `שלום, First Last` in the worker navbar for the signed-in employee while keeping `/api/auth/me` limited to display name plus capability flags.
+- 1.2.23 uses explicit checkboxes for manager car-list worker selection; keep the checkbox column fixed and before worker names in both English LTR and Hebrew RTL layouts.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
 - The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:
