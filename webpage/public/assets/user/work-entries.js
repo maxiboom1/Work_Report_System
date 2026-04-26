@@ -76,12 +76,13 @@ function fillProjectSelect(select, options = {}) {
 
 function populateTimeSelect(select, selectedValue, options = {}) {
   if (!select) return;
-  const { maxTime = "23:55" } = options;
+  const { minTime = "00:00", maxTime = "23:55" } = options;
   const selected = String(selectedValue || "").slice(0, 5);
+  const minMinutes = timeToMinutes(minTime);
   const maxMinutes = timeToMinutes(maxTime);
   select.innerHTML = "";
 
-  for (let total = 0; total < 24 * 60; total += 5) {
+  for (let total = Math.max(0, minMinutes); total < 24 * 60; total += 5) {
     if (total > maxMinutes) break;
     const value = minutesToTime(total);
     const opt = document.createElement("option");
@@ -136,8 +137,9 @@ function updateStaleRecovery() {
 
   $id("stale-project-name").textContent = activeSession.project_name || "-";
   $id("stale-started-at").textContent = `${activeSession.work_date} ${String(activeSession.start_time || "").slice(0, 5)}`;
-  const selected = minutesToTime(Math.min(23 * 60 + 55, timeToMinutes(activeSession.start_time) + 5));
-  populateTimeSelect($id("stale-end-time"), selected, { maxTime: "23:55" });
+  const startTime = String(activeSession.start_time || "").slice(0, 5);
+  const selected = minutesToTime(Math.min(23 * 60 + 55, timeToMinutes(startTime) + 5));
+  populateTimeSelect($id("stale-end-time"), selected, { minTime: startTime, maxTime: "23:55" });
   updateStaticText(modal);
 }
 
@@ -211,7 +213,8 @@ async function openSessionModal(mode) {
   projectSelect.value = "";
 
   const maxTime = currentMaxTime();
-  populateTimeSelect(timeSelect, isStop ? maxTime : maxTime, { maxTime });
+  const minTime = isStop ? String(activeSession?.start_time || "").slice(0, 5) : "00:00";
+  populateTimeSelect(timeSelect, maxTime, { minTime, maxTime });
   if (notesInput) notesInput.value = "";
   modal.hidden = false;
 }

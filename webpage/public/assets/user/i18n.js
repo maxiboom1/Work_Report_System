@@ -1,4 +1,5 @@
 const STORAGE_KEY = "ewrs_worker_language";
+const CURRENT_LANGUAGE = "he";
 
 const STRINGS = {
   en: {
@@ -263,14 +264,14 @@ const STRINGS = {
   },
 };
 
-export let workerLanguage = localStorage.getItem(STORAGE_KEY) === "he" ? "he" : "en";
+export let workerLanguage = CURRENT_LANGUAGE;
 
 export function t(key) {
   return STRINGS[workerLanguage]?.[key] || STRINGS.en[key] || key;
 }
 
 export function setWorkerLanguage(language) {
-  workerLanguage = language === "he" ? "he" : "en";
+  workerLanguage = language === "en" ? "en" : "he";
   localStorage.setItem(STORAGE_KEY, workerLanguage);
   applyDocumentLanguage();
   updateStaticText();
@@ -302,6 +303,8 @@ export function updateStaticText(root = document) {
 }
 
 export function initWorkerI18n(onChange) {
+  workerLanguage = CURRENT_LANGUAGE;
+  localStorage.setItem(STORAGE_KEY, workerLanguage);
   applyDocumentLanguage();
   document.querySelectorAll("[data-worker-lang]").forEach((button) => {
     button.addEventListener("click", () => {

@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.18
+**Version:** v1.1.19
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -19,6 +19,7 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 - Mobile-friendly worker UI with 2 tabs:
   - Work clock (start / stop active work)
   - View reports (monthly entries)
+- Worker UI is currently Hebrew-only by default; language selection will move into settings later.
 - Worker screens must remain responsive because employees mostly enter reports from mobile phones.
 - Employees marked as managers can open manager-only tools:
   - Generate selected workers' name/passport/car details for client parking access.
@@ -47,10 +48,20 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
 
+v1.1.19 improvements:
+- Hid the worker English/Hebrew navbar toggle to keep the worker header cleaner.
+- Made Hebrew the active worker language until language settings are implemented.
+- Added automatic login redirect with a session-expired message when authenticated API calls return unauthorized.
+- Removed the default Ready status under the punch-clock circle and reset clock status when switching worker tabs.
+- Limited stop-time choices to the active session start time through the current rounded server time.
+- Allowed zero-duration work entries so workers can start and immediately stop to create a report-history placeholder.
+- Added a full-screen company-color spinner while login is processing.
+- Tuned mobile login fields to focus the keyboard more reliably and added a password visibility toggle.
+
 v1.1.18 improvements:
 - Added worker recovery for previous-day active sessions so workers are not stuck if the app crashes or they forget to stop work.
 - Added close-or-discard actions for stale active sessions.
-- Added a per-device English/Hebrew toggle for the worker app.
+- Added worker English/Hebrew infrastructure for the worker app.
 - Polished the punch-clock circle text alignment and changed the active counter to show seconds.
 
 v1.1.17 improvements:
@@ -304,7 +315,7 @@ npm install
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
 - Existing databases must run `database/migrate_1_1_17_active_work_sessions.sql`.
-- No additional database migration is required for v1.1.18.
+- No additional database migration is required for v1.1.18 or v1.1.19.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start

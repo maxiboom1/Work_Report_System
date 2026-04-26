@@ -109,7 +109,7 @@ export async function stopSession(user, payload) {
     }
 
     const mins = minutesBetween(String(active.start_time), end_time);
-    if (mins <= 0) return { ok: false, status: 400, message: "End time must be after start time" };
+    if (mins < 0) return { ok: false, status: 400, message: "End time cannot be before start time" };
 
     const result = await sqlService.completeActiveWorkSession(user.uid, end_time, notes);
     if (!result?.entryId) return { ok: false, status: 500, message: "Failed to stop work session" };
@@ -133,7 +133,7 @@ export async function recoverCloseSession(user, payload) {
     }
 
     const mins = minutesBetween(String(active.start_time), end_time);
-    if (mins <= 0) return { ok: false, status: 400, message: "End time must be after start time" };
+    if (mins < 0) return { ok: false, status: 400, message: "End time cannot be before start time" };
 
     const result = await sqlService.completeActiveWorkSession(user.uid, end_time, notes);
     if (!result?.entryId) return { ok: false, status: 500, message: "Failed to recover work session" };
@@ -171,7 +171,7 @@ export async function createMyEntry(user, payload) {
     }
 
     const mins = minutesBetween(start_time, end_time);
-    if (mins <= 0) return { ok: false, status: 400, message: "end_time must be after start_time" };
+    if (mins < 0) return { ok: false, status: 400, message: "end_time cannot be before start_time" };
 
     // Do not allow reporting against disabled projects
     const project = await sqlService.getProjectById(project_id);
@@ -229,7 +229,7 @@ export async function updateMyEntry(user, entryId, payload) {
     if (!project) return { ok: false, status: 400, message: "Invalid project" };
     if (!project.is_active) return { ok: false, status: 400, message: "Project is disabled" };
     const mins = minutesBetween(String(st), String(et));
-    if (mins <= 0) return { ok: false, status: 400, message: "end_time must be after start_time" };
+    if (mins < 0) return { ok: false, status: 400, message: "end_time cannot be before start_time" };
 
     const affected = await sqlService.updateWorkEntry(id, patch);
     if (!affected) return { ok: false, status: 404, message: "Entry not found" };

@@ -11,25 +11,45 @@
     <section class="login-panel">
       <img class="company-logo" src="/assets/company-logo.jpg" alt="I/O Systems" />
 
-      <form id="login-form" autocomplete="on">
+      <form id="login-form" autocomplete="off">
         <div class="field">
           <label class="label" for="username">Username</label>
-          <input id="username" class="input" type="text" autocomplete="username" required />
+          <input id="username" class="input" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" enterkeyhint="next" required />
         </div>
 
         <div class="field">
           <label class="label" for="password">Password</label>
-          <input id="password" class="input" type="password" autocomplete="current-password" required />
+          <div class="password-control">
+            <input id="password" class="input password-input" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" required />
+            <button id="btn-toggle-password" class="password-toggle" type="button" aria-label="Show password" title="Show password">
+              <svg class="eye-icon eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2.2 12s3.6-6 9.8-6 9.8 6 9.8 6-3.6 6-9.8 6-9.8-6-9.8-6Z"></path>
+                <circle cx="12" cy="12" r="2.6"></circle>
+              </svg>
+              <svg class="eye-icon eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M9.7 5.4A10 10 0 0 1 12 5.1c6.2 0 9.8 6 9.8 6a17.4 17.4 0 0 1-3.1 3.7"></path>
+                <path d="M14.1 14.1A3 3 0 0 1 9.9 9.9"></path>
+                <path d="M6.4 6.9A17.4 17.4 0 0 0 2.2 11.1s3.6 6 9.8 6a9.8 9.8 0 0 0 4.2-.9"></path>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="actions">
-          <button id="btn-login" class="btn primary" type="submit">Login</button>
+          <button id="btn-login" class="btn primary" type="submit">
+            <span class="btn-label">Login</span>
+          </button>
         </div>
       </form>
 
       <div id="status" class="status"></div>
     </section>
   </main>
+
+  <div id="login-loading-overlay" class="login-loading-overlay" role="status" aria-live="polite" aria-label="Logging in" hidden>
+    <div class="login-loading-mark" aria-hidden="true"></div>
+  </div>
 
   <script src="/assets/login.js"></script>
 </body>

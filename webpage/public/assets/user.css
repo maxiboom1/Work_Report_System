@@ -70,6 +70,10 @@ body{
   direction:ltr;
 }
 
+.lang-toggle[hidden]{
+  display:none;
+}
+
 .lang-btn{
   border:0;
   border-radius:6px;

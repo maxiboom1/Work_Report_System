@@ -72,6 +72,7 @@ async function init() {
     panelReg.hidden = !isReg;
     panelRep.hidden = !isReports;
     panelManager.hidden = !isManager;
+    setStatus("");
     if (isManager && currentUser?.isManager && managerEmployees.length === 0) {
       loadManagerEmployees().catch((e) => {
         $id("manager-status").textContent = e.message;
@@ -123,7 +124,6 @@ async function init() {
   await loadProjects();
   await initWorkReporting();
   await loadEntries();
-  setStatus(t("ready"));
 }
 
 init().catch((e) => {

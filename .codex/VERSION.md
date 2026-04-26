@@ -1,3 +1,17 @@
+Version: v1.1.19
+Date: 2026-04-26
+Done:
+- Hid the worker English/Hebrew toggle and made Hebrew the active worker language until settings are added.
+- Added automatic redirect to login when authenticated frontend API calls return unauthorized.
+- Added a session-expired message on the login screen.
+- Removed the default Ready status under the punch-clock circle and reset clock status on worker tab changes.
+- Limited stop-time choices to the active session start time through the current rounded server time.
+- Allowed zero-duration work entries so workers can start and immediately stop to create a report-history placeholder.
+- Added a full-screen company-color spinner while login is processing.
+- Tuned mobile login fields to focus the keyboard more reliably and added a password visibility toggle.
+
+----------------------------------------
+
 Version: v1.1.18
 Date: 2026-04-26
 Done:
