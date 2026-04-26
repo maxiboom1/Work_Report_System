@@ -1,4 +1,5 @@
 import { $id } from "../shared/dom.js";
+import { t, workerLanguage } from "./i18n.js";
 import { currentCarList, managerEmployees, setCurrentCarList } from "./state.js";
 
 export function showCarList() {
@@ -11,24 +12,24 @@ export function showCarList() {
 
   if (!selected.length) {
     $id("car-list-screen").hidden = true;
-    $id("manager-status").textContent = "יש לבחור עובד אחד לפחות.";
+    $id("manager-status").textContent = t("selectAtLeastOneWorker");
     return;
   }
 
-  const generatedAt = new Date().toLocaleDateString("he-IL");
+  const generatedAt = new Date().toLocaleDateString(workerLanguage === "he" ? "he-IL" : "en-US");
   const title = document.createElement("div");
   title.className = "car-list-title";
   title.id = "car-list-title";
-  title.textContent = "רשימת רכבים";
+  title.textContent = t("carListTitle");
 
   const meta = document.createElement("div");
   meta.className = "car-list-meta";
-  meta.textContent = `${selected.length} עובדים · ${generatedAt}`;
+  meta.textContent = `${selected.length} ${t("workers")} - ${generatedAt}`;
 
   const table = document.createElement("table");
   table.className = "car-list-table";
   const thead = document.createElement("thead");
-  thead.innerHTML = "<tr><th>שם</th><th>דרכון</th><th>רכב</th></tr>";
+  thead.innerHTML = `<tr><th>${t("name")}</th><th>${t("passport")}</th><th>${t("car")}</th></tr>`;
   const tbody = document.createElement("tbody");
 
   for (const worker of selected) {
@@ -45,19 +46,19 @@ export function showCarList() {
   table.append(thead, tbody);
   output.append(title, meta, table);
   $id("car-list-screen").hidden = false;
-  $id("manager-status").textContent = `${selected.length} עובדים נבחרו.`;
+  $id("manager-status").textContent = `${selected.length} ${t("workersSelected")}`;
 }
 
 export function carListShareText() {
   const separator = "**********";
-  const lines = ["רשימת רכבים:"];
+  const lines = [`${t("carListTitle")}:`];
   for (const worker of currentCarList) {
     const name = `${worker.first_name || ""} ${worker.last_name || ""}`.trim() || "-";
     lines.push(
       separator,
       `*${name}*`,
-      `ת.ז: ${worker.passport_id || "-"}`,
-      `מס.רכב: ${worker.car_id || "-"}`
+      `${t("idNumber")}: ${worker.passport_id || "-"}`,
+      `${t("carNumber")}: ${worker.car_id || "-"}`
     );
   }
   lines.push(separator);
@@ -71,18 +72,16 @@ export function showManualCopyPanel(text, wasCopied) {
   panel.hidden = false;
   textarea.focus();
   textarea.select();
-  $id("manager-status").textContent = wasCopied
-    ? "הרשימה הועתקה ואפשר להדביק אותה לשליחה."
-    : "אם השיתוף לא נפתח, אפשר להעתיק ידנית מהחלון שנפתח.";
+  $id("manager-status").textContent = wasCopied ? t("listCopied") : t("manualShareHint");
 }
 
 export async function shareCarList() {
   if (!currentCarList.length) return;
   const text = carListShareText();
 
-  if (navigator.share && (!navigator.canShare || navigator.canShare({ title: "רשימת רכבים", text }))) {
+  if (navigator.share && (!navigator.canShare || navigator.canShare({ title: t("carListTitle"), text }))) {
     try {
-      await navigator.share({ title: "רשימת רכבים", text });
+      await navigator.share({ title: t("carListTitle"), text });
       return;
     } catch (err) {
       if (err?.name === "AbortError") return;

@@ -1,6 +1,6 @@
 ﻿/* =========================================================
    Employee Work Report System - data import snapshot
-   Source version: v1.1.16
+   Source version: v1.1.18
    Exported at: 2026-04-24 18:24:46
 
    Run this AFTER:
@@ -36,6 +36,7 @@ BEGIN TRY
 
 DELETE FROM dbo.[fault_events];
 DELETE FROM dbo.[fault_contacts];
+DELETE FROM dbo.[active_work_sessions];
 DELETE FROM dbo.[work_entries];
 DELETE FROM dbo.[contractor_entries];
 DELETE FROM dbo.[faults];

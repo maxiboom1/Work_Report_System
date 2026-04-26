@@ -79,10 +79,8 @@ try {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.fill("#username", username);
   await page.fill("#password", password);
-  await Promise.all([
-    page.waitForURL(`${baseUrl}/**`, { timeout: 10000 }).catch(() => null),
-    page.click("#btn-login"),
-  ]);
+  await page.click("#btn-login");
+  await page.waitForFunction(() => !location.pathname.endsWith("/login.html"), { timeout: 10000 }).catch(() => null);
   await page.waitForLoadState("networkidle");
 
   await capturePage(page, "after-login", 1440, 900);

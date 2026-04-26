@@ -1,5 +1,6 @@
 import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
+import { t } from "./i18n.js";
 import { managerEmployees, setManagerEmployees } from "./state.js";
 
 function makeManagerWorkerRow(worker) {
@@ -34,13 +35,13 @@ export function renderManagerEmployees() {
   holder.innerHTML = "";
 
   if (!managerEmployees.length) {
-    holder.innerHTML = '<div class="empty-sub">No workers found.</div>';
+    holder.innerHTML = `<div class="empty-sub">${t("noWorkers")}</div>`;
     return;
   }
 
   const table = document.createElement("table");
   table.className = "manager-workers-table";
-  table.innerHTML = "<thead><tr><th></th><th>Worker name</th></tr></thead>";
+  table.innerHTML = `<thead><tr><th></th><th>${t("workerName")}</th></tr></thead>`;
   const tbody = document.createElement("tbody");
   for (const worker of managerEmployees) {
     tbody.appendChild(makeManagerWorkerRow(worker));
@@ -75,7 +76,7 @@ export async function saveContractorEntry() {
   $id("contractor-start-time").value = "";
   $id("contractor-end-time").value = "";
   $id("contractor-cost").value = "";
-  $id("contractor-status").textContent = "Contractor saved.";
+  $id("contractor-status").textContent = t("contractorSaved");
 }
 
 export function enableManagerTools() {

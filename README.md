@@ -1,6 +1,6 @@
 # Employee Work Report System
 
-**Version:** v1.1.16
+**Version:** v1.1.18
 
 Employee Work Report System is an internal full-stack web application that allows employees to report daily work hours per project, while giving administrators a dashboard for employee/project management and reporting.
 
@@ -12,10 +12,12 @@ The system is intentionally simple, predictable, and fast to operate in a compan
 
 ### Employee
 - Login with personal credentials
-- Create / edit / delete their own work entries
+- Start and stop work with a mobile-friendly punch-clock flow
+- Recover an unfinished previous-day punch-clock session by closing or discarding it
+- Edit / delete their own completed work entries from report history
 - Multiple entries per day (e.g. half day project A + half day project B)
 - Mobile-friendly worker UI with 2 tabs:
-  - Register day (add a new entry)
+  - Work clock (start / stop active work)
   - View reports (monthly entries)
 - Worker screens must remain responsive because employees mostly enter reports from mobile phones.
 - Employees marked as managers can open manager-only tools:
@@ -44,6 +46,19 @@ The system is intentionally simple, predictable, and fast to operate in a compan
   - Project monthly report (days & hours per employee + total cost)
   - External contractor report with editable service cost
 - Admin screens are intended for desktop/workstation use and are not a mobile UI target.
+
+v1.1.18 improvements:
+- Added worker recovery for previous-day active sessions so workers are not stuck if the app crashes or they forget to stop work.
+- Added close-or-discard actions for stale active sessions.
+- Added a per-device English/Hebrew toggle for the worker app.
+- Polished the punch-clock circle text alignment and changed the active counter to show seconds.
+
+v1.1.17 improvements:
+- Replaced the worker manual entry form with a mobile-first punch-clock flow built around one large Start / active-session button.
+- Added durable active work sessions in SQL so started work survives refresh, logout, or browser close until the worker stops it.
+- Added stop-time notes and completed-entry editing from report history for project, date, start time, end time, and notes.
+- Applied the bright v1.1.16 opener visual language to the worker reporting interface.
+- Added `database/migrate_1_1_17_active_work_sessions.sql` for upgrading existing databases.
 
 v1.1.16 improvements:
 - Polished the opener/login screen with a cleaner logo-first layout, updated color palette, focused form styling, and restrained entrance motion.
@@ -196,6 +211,14 @@ v1.0.3 improvements:
 - project_id
 - notes
 
+### active_work_sessions
+- employee_id
+- project_id
+- work_date
+- start_time
+- created_at
+- updated_at
+
 ### contractor_entries
 - service_date (DATE)
 - start_time (TIME, optional)
@@ -280,7 +303,8 @@ npm install
 
 3) Create DB
 - Run: `database/create_employee_work_report_db.sql`
-- No database migration is required for v1.1.16.
+- Existing databases must run `database/migrate_1_1_17_active_work_sessions.sql`.
+- No additional database migration is required for v1.1.18.
 - To copy the current live data snapshot into a fresh DB, run: `database/import_employee_work_report_data.sql`
 
 4) Start

@@ -1,3 +1,23 @@
+Version: v1.1.18
+Date: 2026-04-26
+Done:
+- Added worker recovery for active sessions left open from a previous day, with close or discard actions.
+- Added a per-device English/Hebrew language toggle for the worker app.
+- Polished the punch-clock circle so idle text is centered and active elapsed time includes seconds.
+
+----------------------------------------
+
+Version: v1.1.17
+Date: 2026-04-26
+Done:
+- Replaced the worker manual Register day form with a mobile-first punch-clock flow.
+- Added durable SQL-backed active work sessions so started work survives refresh, logout, or browser close.
+- Added worker stop-time notes and completed-entry editing from View reports.
+- Applied the bright opener visual language to the worker reporting interface.
+- Added an idempotent v1.1.17 database migration for active work sessions.
+
+----------------------------------------
+
 Version: v1.1.16
 Date: 2026-04-26
 Done:

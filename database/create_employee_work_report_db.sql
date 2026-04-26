@@ -1,6 +1,6 @@
 /* =========================================================
    Employee Work Report System — MSSQL Create Script
-   Version: v1.1.16
+   Version: v1.1.18
 
    DEV NOTE:
    - This script is for development / local installs.
@@ -28,6 +28,7 @@ GO
    ======================= */
 
 IF OBJECT_ID(N'dbo.[work_entries]', N'U') IS NOT NULL DROP TABLE dbo.[work_entries];
+IF OBJECT_ID(N'dbo.[active_work_sessions]', N'U') IS NOT NULL DROP TABLE dbo.[active_work_sessions];
 IF OBJECT_ID(N'dbo.[contractor_entries]', N'U') IS NOT NULL DROP TABLE dbo.[contractor_entries];
 IF OBJECT_ID(N'dbo.[fault_events]', N'U') IS NOT NULL DROP TABLE dbo.[fault_events];
 IF OBJECT_ID(N'dbo.[fault_contacts]', N'U') IS NOT NULL DROP TABLE dbo.[fault_contacts];
@@ -177,6 +178,34 @@ GO
 
 CREATE INDEX IX_work_entries_employee_date ON dbo.[work_entries]([employee_id],[work_date]);
 CREATE INDEX IX_work_entries_project_date ON dbo.[work_entries]([project_id],[work_date]);
+GO
+
+-- Active work sessions
+CREATE TABLE dbo.[active_work_sessions] (
+  [id]          INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_active_work_sessions PRIMARY KEY,
+  [employee_id] INT NOT NULL,
+  [project_id]  INT NOT NULL,
+  [work_date]   DATE NOT NULL,
+  [start_time]  TIME(0) NOT NULL,
+  [created_at]  DATETIME2(0) NOT NULL CONSTRAINT DF_active_work_sessions_created_at DEFAULT (SYSDATETIME()),
+  [updated_at]  DATETIME2(0) NULL
+);
+GO
+
+ALTER TABLE dbo.[active_work_sessions]
+  ADD CONSTRAINT FK_active_work_sessions_employee
+  FOREIGN KEY([employee_id]) REFERENCES dbo.[employees]([id])
+  ON DELETE NO ACTION;
+GO
+
+ALTER TABLE dbo.[active_work_sessions]
+  ADD CONSTRAINT FK_active_work_sessions_project
+  FOREIGN KEY([project_id]) REFERENCES dbo.[projects]([id])
+  ON DELETE NO ACTION;
+GO
+
+CREATE UNIQUE INDEX UX_active_work_sessions_employee ON dbo.[active_work_sessions]([employee_id]);
+CREATE INDEX IX_active_work_sessions_project_date ON dbo.[active_work_sessions]([project_id],[work_date]);
 GO
 
 -- Contractor entries

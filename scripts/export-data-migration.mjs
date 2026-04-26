@@ -15,6 +15,7 @@ const TABLES = [
   "faults",
   "fault_contacts",
   "fault_events",
+  "active_work_sessions",
   "work_entries",
   "contractor_entries",
 ];
@@ -279,7 +280,7 @@ async function main() {
 
   const script = `/* =========================================================
    Employee Work Report System - data import snapshot
-   Source version: v1.1.16
+   Source version: v1.1.18
    Exported at: ${exportMeta.display}
 
    Run this AFTER:

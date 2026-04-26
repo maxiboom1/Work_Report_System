@@ -18,16 +18,59 @@ export function parseTime(t) {
   // accept HH:MM or HH:MM:SS
   if (!isNonEmptyString(t)) return null;
   if (!/^\d{2}:\d{2}(:\d{2})?$/.test(t)) return null;
-  return t.length === 5 ? `${t}:00` : t;
+  const value = t.length === 5 ? `${t}:00` : t;
+  const [hour, minute, second] = value.split(":").map(Number);
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) return null;
+  return value;
 }
 
 export function minutesBetween(startTime, endTime) {
   // both HH:MM:SS
-  const [sh, sm] = startTime.split(":");
-  const [eh, em] = endTime.split(":");
-  const s = (Number(sh) * 60) + Number(sm);
-  const e = (Number(eh) * 60) + Number(em);
-  return e - s;
+  return timeToMinutes(endTime) - timeToMinutes(startTime);
+}
+
+export function timeToMinutes(time) {
+  const [hour, minute] = String(time || "").split(":").map(Number);
+  return (hour * 60) + minute;
+}
+
+export function isFiveMinuteTime(time) {
+  const parsed = parseTime(time);
+  if (!parsed) return false;
+  const [, minute, second] = parsed.split(":").map(Number);
+  return minute % 5 === 0 && second === 0;
+}
+
+export function localDateISO(date = new Date()) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function localTimeHHMMSS(date = new Date()) {
+  const hh = String(date.getHours()).padStart(2, "0");
+  const mm = String(date.getMinutes()).padStart(2, "0");
+  const ss = String(date.getSeconds()).padStart(2, "0");
+  return `${hh}:${mm}:${ss}`;
+}
+
+export function floorTimeToFiveMinutes(time) {
+  const parsed = parseTime(time);
+  if (!parsed) return null;
+  const [hour, minute] = parsed.split(":").map(Number);
+  const floored = Math.floor(minute / 5) * 5;
+  return `${String(hour).padStart(2, "0")}:${String(floored).padStart(2, "0")}:00`;
+}
+
+export function isDateTimeInFuture(workDate, time, now = new Date()) {
+  const date = parseISODate(workDate);
+  const parsed = parseTime(time);
+  if (!date || !parsed) return true;
+  const today = localDateISO(now);
+  if (date > today) return true;
+  if (date < today) return false;
+  return timeToMinutes(parsed) > timeToMinutes(localTimeHHMMSS(now));
 }
 
 export function round2(value) {

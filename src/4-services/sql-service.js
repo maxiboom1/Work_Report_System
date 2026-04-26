@@ -951,6 +951,97 @@ class SqlService {
     return r?.recordset || [];
   }
 
+  async getActiveWorkSessionForEmployee(employeeId) {
+    const q = `
+      SELECT
+        aws.id,
+        aws.employee_id,
+        aws.project_id,
+        CONVERT(varchar(10), aws.work_date, 23) AS work_date,
+        CONVERT(varchar(8), aws.start_time, 108) AS start_time,
+        aws.created_at,
+        aws.updated_at,
+        p.name AS project_name
+      FROM dbo.[active_work_sessions] aws
+      INNER JOIN dbo.[projects] p ON p.id = aws.project_id
+      WHERE aws.employee_id = @employee_id;
+    `;
+    const r = await db.execute(q, { employee_id: employeeId });
+    return r?.recordset?.[0] || null;
+  }
+
+  async createActiveWorkSession(session) {
+    const q = `
+      INSERT INTO dbo.[active_work_sessions]
+        (employee_id, project_id, work_date, start_time)
+      OUTPUT inserted.id
+      VALUES
+        (@employee_id, @project_id, @work_date, @start_time);
+    `;
+    const r = await db.execute(q, {
+      employee_id: session.employee_id,
+      project_id: session.project_id,
+      work_date: session.work_date,
+      start_time: session.start_time,
+    });
+    return r?.recordset?.[0]?.id ?? null;
+  }
+
+  async completeActiveWorkSession(employeeId, endTime, notes) {
+    return db.executeTransaction(async (tx) => {
+      const activeQuery = `
+        SELECT TOP (1)
+          aws.id,
+          aws.employee_id,
+          aws.project_id,
+          CONVERT(varchar(10), aws.work_date, 23) AS work_date,
+          CONVERT(varchar(8), aws.start_time, 108) AS start_time,
+          p.name AS project_name
+        FROM dbo.[active_work_sessions] aws WITH (UPDLOCK, HOLDLOCK)
+        INNER JOIN dbo.[projects] p ON p.id = aws.project_id
+        WHERE aws.employee_id = @employee_id;
+      `;
+      const activeResult = await tx(activeQuery, { employee_id: employeeId });
+      const session = activeResult?.recordset?.[0] || null;
+      if (!session) return null;
+
+      const insertQuery = `
+        INSERT INTO dbo.[work_entries]
+          (employee_id, project_id, work_date, start_time, end_time, notes)
+        OUTPUT inserted.id
+        VALUES
+          (@employee_id, @project_id, @work_date, @start_time, @end_time, @notes);
+      `;
+      const insertResult = await tx(insertQuery, {
+        employee_id: session.employee_id,
+        project_id: session.project_id,
+        work_date: session.work_date,
+        start_time: session.start_time,
+        end_time: endTime,
+        notes: notes ?? "",
+      });
+      const entryId = insertResult?.recordset?.[0]?.id ?? null;
+
+      await tx(`
+        DELETE FROM dbo.[active_work_sessions]
+        WHERE id = @id;
+      `, { id: session.id });
+
+      return { entryId, session };
+    });
+  }
+
+  async deleteActiveWorkSessionForEmployee(employeeId) {
+    const q = `
+      DELETE FROM dbo.[active_work_sessions]
+      WHERE employee_id = @employee_id;
+
+      SELECT @@ROWCOUNT AS affected;
+    `;
+    const r = await db.execute(q, { employee_id: employeeId });
+    return r?.recordset?.[0]?.affected ?? 0;
+  }
+
   async getWorkEntryById(id) {
     const q = `
       SELECT

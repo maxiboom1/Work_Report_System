@@ -1,10 +1,11 @@
 import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
-import { todayISO, todayMonth } from "../shared/dates.js";
+import { todayMonth } from "../shared/dates.js";
 import { currentUser, managerEmployees } from "./state.js";
-import { initFaultRegistration, loadFaultFormLookups, saveFaultRegistration } from "./fault-registration.js";
-import { addEntry, loadEntries, loadMe, loadProjects, setStatus } from "./work-entries.js";
-import { enableManagerTools, loadManagerEmployees, saveContractorEntry, showManagerTool } from "./manager-tools.js";
+import { initWorkerI18n, t, updateStaticText } from "./i18n.js";
+import { initFaultRegistration, loadFaultFormLookups, refreshFaultRegistrationLanguage, saveFaultRegistration } from "./fault-registration.js";
+import { initWorkReporting, loadEntries, loadMe, loadProjects, setStatus, updateWorkReportingText } from "./work-entries.js";
+import { enableManagerTools, loadManagerEmployees, renderManagerEmployees, saveContractorEntry, showManagerTool } from "./manager-tools.js";
 import { closeCarList, shareCarList, showCarList } from "./car-list.js";
 
 async function logout() {
@@ -41,12 +42,15 @@ function populateTimeSelect(id, selectedValue, options = {}) {
 
 async function init() {
   $id("rep-month").value = todayMonth();
-  $id("work-date").value = todayISO();
-  populateTimeSelect("start-time", "09:00");
-  populateTimeSelect("end-time", "17:00");
   populateTimeSelect("contractor-start-time", "", { allowEmpty: true });
   populateTimeSelect("contractor-end-time", "", { allowEmpty: true });
   initFaultRegistration();
+  initWorkerI18n(() => {
+    updateWorkReportingText();
+    renderManagerEmployees();
+    refreshFaultRegistrationLanguage();
+    updateStaticText();
+  });
 
   const tabReg = $id("tab-register");
   const tabRep = $id("tab-reports");
@@ -84,20 +88,11 @@ async function init() {
   showManagerTool("cars");
   show("register");
 
-  $id("btn-add").addEventListener("click", async () => {
-    try {
-      setStatus("Saving...");
-      await addEntry();
-    } catch (e) {
-      setStatus(e.message);
-    }
-  });
-
   $id("rep-month").addEventListener("change", () => loadEntries().catch(() => {}));
   $id("btn-show-car-list").addEventListener("click", showCarList);
   $id("btn-save-contractor").addEventListener("click", async () => {
     try {
-      $id("contractor-status").textContent = "Saving...";
+      $id("contractor-status").textContent = t("saving");
       await saveContractorEntry();
     } catch (e) {
       $id("contractor-status").textContent = e.message;
@@ -105,9 +100,9 @@ async function init() {
   });
   $id("btn-save-fault").addEventListener("click", async () => {
     try {
-      $id("fault-status").textContent = "Saving...";
+      $id("fault-status").textContent = t("saving");
       const result = await saveFaultRegistration();
-      $id("fault-status").textContent = result?.fault_ref ? `Fault ${result.fault_ref} registered.` : "Fault registered.";
+      $id("fault-status").textContent = result?.fault_ref ? `${t("faultRegistered")} ${result.fault_ref}` : t("faultRegistered");
     } catch (e) {
       $id("fault-status").textContent = e.message;
     }
@@ -126,8 +121,9 @@ async function init() {
     await loadFaultFormLookups();
   }
   await loadProjects();
+  await initWorkReporting();
   await loadEntries();
-  setStatus("Ready.");
+  setStatus(t("ready"));
 }
 
 init().catch((e) => {

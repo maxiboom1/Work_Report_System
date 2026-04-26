@@ -1,5 +1,6 @@
 import { api } from "../shared/api.js";
 import { $id } from "../shared/dom.js";
+import { t, updateStaticText } from "./i18n.js";
 
 let clientTree = [];
 let equipmentTree = [];
@@ -39,16 +40,16 @@ function toggleHidden(id, hidden) {
 
 function renderClientOptions() {
   const select = $id("fault-client");
-  resetSelect(select, "Select customer");
+  resetSelect(select, t("selectCustomer"));
   for (const client of clientTree) {
     select.appendChild(option(client.name, String(client.id)));
   }
-  select.appendChild(option("Other", "other"));
+  select.appendChild(option(t("other"), "other"));
 }
 
 function renderSiteOptions() {
   const select = $id("fault-site");
-  resetSelect(select, "Select site");
+  resetSelect(select, t("selectSite"));
 
   const clientSelection = $id("fault-client")?.value || "";
   const client = findClient();
@@ -58,7 +59,7 @@ function renderSiteOptions() {
     }
   }
 
-  select.appendChild(option("Other", "other"));
+  select.appendChild(option(t("other"), "other"));
 
   if (clientSelection === "other") {
     select.value = "other";
@@ -106,14 +107,14 @@ function renderExistingContacts() {
 
     const name = document.createElement("div");
     name.className = "fault-contact-name";
-    name.textContent = contact.name || "Unnamed contact";
+    name.textContent = contact.name || t("unnamedContact");
 
     const meta = document.createElement("div");
     meta.className = "fault-contact-meta";
     const parts = [];
     if (contact.email) parts.push(contact.email);
     if (contact.phone) parts.push(contact.phone);
-    meta.textContent = parts.join(" | ") || "No email or phone";
+    meta.textContent = parts.join(" | ") || t("noEmailPhone");
 
     copy.append(name, meta);
     label.append(checkbox, copy);
@@ -130,23 +131,23 @@ function renderClientMode() {
 
 function renderManufacturerOptions() {
   const select = $id("fault-manufacturer");
-  resetSelect(select, "Select manufacturer");
+  resetSelect(select, t("selectManufacturer"));
   for (const manufacturer of equipmentTree) {
     select.appendChild(option(manufacturer.name, String(manufacturer.id)));
   }
-  select.appendChild(option("Other", "other"));
+  select.appendChild(option(t("other"), "other"));
 }
 
 function renderCategoryOptions() {
   const select = $id("fault-category");
-  resetSelect(select, "Select category");
+  resetSelect(select, t("selectCategory"));
   const manufacturer = findManufacturer();
   if (manufacturer) {
     for (const category of manufacturer.categories || []) {
       select.appendChild(option(category.name, String(category.id)));
     }
   }
-  select.appendChild(option("Other", "other"));
+  select.appendChild(option(t("other"), "other"));
 
   if (!manufacturer) {
     select.value = "";
@@ -160,14 +161,14 @@ function renderCategoryOptions() {
 
 function renderSubcategoryOptions() {
   const select = $id("fault-subcategory");
-  resetSelect(select, "Select subcategory");
+  resetSelect(select, t("selectSubcategory"));
   const category = findCategory();
   if (category) {
     for (const subcategory of category.subcategories || []) {
       select.appendChild(option(subcategory.name, String(subcategory.id)));
     }
   }
-  select.appendChild(option("Other", "other"));
+  select.appendChild(option(t("other"), "other"));
 
   if (!category) {
     select.value = "";
@@ -192,8 +193,8 @@ function renderManufacturerMode() {
   toggleHidden("fault-subcategory-other-wrap", !isOther && $id("fault-subcategory")?.value !== "other");
 
   if (isOther) {
-    resetSelect(categorySelect, "Other category");
-    resetSelect(subcategorySelect, "Other subcategory");
+    resetSelect(categorySelect, t("otherCategory"));
+    resetSelect(subcategorySelect, t("otherSubcategory"));
   } else {
     renderCategoryOptions();
   }
@@ -209,7 +210,7 @@ function renderCategoryMode() {
 
   if (isOther) {
     toggleHidden("fault-subcategory-other-wrap", false);
-    resetSelect(subcategorySelect, "Other subcategory");
+    resetSelect(subcategorySelect, t("otherSubcategory"));
   } else {
     renderSubcategoryOptions();
   }
@@ -227,19 +228,20 @@ function makeCustomContactRow(rowId) {
 
   row.innerHTML = `
     <div class="field">
-      <div class="field-label">Name</div>
+      <div class="field-label" data-i18n="name">Name</div>
       <input class="select select-md" data-contact-field="name" type="text" />
     </div>
     <div class="field">
-      <div class="field-label">Email</div>
+      <div class="field-label" data-i18n="email">Email</div>
       <input class="select select-md" data-contact-field="email" type="email" />
     </div>
     <div class="field">
-      <div class="field-label">Phone</div>
+      <div class="field-label" data-i18n="phone">Phone</div>
       <input class="select select-md" data-contact-field="phone" type="text" />
     </div>
-    <button class="btn fault-remove-btn" data-remove-contact type="button">Remove</button>
+    <button class="btn fault-remove-btn" data-remove-contact type="button" data-i18n="remove">Remove</button>
   `;
+  updateStaticText(row);
 
   row.querySelector("[data-remove-contact]")?.addEventListener("click", () => row.remove());
   return row;
@@ -268,7 +270,7 @@ function collectContacts() {
     const phone = String(row.querySelector("[data-contact-field='phone']")?.value || "").trim();
 
     if (!name && !email && !phone) return;
-    if (!name) throw new Error("Custom contact name is required");
+    if (!name) throw new Error(t("customContactNameRequired"));
 
     contacts.push({
       mode: "other",
@@ -279,7 +281,7 @@ function collectContacts() {
   });
 
   if (!contacts.length) {
-    throw new Error("Select or add at least one contact");
+    throw new Error(t("selectOrAddContact"));
   }
 
   return contacts;
@@ -292,11 +294,11 @@ function buildPayload() {
   const categoryValue = $id("fault-category")?.value || "";
   const subcategoryValue = $id("fault-subcategory")?.value || "";
 
-  if (!clientValue) throw new Error("Customer is required");
-  if (!siteValue) throw new Error("Site is required");
-  if (!manufacturerValue) throw new Error("Manufacturer is required");
-  if (!categoryValue && manufacturerValue !== "other") throw new Error("Equipment category is required");
-  if (!subcategoryValue && manufacturerValue !== "other" && categoryValue !== "other") throw new Error("Equipment subcategory is required");
+  if (!clientValue) throw new Error(t("customerRequired"));
+  if (!siteValue) throw new Error(t("siteRequired"));
+  if (!manufacturerValue) throw new Error(t("manufacturerRequired"));
+  if (!categoryValue && manufacturerValue !== "other") throw new Error(t("categoryRequired"));
+  if (!subcategoryValue && manufacturerValue !== "other" && categoryValue !== "other") throw new Error(t("subcategoryRequired"));
 
   const payload = {
     client_mode: clientValue === "other" ? "other" : "existing",
@@ -323,11 +325,11 @@ function buildPayload() {
     contacts: collectContacts(),
   };
 
-  if (payload.client_mode === "other" && !payload.client_name) throw new Error("Other customer is required");
-  if (payload.site_mode === "other" && !payload.site_name) throw new Error("Other site is required");
-  if (payload.manufacturer_mode === "other" && !payload.manufacturer_name) throw new Error("Other manufacturer is required");
-  if (payload.equipment_category_mode === "other" && !payload.equipment_category_name) throw new Error("Other category is required");
-  if (payload.equipment_subcategory_mode === "other" && !payload.equipment_subcategory_name) throw new Error("Other subcategory is required");
+  if (payload.client_mode === "other" && !payload.client_name) throw new Error(t("otherCustomerRequired"));
+  if (payload.site_mode === "other" && !payload.site_name) throw new Error(t("otherSiteRequired"));
+  if (payload.manufacturer_mode === "other" && !payload.manufacturer_name) throw new Error(t("otherManufacturerRequired"));
+  if (payload.equipment_category_mode === "other" && !payload.equipment_category_name) throw new Error(t("otherCategoryRequired"));
+  if (payload.equipment_subcategory_mode === "other" && !payload.equipment_subcategory_name) throw new Error(t("otherSubcategoryRequired"));
 
   return payload;
 }
@@ -360,6 +362,14 @@ export async function loadFaultFormLookups() {
   clientTree = clientResponse.clients || [];
   equipmentTree = equipmentResponse.manufacturers || [];
   resetForm();
+}
+
+export function refreshFaultRegistrationLanguage() {
+  renderClientOptions();
+  renderManufacturerOptions();
+  renderClientMode();
+  renderManufacturerMode();
+  document.querySelectorAll(".fault-custom-contact").forEach((row) => updateStaticText(row));
 }
 
 export async function saveFaultRegistration() {

@@ -9,12 +9,14 @@ import adminReportsRoutes from "./admin-reports.js";
 import adminSettingsRoutes from "./admin-settings.js";
 import managerToolsRoutes from "./manager-tools.js";
 import myWorkEntriesRoutes from "./my-work-entries.js";
+import myWorkSessionRoutes from "./my-work-session.js";
 import publicLookupsRoutes from "./public-lookups.js";
 
 const router = express.Router();
 
 router.use("/auth", authRoutes);
 router.use(publicLookupsRoutes);
+router.use(myWorkSessionRoutes);
 router.use(myWorkEntriesRoutes);
 router.use(managerToolsRoutes);
 router.use(adminSettingsRoutes);

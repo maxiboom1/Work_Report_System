@@ -9,12 +9,16 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <div id="brand-title" class="brand-title" title="About Employee Work Report System">Work Reports</div>
+      <div id="brand-title" class="brand-title" title="About Employee Work Report System" data-i18n="appTitle" data-i18n-title="appTitle">Work Reports</div>
       <div id="crumb" class="crumb">Loading...</div>
     </div>
 
     <div class="actions">
-      <button id="btn-logout" class="btn">Logout</button>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button class="lang-btn active" data-worker-lang="en" type="button" aria-pressed="true">Eng</button>
+        <button class="lang-btn" data-worker-lang="he" type="button" aria-pressed="false">Heb</button>
+      </div>
+      <button id="btn-logout" class="btn" data-i18n="logout">Logout</button>
     </div>
   </header>
 
@@ -22,53 +26,30 @@
     <section class="content" role="region" aria-label="Employee work reporting">
 
       <div class="tabbar" role="tablist" aria-label="Employee tabs">
-        <button id="tab-register" class="tabbtn active" type="button" role="tab" aria-selected="true">Register day</button>
-        <button id="tab-reports" class="tabbtn" type="button" role="tab" aria-selected="false">View reports</button>
-        <button id="tab-manager" class="tabbtn" type="button" role="tab" aria-selected="false" hidden>Manager tools</button>
+        <button id="tab-register" class="tabbtn active" type="button" role="tab" aria-selected="true" data-i18n="workClock">Work clock</button>
+        <button id="tab-reports" class="tabbtn" type="button" role="tab" aria-selected="false" data-i18n="viewReports">View reports</button>
+        <button id="tab-manager" class="tabbtn" type="button" role="tab" aria-selected="false" hidden data-i18n="managerTools">Manager tools</button>
       </div>
 
       <section id="panel-register" class="panel" role="tabpanel">
-        <div class="card">
-          <div class="card-title">New work entry</div>
-
-          <div class="form-grid">
-            <div class="field">
-              <div class="field-label">Work date</div>
-              <input id="work-date" class="select select-md" type="date" />
-            </div>
-            <div class="field">
-              <div class="field-label">Project</div>
-              <select id="project" class="select select-md"></select>
-            </div>
-            <div class="field">
-              <div class="field-label">Start</div>
-              <select id="start-time" class="select select-md"></select>
-            </div>
-            <div class="field">
-              <div class="field-label">End</div>
-              <select id="end-time" class="select select-md"></select>
-            </div>
-          </div>
-
-          <div class="field mt-10">
-            <div class="field-label">Notes</div>
-            <input id="notes" class="select select-md" type="text" placeholder="Optional notes..." />
-          </div>
-
-          <div class="row-actions">
-            <button id="btn-add" class="btn btn-open" type="button">Add entry</button>
-            <div id="status" class="crumb">Ready.</div>
-          </div>
+        <div class="work-clock">
+          <button id="work-punch-button" class="punch-button is-idle" type="button" aria-live="polite">
+            <span id="punch-label" class="punch-label" data-i18n="start">Start</span>
+            <span id="punch-project" class="punch-project"></span>
+            <span id="punch-time" class="punch-time"></span>
+            <span id="punch-counter" class="punch-counter"></span>
+          </button>
+          <div id="status" class="clock-status" data-i18n="ready">Ready.</div>
         </div>
       </section>
 
       <section id="panel-reports" class="panel" role="tabpanel" hidden>
         <div class="card">
-          <div class="card-title">My entries</div>
+          <div class="card-title" data-i18n="myEntries">My entries</div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Month</div>
+              <div class="field-label" data-i18n="month">Month</div>
               <input id="rep-month" class="select select-md" type="month" />
             </div>
           </div>
@@ -76,172 +57,172 @@
           <div id="rep-entries" class="entries mt-12"></div>
 
           <div id="empty" class="empty" hidden>
-            <div class="empty-title">No entries</div>
-            <div class="empty-sub">No work entries for selected month.</div>
+            <div class="empty-title" data-i18n="noEntries">No entries</div>
+            <div class="empty-sub" data-i18n="noEntriesForMonth">No work entries for selected month.</div>
           </div>
         </div>
       </section>
 
       <section id="panel-manager" class="panel" role="tabpanel" hidden>
         <div class="manager-subtabs" role="tablist" aria-label="Manager tools">
-          <button id="manager-subtab-cars" class="manager-subtab active" type="button" role="tab" aria-selected="true">Car list</button>
-          <button id="manager-subtab-contractors" class="manager-subtab" type="button" role="tab" aria-selected="false">Contractors</button>
-          <button id="manager-subtab-faults" class="manager-subtab" type="button" role="tab" aria-selected="false">Fault registration</button>
+          <button id="manager-subtab-cars" class="manager-subtab active" type="button" role="tab" aria-selected="true" data-i18n="carList">Car list</button>
+          <button id="manager-subtab-contractors" class="manager-subtab" type="button" role="tab" aria-selected="false" data-i18n="contractors">Contractors</button>
+          <button id="manager-subtab-faults" class="manager-subtab" type="button" role="tab" aria-selected="false" data-i18n="faultRegistration">Fault registration</button>
         </div>
 
         <div id="manager-panel-cars" class="card manager-card manager-tool-panel" role="tabpanel">
-          <div class="card-title">Car list</div>
-          <div class="manager-hint">Select workers and prepare a name, passport, and car list to share with the client.</div>
+          <div class="card-title" data-i18n="carList">Car list</div>
+          <div class="manager-hint" data-i18n="carListHint">Select workers and prepare a name, passport, and car list to share with the client.</div>
 
           <div id="manager-workers" class="manager-workers mt-12"></div>
 
           <div class="row-actions">
-            <button id="btn-show-car-list" class="btn btn-open" type="button">Show car list</button>
-            <div id="manager-status" class="crumb">Select one or more workers.</div>
+            <button id="btn-show-car-list" class="btn btn-open" type="button" data-i18n="showCarList">Show car list</button>
+            <div id="manager-status" class="crumb" data-i18n="selectWorkers">Select one or more workers.</div>
           </div>
         </div>
 
         <div id="manager-panel-contractors" class="card manager-card manager-tool-panel contractor-card" role="tabpanel" hidden>
-          <div class="card-title">Register contractor</div>
-          <div class="manager-hint">Log work done by an external contractor for a project.</div>
+          <div class="card-title" data-i18n="registerContractor">Register contractor</div>
+          <div class="manager-hint" data-i18n="contractorHint">Log work done by an external contractor for a project.</div>
 
           <div class="form-grid mt-12">
             <div class="field">
-              <div class="field-label">Project</div>
+              <div class="field-label" data-i18n="project">Project</div>
               <select id="contractor-project" class="select select-md"></select>
             </div>
             <div class="field">
-              <div class="field-label">Contractor name</div>
+              <div class="field-label" data-i18n="contractorName">Contractor name</div>
               <input id="contractor-name" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="field mt-10">
-            <div class="field-label">Service description</div>
+            <div class="field-label" data-i18n="serviceDescription">Service description</div>
             <textarea id="contractor-description" class="select select-md textarea" rows="3"></textarea>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Start time (optional)</div>
+              <div class="field-label" data-i18n="startTimeOptional">Start time (optional)</div>
               <select id="contractor-start-time" class="select select-md"></select>
             </div>
             <div class="field">
-              <div class="field-label">End time (optional)</div>
+              <div class="field-label" data-i18n="endTimeOptional">End time (optional)</div>
               <select id="contractor-end-time" class="select select-md"></select>
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Service cost (optional)</div>
+              <div class="field-label" data-i18n="serviceCostOptional">Service cost (optional)</div>
               <input id="contractor-cost" class="select select-md" type="number" min="0" step="0.01" />
             </div>
           </div>
 
           <div class="row-actions">
-            <button id="btn-save-contractor" class="btn btn-open" type="button">Save contractor</button>
-            <div id="contractor-status" class="crumb">Ready.</div>
+            <button id="btn-save-contractor" class="btn btn-open" type="button" data-i18n="saveContractor">Save contractor</button>
+            <div id="contractor-status" class="crumb" data-i18n="ready">Ready.</div>
           </div>
         </div>
 
         <div id="manager-panel-faults" class="card manager-card manager-tool-panel contractor-card" role="tabpanel" hidden>
-          <div class="card-title">Fault registration form</div>
-          <div class="manager-hint">Managers only report a new fault here. The admin team handles the follow-up afterward.</div>
+          <div class="card-title" data-i18n="faultFormTitle">Fault registration form</div>
+          <div class="manager-hint" data-i18n="faultFormHint">Managers only report a new fault here. The admin team handles the follow-up afterward.</div>
 
           <div class="form-grid mt-12">
             <div class="field">
-              <div class="field-label">Customer</div>
+              <div class="field-label" data-i18n="customer">Customer</div>
               <select id="fault-client" class="select select-md"></select>
             </div>
             <div id="fault-client-other-wrap" class="field" hidden>
-              <div class="field-label">Other customer</div>
+              <div class="field-label" data-i18n="otherCustomer">Other customer</div>
               <input id="fault-client-other" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Site</div>
+              <div class="field-label" data-i18n="site">Site</div>
               <select id="fault-site" class="select select-md"></select>
             </div>
             <div id="fault-site-other-wrap" class="field" hidden>
-              <div class="field-label">Other site</div>
+              <div class="field-label" data-i18n="otherSite">Other site</div>
               <input id="fault-site-other" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="field mt-10">
-            <div class="field-label">Client contacts</div>
+            <div class="field-label" data-i18n="clientContacts">Client contacts</div>
             <div id="fault-contacts-existing" class="fault-contact-list"></div>
-            <div id="fault-contacts-empty" class="manager-hint fault-inline-hint" hidden>No active contacts for this customer yet.</div>
+            <div id="fault-contacts-empty" class="manager-hint fault-inline-hint" hidden data-i18n="noActiveContacts">No active contacts for this customer yet.</div>
             <div id="fault-custom-contacts" class="fault-custom-contacts"></div>
-            <button id="btn-add-custom-contact" class="btn fault-inline-btn" type="button">Add custom contact</button>
+            <button id="btn-add-custom-contact" class="btn fault-inline-btn" type="button" data-i18n="addCustomContact">Add custom contact</button>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Manufacturer</div>
+              <div class="field-label" data-i18n="manufacturer">Manufacturer</div>
               <select id="fault-manufacturer" class="select select-md"></select>
             </div>
             <div id="fault-manufacturer-other-wrap" class="field" hidden>
-              <div class="field-label">Other manufacturer</div>
+              <div class="field-label" data-i18n="otherManufacturer">Other manufacturer</div>
               <input id="fault-manufacturer-other" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Equipment category</div>
+              <div class="field-label" data-i18n="equipmentCategory">Equipment category</div>
               <select id="fault-category" class="select select-md"></select>
             </div>
             <div id="fault-category-other-wrap" class="field" hidden>
-              <div class="field-label">Other category</div>
+              <div class="field-label" data-i18n="otherCategory">Other category</div>
               <input id="fault-category-other" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Subcategory / component</div>
+              <div class="field-label" data-i18n="subcategory">Subcategory / component</div>
               <select id="fault-subcategory" class="select select-md"></select>
             </div>
             <div id="fault-subcategory-other-wrap" class="field" hidden>
-              <div class="field-label">Other subcategory</div>
+              <div class="field-label" data-i18n="otherSubcategory">Other subcategory</div>
               <input id="fault-subcategory-other" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Support level</div>
+              <div class="field-label" data-i18n="supportLevel">Support level</div>
               <select id="fault-support-level" class="select select-md">
-                <option value="layer2_support">Under Layer-2 Support</option>
-                <option value="under_support">Under Support</option>
-                <option value="no_support">Not Under Support</option>
+                <option value="layer2_support" data-i18n="layer2Support">Under Layer-2 Support</option>
+                <option value="under_support" data-i18n="underSupport">Under Support</option>
+                <option value="no_support" data-i18n="noSupport">Not Under Support</option>
               </select>
             </div>
             <div class="field">
-              <div class="field-label">Serial / unit ID</div>
+              <div class="field-label" data-i18n="serialUnit">Serial / unit ID</div>
               <input id="fault-serial-number" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="form-grid mt-10">
             <div class="field">
-              <div class="field-label">Manufacturer ticket ID</div>
+              <div class="field-label" data-i18n="manufacturerTicket">Manufacturer ticket ID</div>
               <input id="fault-ticket-id" class="select select-md" type="text" />
             </div>
           </div>
 
           <div class="field mt-10">
-            <div class="field-label">Fault description</div>
+            <div class="field-label" data-i18n="faultDescription">Fault description</div>
             <textarea id="fault-description" class="select select-md textarea" rows="4"></textarea>
           </div>
 
           <div class="row-actions">
-            <button id="btn-save-fault" class="btn btn-open" type="button">Save fault</button>
-            <div id="fault-status" class="crumb">Ready.</div>
+            <button id="btn-save-fault" class="btn btn-open" type="button" data-i18n="saveFault">Save fault</button>
+            <div id="fault-status" class="crumb" data-i18n="ready">Ready.</div>
           </div>
         </div>
       </section>
@@ -249,17 +230,146 @@
     </section>
   </main>
 
+  <section id="work-session-modal" class="work-modal" role="dialog" aria-modal="true" aria-labelledby="work-session-title" hidden>
+    <div class="work-modal-backdrop" data-close-work-session></div>
+    <div class="work-modal-card">
+      <div class="work-modal-head">
+        <div>
+          <div id="work-session-title" class="work-modal-title" data-i18n="startWork">Start work</div>
+          <div id="work-session-subtitle" class="work-modal-subtitle" data-i18n="startSubtitle">Choose today&apos;s project and time.</div>
+        </div>
+        <button id="btn-work-session-close" class="btn btn-icon" type="button" aria-label="Close" data-i18n-aria-label="close">x</button>
+      </div>
+
+      <div class="work-modal-body">
+        <div id="work-session-project-row" class="field">
+          <div class="field-label" data-i18n="project">Project</div>
+          <select id="work-session-project" class="select select-md"></select>
+        </div>
+
+        <div class="form-grid mt-10">
+          <div class="field">
+            <div class="field-label" data-i18n="date">Date</div>
+            <input id="work-session-date" class="select select-md" type="date" disabled />
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="time">Time</div>
+            <select id="work-session-time" class="select select-md"></select>
+          </div>
+        </div>
+
+        <div id="work-session-notes-row" class="field mt-10" hidden>
+          <div class="field-label" data-i18n="notes">Notes</div>
+          <textarea id="work-session-notes" class="select select-md textarea" rows="3" placeholder="Optional notes..." data-i18n-placeholder="optionalNotes"></textarea>
+        </div>
+      </div>
+
+      <div class="work-modal-actions">
+        <button id="btn-work-session-save" class="btn btn-open" type="button" data-i18n="start">Start</button>
+        <div id="work-session-status" class="crumb"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="work-entry-edit-modal" class="work-modal" role="dialog" aria-modal="true" aria-labelledby="work-entry-edit-title" hidden>
+    <div class="work-modal-backdrop" data-close-work-entry></div>
+    <div class="work-modal-card">
+      <div class="work-modal-head">
+        <div>
+          <div id="work-entry-edit-title" class="work-modal-title" data-i18n="editEntry">Edit entry</div>
+          <div class="work-modal-subtitle" data-i18n="editEntrySubtitle">Correct the saved project, date, time, or notes.</div>
+        </div>
+        <button id="btn-work-entry-close" class="btn btn-icon" type="button" aria-label="Close" data-i18n-aria-label="close">x</button>
+      </div>
+
+      <div class="work-modal-body">
+        <div class="field">
+          <div class="field-label" data-i18n="project">Project</div>
+          <select id="edit-project" class="select select-md"></select>
+        </div>
+
+        <div class="form-grid mt-10">
+          <div class="field">
+            <div class="field-label" data-i18n="date">Date</div>
+            <input id="edit-work-date" class="select select-md" type="date" />
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="startTime">Start</div>
+            <select id="edit-start-time" class="select select-md"></select>
+          </div>
+          <div class="field">
+            <div class="field-label" data-i18n="endTime">End</div>
+            <select id="edit-end-time" class="select select-md"></select>
+          </div>
+        </div>
+
+        <div class="field mt-10">
+          <div class="field-label" data-i18n="notes">Notes</div>
+          <textarea id="edit-notes" class="select select-md textarea" rows="3" placeholder="Optional notes..." data-i18n-placeholder="optionalNotes"></textarea>
+        </div>
+      </div>
+
+      <div class="work-modal-actions">
+        <button id="btn-work-entry-save" class="btn btn-open" type="button" data-i18n="saveChanges">Save changes</button>
+        <div id="work-entry-edit-status" class="crumb"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="stale-session-modal" class="work-modal stale-modal" role="dialog" aria-modal="true" aria-labelledby="stale-session-title" hidden>
+    <div class="work-modal-backdrop"></div>
+    <div class="work-modal-card">
+      <div class="work-modal-head">
+        <div>
+          <div id="stale-session-title" class="work-modal-title" data-i18n="staleTitle">Finish previous work</div>
+          <div class="work-modal-subtitle" data-i18n="staleSubtitle">This work session was started on a previous day. Close it or discard it before starting new work.</div>
+        </div>
+      </div>
+
+      <div class="stale-summary">
+        <div>
+          <span data-i18n="staleProject">Project</span>
+          <strong id="stale-project-name">-</strong>
+        </div>
+        <div>
+          <span data-i18n="staleStarted">Started</span>
+          <strong id="stale-started-at">-</strong>
+        </div>
+      </div>
+
+      <div class="work-modal-body">
+        <div class="form-grid mt-10">
+          <div class="field">
+            <div class="field-label" data-i18n="endTime">End</div>
+            <select id="stale-end-time" class="select select-md"></select>
+          </div>
+        </div>
+
+        <div class="field mt-10">
+          <div class="field-label" data-i18n="notes">Notes</div>
+          <textarea id="stale-notes" class="select select-md textarea" rows="3" placeholder="Optional notes..." data-i18n-placeholder="optionalNotes"></textarea>
+        </div>
+      </div>
+
+      <div class="work-modal-actions recovery-actions">
+        <button id="btn-stale-close" class="btn btn-open" type="button" data-i18n="closeSession">Close session</button>
+        <button id="btn-stale-discard" class="btn" type="button" data-i18n="discardSession">Discard session</button>
+        <div id="stale-session-status" class="crumb"></div>
+      </div>
+    </div>
+  </section>
+
   <section id="car-list-screen" class="car-list-screen" role="dialog" aria-modal="true" aria-labelledby="car-list-title" hidden>
     <div class="car-list-toolbar">
-      <button id="btn-close-car-list" class="btn" type="button">Close</button>
-      <button id="btn-share-car-list" class="btn btn-open" type="button">Share</button>
+      <button id="btn-close-car-list" class="btn" type="button" data-i18n="close">Close</button>
+      <button id="btn-share-car-list" class="btn btn-open" type="button" data-i18n="share">Share</button>
     </div>
 
     <div id="car-list-output" class="car-list-document"></div>
 
     <div id="car-list-copy-panel" class="car-list-copy-panel" hidden>
-      <div class="copy-panel-title">Manual copy</div>
-      <div class="copy-panel-hint">The browser blocked automatic sharing. Select the text, copy it, and send it in WhatsApp.</div>
+      <div class="copy-panel-title" data-i18n="manualCopy">Manual copy</div>
+      <div class="copy-panel-hint" data-i18n="manualCopyHint">The browser blocked automatic sharing. Select the text, copy it, and send it in WhatsApp.</div>
       <textarea id="car-list-copy-text" class="car-list-copy-text" readonly></textarea>
     </div>
   </section>
