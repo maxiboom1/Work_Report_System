@@ -50,22 +50,22 @@ GO
 
 -- Employees
 CREATE TABLE dbo.[employees] (
-  [id]           INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_employees PRIMARY KEY,
-  [first_name]   NVARCHAR(60)  NOT NULL,
-  [last_name]    NVARCHAR(60)  NOT NULL,
-  [passport_id]  NVARCHAR(40)  NULL,
-  [car_id]       NVARCHAR(40)  NULL,
-  [card_id]      NVARCHAR(40)  NULL,
-  [phone]        NVARCHAR(40)  NULL,
-  [email]        NVARCHAR(120) NULL,
-  [daily_rate]   DECIMAL(10,2) NOT NULL,
-  [login]        NVARCHAR(80)  NOT NULL,
+  [id]            INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_employees PRIMARY KEY,
+  [first_name]    NVARCHAR(100) NOT NULL,
+  [last_name]     NVARCHAR(100) NOT NULL,
+  [passport_id]   NVARCHAR(50)  NULL,
+  [card_id]       NVARCHAR(50)  NULL,
+  [car_id]        NVARCHAR(50)  NULL,
+  [daily_rate]    DECIMAL(12,2) NOT NULL CONSTRAINT DF_employees_daily_rate DEFAULT(0),
+  [login]         NVARCHAR(100) NOT NULL,
   [password_hash] NVARCHAR(255) NOT NULL,
-  [role]         NVARCHAR(20)  NOT NULL CONSTRAINT DF_employees_role DEFAULT('employee'),
-  [is_manager]   BIT           NOT NULL CONSTRAINT DF_employees_is_manager DEFAULT(0),
-  [is_active]    BIT           NOT NULL CONSTRAINT DF_employees_is_active DEFAULT(1),
-  [created_at]   DATETIME2(0)  NOT NULL CONSTRAINT DF_employees_created_at DEFAULT (SYSDATETIME()),
-  [updated_at]   DATETIME2(0)  NULL
+  [role]          NVARCHAR(20)  NOT NULL CONSTRAINT DF_employees_role DEFAULT('employee'),
+  [is_active]     BIT           NOT NULL CONSTRAINT DF_employees_is_active DEFAULT(1),
+  [created_at]    DATETIME2     NOT NULL CONSTRAINT DF_employees_created_at DEFAULT (SYSUTCDATETIME()),
+  [updated_at]    DATETIME2     NOT NULL CONSTRAINT DF_employees_updated_at DEFAULT (SYSUTCDATETIME()),
+  [phone]         NVARCHAR(40)  NULL,
+  [email]         NVARCHAR(120) NULL,
+  [is_manager]    BIT           NOT NULL CONSTRAINT DF_employees_is_manager DEFAULT(0)
 );
 GO
 
@@ -75,9 +75,9 @@ GO
 -- Projects
 CREATE TABLE dbo.[projects] (
   [id]         INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_projects PRIMARY KEY,
-  [name]       NVARCHAR(120) NOT NULL,
+  [name]       NVARCHAR(200) NOT NULL,
   [is_active]  BIT NOT NULL CONSTRAINT DF_projects_is_active DEFAULT(1),
-  [created_at] DATETIME2(0) NOT NULL CONSTRAINT DF_projects_created_at DEFAULT (SYSDATETIME())
+  [created_at] DATETIME2 NOT NULL CONSTRAINT DF_projects_created_at DEFAULT (SYSUTCDATETIME())
 );
 GO
 
@@ -157,27 +157,23 @@ CREATE TABLE dbo.[work_entries] (
   [work_date]   DATE NOT NULL,
   [start_time]  TIME(0) NOT NULL,
   [end_time]    TIME(0) NOT NULL,
-  [notes]       NVARCHAR(400) NULL,
-  [admin_notes] NVARCHAR(400) NULL,
-  [created_at]  DATETIME2(0) NOT NULL CONSTRAINT DF_work_entries_created_at DEFAULT (SYSDATETIME()),
-  [updated_at]  DATETIME2(0) NULL
+  [notes]       NVARCHAR(1000) NOT NULL CONSTRAINT DF_work_entries_notes DEFAULT(''),
+  [admin_notes] NVARCHAR(1000) NOT NULL CONSTRAINT DF_work_entries_admin_notes DEFAULT(''),
+  [created_at]  DATETIME2 NOT NULL CONSTRAINT DF_work_entries_created_at DEFAULT (SYSUTCDATETIME()),
+  [updated_at]  DATETIME2 NOT NULL CONSTRAINT DF_work_entries_updated_at DEFAULT (SYSUTCDATETIME())
 );
 GO
 
 ALTER TABLE dbo.[work_entries]
-  ADD CONSTRAINT FK_work_entries_employee
+  ADD CONSTRAINT FK_work_entries_employees
   FOREIGN KEY([employee_id]) REFERENCES dbo.[employees]([id])
   ON DELETE NO ACTION;
 GO
 
 ALTER TABLE dbo.[work_entries]
-  ADD CONSTRAINT FK_work_entries_project
+  ADD CONSTRAINT FK_work_entries_projects
   FOREIGN KEY([project_id]) REFERENCES dbo.[projects]([id])
   ON DELETE NO ACTION;
-GO
-
-CREATE INDEX IX_work_entries_employee_date ON dbo.[work_entries]([employee_id],[work_date]);
-CREATE INDEX IX_work_entries_project_date ON dbo.[work_entries]([project_id],[work_date]);
 GO
 
 -- Active work sessions
@@ -214,13 +210,13 @@ CREATE TABLE dbo.[contractor_entries] (
   [manager_employee_id] INT NOT NULL,
   [project_id]          INT NOT NULL,
   [service_date]        DATE NOT NULL CONSTRAINT DF_contractor_entries_service_date DEFAULT (CONVERT(date, SYSDATETIME())),
-  [start_time]          TIME(0) NULL,
-  [end_time]            TIME(0) NULL,
   [contractor_name]     NVARCHAR(120) NOT NULL,
   [service_description] NVARCHAR(600) NOT NULL,
   [service_cost]        DECIMAL(10,2) NULL,
   [created_at]          DATETIME2(0) NOT NULL CONSTRAINT DF_contractor_entries_created_at DEFAULT (SYSDATETIME()),
-  [updated_at]          DATETIME2(0) NULL
+  [updated_at]          DATETIME2(0) NULL,
+  [start_time]          TIME(0) NULL,
+  [end_time]            TIME(0) NULL
 );
 GO
 
