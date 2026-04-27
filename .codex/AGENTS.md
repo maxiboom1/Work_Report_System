@@ -4,7 +4,7 @@
 
 Employee Work Report System is a working Node.js/Express application backed by Microsoft SQL Server.
 
-- App version: `1.2.23`.
+- App version: `1.2.24`.
 - Runtime entry point: `app.js`.
 - Backend layers follow `routes -> services -> dal/sql`.
 - SQL access is centralized in `src/1-dal/sql.js` and business logic is in `src/4-services`.
@@ -106,6 +106,7 @@ Repository files are the source of truth.
 - 1.2.21 removes Card ID from worker personal settings and separates the password-change fields with a labeled divider.
 - 1.2.22 shows `שלום, First Last` in the worker navbar for the signed-in employee while keeping `/api/auth/me` limited to display name plus capability flags.
 - 1.2.23 uses explicit checkboxes for manager car-list worker selection; keep the checkbox column fixed and before worker names in both English LTR and Hebrew RTL layouts.
+- 1.2.24 keeps the worker boot overlay visible until initial language, auth, project, active-session, and entries loading has completed; avoid exposing untranslated or wrong-direction first frames.
 - The login/startup screen should stay minimal, friendly, and brand-led: company logo first, short labels, no technical session or environment copy.
 - The new opener visual language from v1.1.16 is planned to expand across the frontend, including color schemes, spacing, and control styling.
 - Use Playwright for browser inspection and screenshots:

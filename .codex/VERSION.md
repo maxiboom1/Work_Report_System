@@ -1,3 +1,13 @@
+Version: 1.2.24
+Package version: 1.2.24
+Date: 2026-04-27
+Done:
+- Worker boot now keeps the loading overlay visible until language, auth state, projects, active session state, and entries are initialized.
+- Worker HTML applies the saved English/Hebrew direction before the stylesheet loads to prevent first-frame LTR/RTL artifacts.
+- No database migration required.
+
+----------------------------------------
+
 Version: 1.2.23
 Package version: 1.2.23
 Date: 2026-04-26

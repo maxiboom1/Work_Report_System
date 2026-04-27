@@ -9,6 +9,16 @@ import { enableManagerTools, loadManagerEmployees, renderManagerEmployees, saveC
 import { closeCarList, shareCarList, showCarList } from "./car-list.js";
 import { initUserSettings, refreshUserSettingsText } from "./profile.js";
 
+function finishAppBoot() {
+  const overlay = $id("app-loading-overlay");
+  document.body.classList.remove("app-booting");
+  if (!overlay) return;
+  overlay.classList.add("is-leaving");
+  window.setTimeout(() => {
+    overlay.hidden = true;
+  }, 200);
+}
+
 async function logout() {
   try { await api("/auth/logout", { method: "POST" }); } catch {}
   location.href = "/login.html";
@@ -147,9 +157,11 @@ async function init() {
   await loadProjects();
   await initWorkReporting();
   await loadEntries();
+  finishAppBoot();
 }
 
 init().catch((e) => {
   console.error(e);
+  finishAppBoot();
   alert(e?.message || "Failed to load employee page");
 });

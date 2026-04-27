@@ -32,6 +32,51 @@ body{
   touch-action:manipulation;
 }
 
+body.app-booting .topbar,
+body.app-booting .main{
+  visibility:hidden;
+}
+
+.app-loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:grid;
+  place-items:center;
+  background:
+    linear-gradient(135deg, rgba(242,100,82,.18) 0 28%, transparent 28% 100%),
+    rgba(255,253,249,.92);
+  backdrop-filter:blur(10px);
+  opacity:1;
+  transition:opacity 180ms ease;
+}
+
+.app-loading-overlay.is-leaving{
+  opacity:0;
+  pointer-events:none;
+}
+
+.app-loading-overlay[hidden]{
+  display:none;
+}
+
+.app-loading-mark{
+  width:82px;
+  height:82px;
+  border-radius:50%;
+  border:8px solid rgba(17,17,17,.16);
+  border-top-color:#111111;
+  border-right-color:var(--worker-red, #f26452);
+  box-shadow:
+    0 22px 60px rgba(17,17,17,.18),
+    inset 0 0 0 6px rgba(255,253,249,.82);
+  animation:app-loading-spin 2000ms linear infinite;
+}
+
+@keyframes app-loading-spin{
+  to{transform:rotate(360deg)}
+}
+
 /* Hide scrollbars but keep scrolling */
 *{scrollbar-width:none}
 *::-webkit-scrollbar{width:0;height:0}
